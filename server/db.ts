@@ -445,9 +445,10 @@ export async function getAllEvents() {
 export async function getPublishedEvents() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(events)
-    .where(eq(events.status, 'published'))
-    .orderBy(desc(events.eventDate));
+  // Note: Database has eventStatus column, but Drizzle schema uses 'status'
+  // Using raw SQL query to work around schema mismatch
+  const result = await db.execute(sql`SELECT * FROM events WHERE eventStatus = 'published' ORDER BY eventDate DESC`);
+  return ((result as any)[0] || []) as any[];
 }
 
 export async function updateEvent(id: number, data: Partial<InsertEvent>) {

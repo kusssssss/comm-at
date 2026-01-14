@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, name, role, userStatus, markState, clearanceState FROM users WHERE id = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, name, role, userStatus, markState, clearanceState FROM users WHERE id = 1;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "kustandy kwek",
+      "role": "user",
+      "userStatus": "active",
+      "markState": "outside",
+      "clearanceState": "none"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\trole\tuserStatus\tmarkState\tclearanceState\n1\tkustandy kwek\tuser\tactive\toutside\tnone\n",
+  "stderr": "",
+  "execution_time_ms": 1537
+}

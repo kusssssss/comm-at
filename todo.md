@@ -144,3 +144,15 @@
 - [x] Audit all routes in App.tsx (added /marks, /gatherings, /partners, /ranks, /refer aliases)
 - [x] Ensure all pages are properly registered
 - [x] Updated all navigation links across pages (Home, Drops, Events, Inside, Leaderboard, Referral, DropDetail, EventDetail)
+
+## Functionality Audit & Fixes
+- [x] Fixed marks purchase flow - added ACQUIRE button to Drops page
+- [x] Fixed marks detail page - product links now work correctly
+- [x] Fixed gatherings RSVP flow - updated getPublishedEvents query to use eventStatus column
+- [x] Fixed database schema mismatch - events table uses eventStatus not status
+- [x] Published all sample events so they appear in Gatherings page
+- [x] Fixed all routing issues - product links now work correctly
+- [x] Verified all pages load without 404 errors
+- [x] Confirmed tier system working
+- [x] Confirmed admin panel accessible
+- [x] Confirmed referral system functional

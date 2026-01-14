@@ -509,16 +509,28 @@ export default function Drops() {
                     </div>
                   )}
 
-                  {/* Verification CTA - only for non-restricted */}
+                  {/* Action CTAs - only for non-restricted */}
                   {!isRestricted && (
                     <div className="space-y-4">
+                      {/* Primary: Acquire button - only show if sale window is open or upcoming */}
+                      {(currentDrop.saleWindowStart || currentDrop.saleWindowEnd) && (
+                        <button 
+                          onClick={() => setLocation(`/acquire/${currentDrop.id}`)}
+                          className="w-full bg-[#9333EA] text-black px-8 py-4 text-sm font-semibold tracking-wider uppercase hover:bg-[#A855F7] transition-all duration-300 flex items-center justify-center gap-2"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          Acquire This Mark
+                        </button>
+                      )}
+                      
+                      {/* Secondary: Verify button */}
                       <p className="text-[#888888] text-sm">
-                        Own this mark? Verify your possession to receive The Mark.
+                        Already own this mark? Verify your possession to receive The Mark.
                       </p>
                       <div className="flex flex-col sm:flex-row gap-4">
                         <button 
                           onClick={() => setLocation('/verify')}
-                          className="w-full sm:w-auto bg-[#9333EA] text-black px-8 py-4 text-sm font-semibold tracking-wider uppercase hover:bg-[#A855F7] transition-all duration-300"
+                          className="w-full sm:w-auto border border-[#9333EA] text-[#9333EA] px-8 py-4 text-sm font-semibold tracking-wider uppercase hover:bg-[#9333EA] hover:text-black transition-all duration-300"
                         >
                           Verify Mark
                         </button>

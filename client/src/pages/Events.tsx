@@ -15,13 +15,14 @@ export default function Events() {
 
   const isMarked = user && ["marked_initiate", "marked_member", "marked_inner_circle"].includes(user.role);
   const isStaff = user && ["staff", "admin"].includes(user.role);
+  const hasAccess = isMarked || isStaff;
 
-  // Redirect if not marked
+  // Redirect if not marked (but allow admin/staff access)
   useEffect(() => {
-    if (!authLoading && isAuthenticated && !isMarked && !isStaff) {
+    if (!authLoading && isAuthenticated && !hasAccess) {
       navigate("/");
     }
-  }, [authLoading, isAuthenticated, isMarked, isStaff, navigate]);
+  }, [authLoading, isAuthenticated, hasAccess, navigate]);
 
   if (authLoading || eventsLoading) {
     return (

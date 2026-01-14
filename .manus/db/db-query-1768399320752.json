@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, title, eventStatus FROM events LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, title, eventStatus FROM events LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "THE MIDNIGHT SESSION",
+      "eventStatus": "published"
+    },
+    {
+      "id": "2",
+      "title": "CHAPTER INITIATION",
+      "eventStatus": "published"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\teventStatus\n1\tTHE MIDNIGHT SESSION\tpublished\n2\tCHAPTER INITIATION\tpublished\n",
+  "stderr": "",
+  "execution_time_ms": 1535
+}

@@ -1,0 +1,32 @@
+{
+  "query": "SELECT * FROM events LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT * FROM events LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "THE MIDNIGHT SESSION",
+      "slug": "NULL",
+      "chapter": "NULL",
+      "description": "An intimate gathering for the marked. Live music, exclusive previews, and conversations that stay inside. Dress code: Black.",
+      "rules": "NULL",
+      "capacity": "50",
+      "markState": "initiate",
+      "eventVisibility": "public",
+      "city": "Jakarta",
+      "locationText": "Location revealed 24 hours before the event. Check back closer to the date.",
+      "locationRevealHoursBefore": "24",
+      "locationRevealAt": "NULL",
+      "eventDate": "2026-01-21 13:10:56",
+      "startDatetime": "NULL",
+      "endDatetime": "NULL",
+      "eventStatus": "published",
+      "publishedAt": "2026-01-14 13:10:56",
+      "createdAt": "2026-01-14 13:10:56",
+      "updatedAt": "2026-01-14 13:10:56"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tslug\tchapter\tdescription\trules\tcapacity\tmarkState\teventVisibility\tcity\tlocationText\tlocationRevealHoursBefore\tlocationRevealAt\teventDate\tstartDatetime\tendDatetime\teventStatus\tpublishedAt\tcreatedAt\tupdatedAt\n1\tTHE MIDNIGHT SESSION\tNULL\tNULL\tAn intimate gathering for the marked. Live music, exclusive previews, and conversations that stay inside. Dress code: Black.\tNULL\t50\tinitiate\tpublic\tJakarta\tLocation revealed 24 hours before the event. Check back closer to the date.\t24\tNULL\t2026-01-21 13:10:56\tNULL\tNULL\tpublished\t2026-01-14 13:10:56\t2026-01-14 13:10:56\t2026-01-14 13:10:56\n",
+  "stderr": "",
+  "execution_time_ms": 1543
+}

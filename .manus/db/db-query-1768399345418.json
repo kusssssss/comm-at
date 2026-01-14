@@ -1,0 +1,142 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'events';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'events';",
+  "rows": [
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "title"
+    },
+    {
+      "COLUMN_NAME": "slug"
+    },
+    {
+      "COLUMN_NAME": "chapter"
+    },
+    {
+      "COLUMN_NAME": "description"
+    },
+    {
+      "COLUMN_NAME": "rules"
+    },
+    {
+      "COLUMN_NAME": "capacity"
+    },
+    {
+      "COLUMN_NAME": "markState"
+    },
+    {
+      "COLUMN_NAME": "eventVisibility"
+    },
+    {
+      "COLUMN_NAME": "city"
+    },
+    {
+      "COLUMN_NAME": "locationText"
+    },
+    {
+      "COLUMN_NAME": "locationRevealHoursBefore"
+    },
+    {
+      "COLUMN_NAME": "locationRevealAt"
+    },
+    {
+      "COLUMN_NAME": "eventDate"
+    },
+    {
+      "COLUMN_NAME": "startDatetime"
+    },
+    {
+      "COLUMN_NAME": "endDatetime"
+    },
+    {
+      "COLUMN_NAME": "eventStatus"
+    },
+    {
+      "COLUMN_NAME": "publishedAt"
+    },
+    {
+      "COLUMN_NAME": "createdAt"
+    },
+    {
+      "COLUMN_NAME": "updatedAt"
+    },
+    {
+      "COLUMN_NAME": "EVENT_CATALOG"
+    },
+    {
+      "COLUMN_NAME": "EVENT_SCHEMA"
+    },
+    {
+      "COLUMN_NAME": "EVENT_NAME"
+    },
+    {
+      "COLUMN_NAME": "DEFINER"
+    },
+    {
+      "COLUMN_NAME": "TIME_ZONE"
+    },
+    {
+      "COLUMN_NAME": "EVENT_BODY"
+    },
+    {
+      "COLUMN_NAME": "EVENT_DEFINITION"
+    },
+    {
+      "COLUMN_NAME": "EVENT_TYPE"
+    },
+    {
+      "COLUMN_NAME": "EXECUTE_AT"
+    },
+    {
+      "COLUMN_NAME": "INTERVAL_VALUE"
+    },
+    {
+      "COLUMN_NAME": "INTERVAL_FIELD"
+    },
+    {
+      "COLUMN_NAME": "SQL_MODE"
+    },
+    {
+      "COLUMN_NAME": "STARTS"
+    },
+    {
+      "COLUMN_NAME": "ENDS"
+    },
+    {
+      "COLUMN_NAME": "STATUS"
+    },
+    {
+      "COLUMN_NAME": "ON_COMPLETION"
+    },
+    {
+      "COLUMN_NAME": "CREATED"
+    },
+    {
+      "COLUMN_NAME": "LAST_ALTERED"
+    },
+    {
+      "COLUMN_NAME": "LAST_EXECUTED"
+    },
+    {
+      "COLUMN_NAME": "EVENT_COMMENT"
+    },
+    {
+      "COLUMN_NAME": "ORIGINATOR"
+    },
+    {
+      "COLUMN_NAME": "CHARACTER_SET_CLIENT"
+    },
+    {
+      "COLUMN_NAME": "COLLATION_CONNECTION"
+    },
+    {
+      "COLUMN_NAME": "DATABASE_COLLATION"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nid\ntitle\nslug\nchapter\ndescription\nrules\ncapacity\nmarkState\neventVisibility\ncity\nlocationText\nlocationRevealHoursBefore\nlocationRevealAt\neventDate\nstartDatetime\nendDatetime\neventStatus\npublishedAt\ncreatedAt\nupdatedAt\nEVENT_CATALOG\nEVENT_SCHEMA\nEVENT_NAME\nDEFINER\nTIME_ZONE\nEVENT_BODY\nEVENT_DEFINITION\nEVENT_TYPE\nEXECUTE_AT\nINTERVAL_VALUE\nINTERVAL_FIELD\nSQL_MODE\nSTARTS\nENDS\nSTATUS\nON_COMPLETION\nCREATED\nLAST_ALTERED\nLAST_EXECUTED\nEVENT_COMMENT\nORIGINATOR\nCHARACTER_SET_CLIENT\nCOLLATION_CONNECTION\nDATABASE_COLLATION\n",
+  "stderr": "",
+  "execution_time_ms": 1548
+}
