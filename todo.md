@@ -103,3 +103,10 @@
 
 ## Bugs
 - [x] Fix OAuth callback failed error when logging in with Google (added missing columns to users table)
+
+## SEO Fixes
+- [x] Add keywords meta tag to homepage
+- [x] Add H1 heading to homepage (with sr-only text for accessibility)
+- [x] Add H2 headings to homepage sections (Drops, Events, Inside, Tiers, Code, Partners)
+- [x] Fix page title (55 characters: "COMM@ | Exclusive Streetwear Collective - Jakarta, Indonesia")
+- [x] Add meta description (134 characters)

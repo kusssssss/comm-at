@@ -415,7 +415,7 @@ export default function Home() {
               <DecryptText text="CHAPTER ONE" delay={500} speed={40} />
             </motion.p>
             
-            {/* Main title */}
+            {/* Main title - SEO H1 */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={showContent ? { opacity: 1, scale: 1 } : {}}
@@ -426,6 +426,7 @@ export default function Home() {
                 <ChromaticText intensity={3}>
                   <DecryptText text="JXL" delay={700} speed={50} />
                 </ChromaticText>
+                <span className="sr-only">COMM@ - Exclusive Streetwear Collective Jakarta</span>
               </h1>
             </motion.div>
             
@@ -436,9 +437,9 @@ export default function Home() {
               transition={{ delay: 0.8, duration: 0.6 }}
               className="mb-8"
             >
-              <h2 className="text-[8vw] md:text-[6vw] lg:text-[5rem] font-black text-[#9333EA] tracking-tight">
+              <span className="text-[8vw] md:text-[6vw] lg:text-[5rem] font-black text-[#9333EA] tracking-tight block">
                 <DecryptText text="TAKEOVER" delay={900} speed={40} />
-              </h2>
+              </span>
             </motion.div>
             
             {/* Location */}
