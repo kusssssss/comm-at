@@ -1,0 +1,18 @@
+{
+  "query": "SHOW COLUMNS FROM drops WHERE Field = 'dropStatus';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SHOW COLUMNS FROM drops WHERE Field = 'dropStatus';",
+  "rows": [
+    {
+      "Field": "dropStatus",
+      "Type": "enum('draft','published','archived')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "draft",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\ndropStatus\tenum('draft','published','archived')\tNO\t\tdraft\t\n",
+  "stderr": "",
+  "execution_time_ms": 1550
+}

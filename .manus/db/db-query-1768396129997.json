@@ -1,0 +1,120 @@
+{
+  "query": "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'drops' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT COLUMN_NAME, DATA_TYPE, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'drops' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "DATA_TYPE": "int",
+      "COLUMN_TYPE": "int(11)"
+    },
+    {
+      "COLUMN_NAME": "artistName",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(255)"
+    },
+    {
+      "COLUMN_NAME": "title",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(255)"
+    },
+    {
+      "COLUMN_NAME": "slug",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(255)"
+    },
+    {
+      "COLUMN_NAME": "description",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "editionSize",
+      "DATA_TYPE": "int",
+      "COLUMN_TYPE": "int(11)"
+    },
+    {
+      "COLUMN_NAME": "dropStatus",
+      "DATA_TYPE": "enum",
+      "COLUMN_TYPE": "enum('draft','published','archived')"
+    },
+    {
+      "COLUMN_NAME": "chapter",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(64)"
+    },
+    {
+      "COLUMN_NAME": "storyBlurb",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "priceIdr",
+      "DATA_TYPE": "int",
+      "COLUMN_TYPE": "int(11)"
+    },
+    {
+      "COLUMN_NAME": "heroImageUrl",
+      "DATA_TYPE": "varchar",
+      "COLUMN_TYPE": "varchar(512)"
+    },
+    {
+      "COLUMN_NAME": "productImages",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "availableSizes",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "keyTerms",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "tags",
+      "DATA_TYPE": "text",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "clearanceRequired",
+      "DATA_TYPE": "enum",
+      "COLUMN_TYPE": "enum('none','initiate','member','inner_circle')"
+    },
+    {
+      "COLUMN_NAME": "saleWindowStart",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "saleWindowEnd",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "visibilityLevel",
+      "DATA_TYPE": "enum",
+      "COLUMN_TYPE": "enum('public','members','inner_circle')"
+    },
+    {
+      "COLUMN_NAME": "publishedAt",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "createdAt",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "updatedAt",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_TYPE": "timestamp"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\tCOLUMN_TYPE\nid\tint\tint(11)\nartistName\tvarchar\tvarchar(255)\ntitle\tvarchar\tvarchar(255)\nslug\tvarchar\tvarchar(255)\ndescription\ttext\ttext\neditionSize\tint\tint(11)\ndropStatus\tenum\tenum('draft','published','archived')\nchapter\tvarchar\tvarchar(64)\nstoryBlurb\ttext\ttext\npriceIdr\tint\tint(11)\nheroImageUrl\tvarchar\tvarchar(512)\nproductImages\ttext\ttext\navailableSizes\ttext\ttext\nkeyTerms\ttext\ttext\ntags\ttext\ttext\nclearanceRequired\tenum\tenum('none','initiate','member','inner_circle')\nsaleWindowStart\ttimestamp\ttimestamp\nsaleWindowEnd\ttimestamp\ttimestamp\nvisibilityLevel\tenum\tenum('public','members','inner_circle')\npublishedAt\ttimestamp\ttimestamp\ncreatedAt\ttimestamp\ttimestamp\nupdatedAt\ttimestamp\ttimestamp\n",
+  "stderr": "",
+  "execution_time_ms": 1575
+}

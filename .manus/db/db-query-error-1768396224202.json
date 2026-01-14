@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO `events` (\n  `title`,\n  `slug`,\n  `chapter`,\n  `description`,\n  `capacity`,\n  `city`,\n  `locationText`,\n  `eventDate`,\n  `status`,\n  `publishedAt`\n) VALUES (\n  'THE MIDNIGHT SESSION',\n  'midnight-session-01',\n  'South Jakarta',\n  'An intimate gathering for the marked. Live music, exclusive previews, and conversations that stay inside. Dress code: Black.',\n  50,\n  'Jakarta',\n  'Location revealed 24 hours before the event. Check back closer to the date.',\n  DATE_ADD(NOW(), INTERVAL 7 DAY),\n  'published',\n  NOW()\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute INSERT INTO `events` (\n  `title`,\n  `slug`,\n  `chapter`,\n  `description`,\n  `capacity`,\n  `city`,\n  `locationText`,\n  `eventDate`,\n  `status`,\n  `publishedAt`\n) VALUES (\n  'THE MIDNIGHT SESSION',\n  'midnight-session-01',\n  'South Jakarta',\n  'An intimate gathering for the marked. Live music, exclusive previews, and conversations that stay inside. Dress code: Black.',\n  50,\n  'Jakarta',\n  'Location revealed 24 hours before the event. Check back closer to the date.',\n  DATE_ADD(NOW(), INTERVAL 7 DAY),\n  'published',\n  NOW()\n);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'status' in 'field list'"
+  ]
+}

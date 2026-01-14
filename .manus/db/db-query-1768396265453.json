@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO `events` (\n  `title`,\n  `city`,\n  `description`,\n  `capacity`,\n  `locationText`,\n  `eventDate`,\n  `eventStatus`,\n  `publishedAt`\n) VALUES (\n  'CHAPTER INITIATION',\n  'South Jakarta',\n  'The quarterly initiation ceremony. New members receive their marks. Existing members witness and welcome. This is where it begins.',\n  30,\n  'Undisclosed location in Kemang. Coordinates sent 12 hours before.',\n  DATE_ADD(NOW(), INTERVAL 21 DAY),\n  'published',\n  NOW()\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute INSERT INTO `events` (\n  `title`,\n  `city`,\n  `description`,\n  `capacity`,\n  `locationText`,\n  `eventDate`,\n  `eventStatus`,\n  `publishedAt`\n) VALUES (\n  'CHAPTER INITIATION',\n  'South Jakarta',\n  'The quarterly initiation ceremony. New members receive their marks. Existing members witness and welcome. This is where it begins.',\n  30,\n  'Undisclosed location in Kemang. Coordinates sent 12 hours before.',\n  DATE_ADD(NOW(), INTERVAL 21 DAY),\n  'published',\n  NOW()\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1646
+}

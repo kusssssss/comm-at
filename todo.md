@@ -123,3 +123,7 @@
 - [x] Change "DROPS" to "MARKS" in navigation
 - [x] Change "EVENTS" to "GATHERINGS" (more secretive) in navigation
 - [x] Update page titles and headings to match
+
+## Sample Content
+- [x] Create sample Mark (product drop) with realistic data (2 marks: Noodle Bowl Chain, Varsity Jacket)
+- [x] Create sample Gathering (event) with realistic data (2 events: The Midnight Session, Chapter Initiation)

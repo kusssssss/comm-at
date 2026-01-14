@@ -1,0 +1,186 @@
+{
+  "query": "SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'events' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'events' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "COLUMN_TYPE": "int(11)"
+    },
+    {
+      "COLUMN_NAME": "EVENT_CATALOG",
+      "COLUMN_TYPE": "varchar(64)"
+    },
+    {
+      "COLUMN_NAME": "EVENT_SCHEMA",
+      "COLUMN_TYPE": "varchar(64)"
+    },
+    {
+      "COLUMN_NAME": "title",
+      "COLUMN_TYPE": "varchar(255)"
+    },
+    {
+      "COLUMN_NAME": "slug",
+      "COLUMN_TYPE": "varchar(255)"
+    },
+    {
+      "COLUMN_NAME": "EVENT_NAME",
+      "COLUMN_TYPE": "varchar(64)"
+    },
+    {
+      "COLUMN_NAME": "DEFINER",
+      "COLUMN_TYPE": "varchar(77)"
+    },
+    {
+      "COLUMN_NAME": "chapter",
+      "COLUMN_TYPE": "varchar(64)"
+    },
+    {
+      "COLUMN_NAME": "description",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "TIME_ZONE",
+      "COLUMN_TYPE": "varchar(64)"
+    },
+    {
+      "COLUMN_NAME": "rules",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "EVENT_BODY",
+      "COLUMN_TYPE": "varchar(8)"
+    },
+    {
+      "COLUMN_NAME": "capacity",
+      "COLUMN_TYPE": "int(11)"
+    },
+    {
+      "COLUMN_NAME": "EVENT_DEFINITION",
+      "COLUMN_TYPE": "longtext"
+    },
+    {
+      "COLUMN_NAME": "EVENT_TYPE",
+      "COLUMN_TYPE": "varchar(9)"
+    },
+    {
+      "COLUMN_NAME": "markState",
+      "COLUMN_TYPE": "enum('outside','initiate','member','inner_circle','dormant','restricted','revoked')"
+    },
+    {
+      "COLUMN_NAME": "EXECUTE_AT",
+      "COLUMN_TYPE": "datetime"
+    },
+    {
+      "COLUMN_NAME": "eventVisibility",
+      "COLUMN_TYPE": "enum('public','members','inner_circle')"
+    },
+    {
+      "COLUMN_NAME": "INTERVAL_VALUE",
+      "COLUMN_TYPE": "varchar(256)"
+    },
+    {
+      "COLUMN_NAME": "city",
+      "COLUMN_TYPE": "varchar(128)"
+    },
+    {
+      "COLUMN_NAME": "INTERVAL_FIELD",
+      "COLUMN_TYPE": "varchar(18)"
+    },
+    {
+      "COLUMN_NAME": "locationText",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "locationRevealHoursBefore",
+      "COLUMN_TYPE": "int(11)"
+    },
+    {
+      "COLUMN_NAME": "SQL_MODE",
+      "COLUMN_TYPE": "varchar(8192)"
+    },
+    {
+      "COLUMN_NAME": "STARTS",
+      "COLUMN_TYPE": "datetime"
+    },
+    {
+      "COLUMN_NAME": "locationRevealAt",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "eventDate",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "ENDS",
+      "COLUMN_TYPE": "datetime"
+    },
+    {
+      "COLUMN_NAME": "startDatetime",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "STATUS",
+      "COLUMN_TYPE": "varchar(18)"
+    },
+    {
+      "COLUMN_NAME": "endDatetime",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "ON_COMPLETION",
+      "COLUMN_TYPE": "varchar(12)"
+    },
+    {
+      "COLUMN_NAME": "eventStatus",
+      "COLUMN_TYPE": "enum('draft','published','completed','cancelled')"
+    },
+    {
+      "COLUMN_NAME": "CREATED",
+      "COLUMN_TYPE": "datetime"
+    },
+    {
+      "COLUMN_NAME": "publishedAt",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "LAST_ALTERED",
+      "COLUMN_TYPE": "datetime"
+    },
+    {
+      "COLUMN_NAME": "createdAt",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "LAST_EXECUTED",
+      "COLUMN_TYPE": "datetime"
+    },
+    {
+      "COLUMN_NAME": "updatedAt",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "EVENT_COMMENT",
+      "COLUMN_TYPE": "varchar(64)"
+    },
+    {
+      "COLUMN_NAME": "ORIGINATOR",
+      "COLUMN_TYPE": "int(10)"
+    },
+    {
+      "COLUMN_NAME": "CHARACTER_SET_CLIENT",
+      "COLUMN_TYPE": "varchar(32)"
+    },
+    {
+      "COLUMN_NAME": "COLLATION_CONNECTION",
+      "COLUMN_TYPE": "varchar(32)"
+    },
+    {
+      "COLUMN_NAME": "DATABASE_COLLATION",
+      "COLUMN_TYPE": "varchar(32)"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tCOLUMN_TYPE\nid\tint(11)\nEVENT_CATALOG\tvarchar(64)\nEVENT_SCHEMA\tvarchar(64)\ntitle\tvarchar(255)\nslug\tvarchar(255)\nEVENT_NAME\tvarchar(64)\nDEFINER\tvarchar(77)\nchapter\tvarchar(64)\ndescription\ttext\nTIME_ZONE\tvarchar(64)\nrules\ttext\nEVENT_BODY\tvarchar(8)\ncapacity\tint(11)\nEVENT_DEFINITION\tlongtext\nEVENT_TYPE\tvarchar(9)\nmarkState\tenum('outside','initiate','member','inner_circle','dormant','restricted','revoked')\nEXECUTE_AT\tdatetime\neventVisibility\tenum('public','members','inner_circle')\nINTERVAL_VALUE\tvarchar(256)\ncity\tvarchar(128)\nINTERVAL_FIELD\tvarchar(18)\nlocationText\ttext\nlocationRevealHoursBefore\tint(11)\nSQL_MODE\tvarchar(8192)\nSTARTS\tdatetime\nlocationRevealAt\ttimestamp\neventDate\ttimestamp\nENDS\tdatetime\nstartDatetime\ttimestamp\nSTATUS\tvarchar(18)\nendDatetime\ttimestamp\nON_COMPLETION\tvarchar(12)\neventStatus\tenum('draft','published','completed','cancelled')\nCREATED\tdatetime\npublishedAt\ttimestamp\nLAST_ALTERED\tdatetime\ncreatedAt\ttimestamp\nLAST_EXECUTED\tdatetime\nupdatedAt\ttimestamp\nEVENT_COMMENT\tvarchar(64)\nORIGINATOR\tint(10)\nCHARACTER_SET_CLIENT\tvarchar(32)\nCOLLATION_CONNECTION\tvarchar(32)\nDATABASE_COLLATION\tvarchar(32)\n",
+  "stderr": "",
+  "execution_time_ms": 1561
+}
