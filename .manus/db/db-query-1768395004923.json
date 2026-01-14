@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `artifacts` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `dropId` int NOT NULL,\n  `serialNumber` varchar(64) NOT NULL,\n  `activationCodeHash` varchar(255) NOT NULL,\n  `artifactStatus` enum('unmarked','marked','flagged') NOT NULL DEFAULT 'unmarked',\n  `markedByUserId` int,\n  `markedAt` timestamp,\n  `flagReason` text,\n  `flaggedAt` timestamp,\n  `flaggedById` int,\n  `size` varchar(8),\n  `editionNumber` int DEFAULT 1 NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `artifacts_id` PRIMARY KEY(`id`),\n  CONSTRAINT `artifacts_serialNumber_unique` UNIQUE(`serialNumber`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute CREATE TABLE IF NOT EXISTS `artifacts` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `dropId` int NOT NULL,\n  `serialNumber` varchar(64) NOT NULL,\n  `activationCodeHash` varchar(255) NOT NULL,\n  `artifactStatus` enum('unmarked','marked','flagged') NOT NULL DEFAULT 'unmarked',\n  `markedByUserId` int,\n  `markedAt` timestamp,\n  `flagReason` text,\n  `flaggedAt` timestamp,\n  `flaggedById` int,\n  `size` varchar(8),\n  `editionNumber` int DEFAULT 1 NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `artifacts_id` PRIMARY KEY(`id`),\n  CONSTRAINT `artifacts_serialNumber_unique` UNIQUE(`serialNumber`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1639
+}

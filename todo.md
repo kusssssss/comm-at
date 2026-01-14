@@ -110,3 +110,11 @@
 - [x] Add H2 headings to homepage sections (Drops, Events, Inside, Tiers, Code, Partners)
 - [x] Fix page title (55 characters: "COMM@ | Exclusive Streetwear Collective - Jakarta, Indonesia")
 - [x] Add meta description (134 characters)
+
+## Database Fixes
+- [x] Create missing artifacts table
+- [x] Create missing sponsors table
+- [x] Create missing events table
+- [x] Create missing drops table
+- [x] Create missing marking_logs table
+- [x] Create all other missing tables from schema (28 tables total)

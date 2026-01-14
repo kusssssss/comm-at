@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `marks` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `dropId` int NOT NULL,\n  `serial` varchar(64) NOT NULL,\n  `activationCode` varchar(255) NOT NULL,\n  `editionNumber` int NOT NULL DEFAULT 1,\n  `status` enum('unclaimed','active','dormant','revoked') NOT NULL DEFAULT 'unclaimed',\n  `size` varchar(8),\n  `chapter` varchar(64) DEFAULT 'South Jakarta',\n  `ownerId` int,\n  `activatedAt` timestamp,\n  `flagReason` text,\n  `flaggedAt` timestamp,\n  `flaggedById` int,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `marks_id` PRIMARY KEY(`id`),\n  CONSTRAINT `marks_serial_unique` UNIQUE(`serial`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute CREATE TABLE IF NOT EXISTS `marks` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `dropId` int NOT NULL,\n  `serial` varchar(64) NOT NULL,\n  `activationCode` varchar(255) NOT NULL,\n  `editionNumber` int NOT NULL DEFAULT 1,\n  `status` enum('unclaimed','active','dormant','revoked') NOT NULL DEFAULT 'unclaimed',\n  `size` varchar(8),\n  `chapter` varchar(64) DEFAULT 'South Jakarta',\n  `ownerId` int,\n  `activatedAt` timestamp,\n  `flagReason` text,\n  `flaggedAt` timestamp,\n  `flaggedById` int,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `marks_id` PRIMARY KEY(`id`),\n  CONSTRAINT `marks_serial_unique` UNIQUE(`serial`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1649
+}

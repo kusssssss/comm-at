@@ -1,0 +1,94 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "artifacts"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "audit_logs"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "check_in_logs"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "doctrine_cards"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "drops"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "event_passes"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "event_rsvps"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "events"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "marking_logs"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "marks"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "memory_logs"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "notification_preferences"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "notification_subscriptions"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "notifications"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "orders"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "otp_codes"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "rate_limits"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "referrals"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "reputation_events"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "sponsor_analytics"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "sponsor_drops"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "sponsor_events"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "sponsor_inquiries"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "sponsors"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "ugc_consent"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "ugc_media"
+    },
+    {
+      "Tables_in_cVz8pxyPALhhBHJqgpAifY": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_cVz8pxyPALhhBHJqgpAifY\n__drizzle_migrations\nartifacts\naudit_logs\ncheck_in_logs\ndoctrine_cards\ndrops\nevent_passes\nevent_rsvps\nevents\nmarking_logs\nmarks\nmemory_logs\nnotification_preferences\nnotification_subscriptions\nnotifications\norders\notp_codes\nrate_limits\nreferrals\nreputation_events\nsponsor_analytics\nsponsor_drops\nsponsor_events\nsponsor_inquiries\nsponsors\nugc_consent\nugc_media\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 1554
+}

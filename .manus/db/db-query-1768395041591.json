@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `marking_logs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `artifactId` int NOT NULL,\n  `userId` int,\n  `markingResult` enum('success','failed') NOT NULL,\n  `failureReason` text,\n  `ipAddress` varchar(64),\n  `userAgent` text,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `marking_logs_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute CREATE TABLE IF NOT EXISTS `marking_logs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `artifactId` int NOT NULL,\n  `userId` int,\n  `markingResult` enum('success','failed') NOT NULL,\n  `failureReason` text,\n  `ipAddress` varchar(64),\n  `userAgent` text,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `marking_logs_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1690
+}
