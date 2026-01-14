@@ -441,7 +441,7 @@ export const appRouter = router({
             passCount,
             capacity: event.capacity,
             hasPass: !!userPass,
-            passStatus: userPass?.status || null,
+            passStatus: userPass?.passStatus || null,
             qrPayload: userPass?.qrPayload || null,
           });
         }
@@ -661,7 +661,7 @@ export const appRouter = router({
           return { valid: false, reason: "Pass is for a different event" };
         }
         
-        if (pass.status === "used") {
+        if (pass.passStatus === "used") {
           await db.createCheckInLog({
             eventId: input.eventId,
             eventPassId: pass.id,
@@ -672,7 +672,7 @@ export const appRouter = router({
           return { valid: false, reason: "Pass already used" };
         }
         
-        if (pass.status === "revoked") {
+        if (pass.passStatus === "revoked") {
           await db.createCheckInLog({
             eventId: input.eventId,
             eventPassId: pass.id,

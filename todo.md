@@ -166,3 +166,7 @@
 - [x] Update app icon for PWA (manifest.json created)
 - [x] Change "streetwear collective" to "secret society" throughout site
 - [x] Update meta descriptions and SEO text in index.html
+
+## Bug Fixes - Events & Favicon
+- [x] Fix events not showing on Gatherings page (fixed event_passes table schema mismatch - added missing columns)
+- [x] Fix favicon not loading on production site (added cache-busting query parameters to favicon links)

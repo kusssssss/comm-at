@@ -1,0 +1,50 @@
+{
+  "query": "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'event_passes';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'event_passes';",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "DATA_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "eventId",
+      "DATA_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "userId",
+      "DATA_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "passStatus",
+      "DATA_TYPE": "enum"
+    },
+    {
+      "COLUMN_NAME": "qrPayload",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "claimedAt",
+      "DATA_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "usedAt",
+      "DATA_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "revokedAt",
+      "DATA_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "revokedReason",
+      "DATA_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "revokedById",
+      "DATA_TYPE": "int"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\nid\tint\neventId\tint\nuserId\tint\npassStatus\tenum\nqrPayload\tvarchar\nclaimedAt\ttimestamp\nusedAt\ttimestamp\nrevokedAt\ttimestamp\nrevokedReason\ttext\nrevokedById\tint\n",
+  "stderr": "",
+  "execution_time_ms": 1561
+}

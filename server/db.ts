@@ -476,7 +476,7 @@ export async function getEventPassCount(eventId: number): Promise<number> {
     .from(eventPasses)
     .where(and(
       eq(eventPasses.eventId, eventId),
-      sql`${eventPasses.status} != 'revoked'`
+      sql`${eventPasses.passStatus} != 'revoked'`
     ));
   return result[0]?.count ?? 0;
 }
@@ -553,7 +553,7 @@ export async function getEventPasses(eventId: number) {
 export async function markPassUsed(passId: number) {
   const db = await getDb();
   if (!db) return false;
-  await db.update(eventPasses).set({ status: 'used', usedAt: new Date() }).where(eq(eventPasses.id, passId));
+  await db.update(eventPasses).set({ passStatus: 'used', usedAt: new Date() }).where(eq(eventPasses.id, passId));
   return true;
 }
 
@@ -561,7 +561,7 @@ export async function revokePass(passId: number, reason: string, revokedById: nu
   const db = await getDb();
   if (!db) return;
   await db.update(eventPasses).set({
-    status: 'revoked',
+    passStatus: 'revoked',
     revokedAt: new Date(),
     revokedReason: reason,
     revokedById,

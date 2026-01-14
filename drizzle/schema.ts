@@ -356,7 +356,7 @@ export const eventPasses = mysqlTable("event_passes", {
   eventId: int("eventId").notNull(),
   userId: int("userId").notNull(),
   markId: int("markId"), // The Mark used to claim this pass
-  status: passStatusEnum.default("claimed").notNull(),
+  passStatus: passStatusEnum.default("claimed").notNull(),
   
   // QR/Scannable code
   scannableCode: varchar("scannableCode", { length: 128 }).notNull().unique(),
