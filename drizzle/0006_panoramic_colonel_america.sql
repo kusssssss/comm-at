@@ -1,0 +1,1 @@
+ALTER TABLE `audit_logs` MODIFY COLUMN `auditAction` enum('drop_created','drop_published','drop_archived','artifacts_generated','artifact_flagged','artifact_reissued','event_created','event_published','event_cancelled','pass_revoked','user_revoked','user_banned','user_role_changed','image_uploaded','ugc_uploaded') NOT NULL;

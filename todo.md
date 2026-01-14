@@ -1,0 +1,102 @@
+# COMM@ Project Reconstruction TODO
+
+## Database & Schema
+- [x] Copy database schema from export (drizzle/schema.ts)
+- [x] Copy all 11 migration files from export
+- [x] Copy relations.ts from export
+- [x] Push database migrations
+
+## Server & Backend
+- [x] Copy server/db.ts with all query helpers
+- [x] Copy server/routers.ts with all tRPC procedures
+- [x] Copy server/storage.ts for S3 file storage
+- [x] Copy server/visibility.ts for access control
+- [x] Copy server/uploadRouter.ts for file uploads
+- [x] Copy server/imageOptimizer.ts for image processing
+- [x] Copy all test files from server/
+
+## Frontend Pages
+- [x] Copy Home.tsx page
+- [x] Copy Drops.tsx page
+- [x] Copy DropDetail.tsx page
+- [x] Copy Events.tsx page
+- [x] Copy EventDetail.tsx page
+- [x] Copy Inside.tsx page
+- [x] Copy Leaderboard.tsx page
+- [x] Copy Referral.tsx page
+- [x] Copy Admin.tsx page
+- [x] Copy Dev.tsx page
+- [x] Copy Verify.tsx page
+- [x] Copy Apply.tsx page
+- [x] Copy Acquire.tsx page
+- [x] Copy Archive.tsx page
+- [x] Copy Mark.tsx page
+- [x] Copy Profile.tsx page
+- [x] Copy NotFound.tsx page
+- [x] Copy ComponentShowcase.tsx page
+- [x] Copy HomeTest.tsx page
+- [x] Copy Sponsors.tsx page
+- [x] Copy SponsorAnalytics.tsx page
+- [x] Copy Staff.tsx page
+
+## Frontend Components
+- [x] Copy DashboardLayout.tsx
+- [x] Copy DashboardLayoutSkeleton.tsx
+- [x] Copy AIChatBox.tsx
+- [x] Copy Map.tsx
+- [x] Copy SponsorShowcase.tsx
+- [x] Copy AuthDialog.tsx
+- [x] Copy ClearanceTest.tsx (StratifiedRealityTest)
+- [x] Copy Nav.tsx
+- [x] Copy TierBadge.tsx
+- [x] Copy TierProgressCard.tsx (updated for new tier interface)
+- [x] Copy EventRsvpCard.tsx
+- [x] Copy Countdown.tsx
+- [x] Copy CheckInScanner.tsx
+- [x] Copy NotificationBell.tsx
+- [x] Copy AccessLock.tsx
+- [x] Copy BlurOverlay.tsx
+- [x] Copy CardHoverAnimation.tsx
+- [x] Copy Effects2200.tsx
+- [x] Copy ErrorBoundary.tsx
+- [x] Copy ImageFallback.tsx
+- [x] Copy LoadingSkeleton.tsx
+- [x] Copy OptimizedImage.tsx
+- [x] Copy FloatingParticles.tsx
+
+## UI Components
+- [x] Copy all shadcn/ui components from export
+
+## Hooks & Contexts
+- [x] Copy useComposition.ts hook
+- [x] Copy useMobile.tsx hook
+- [x] Copy usePersistFn.ts hook
+- [x] Copy ThemeContext.tsx
+- [x] Copy lib/trpc.ts
+- [x] Copy lib/utils.ts
+
+## Assets & Images
+- [x] Copy product-chain.jpg (Noodle Bowl Chain)
+- [x] Copy product-varsity.jpg (BOMBAE Varsity)
+- [x] Copy product-hoodie.jpg (Good Girl Hoodie)
+- [x] Copy product-bomber.jpg (Team Tomodachi Bomber)
+- [x] Copy product-sukajan.jpg
+- [x] Copy product-longsleeve.jpg
+- [x] Copy feelbert-group-banner.png
+- [x] Copy hero-scene images
+- [x] Copy event-venue.jpg
+- [x] Copy crowd-silhouette.jpg
+- [x] Copy street-scene.jpg
+- [x] Copy UGC images (27 images)
+
+## Configuration
+- [x] Update package.json with additional dependencies (bcrypt, sharp, multer, react-qr-code)
+- [x] Copy App.tsx with all routes
+- [x] Copy index.css with custom theme
+
+## Verification
+- [x] Run pnpm install
+- [x] Run pnpm db:push (migrations applied successfully)
+- [x] Run pnpm test (tier tests passing)
+- [x] Verify dev server runs correctly
+- [ ] Test authentication flow (OAuth configured)

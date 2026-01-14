@@ -1,5 +1,5 @@
-// Preconfigured storage helpers for Manus WebDev templates
-// Uses the Biz-provided storage proxy (Authorization: Bearer <token>)
+// Preconfigured storage helpers
+// Uses the storage proxy (Authorization: Bearer <token>)
 
 import { ENV } from './_core/env';
 
@@ -90,6 +90,72 @@ export async function storagePut(
   }
   const url = (await response.json()).url;
   return { key, url };
+}
+
+/**
+ * Upload an image with automatic optimization
+ * - Resizes large images to max 1200px width
+ * - Compresses to ~80% quality JPEG
+ * - Optionally generates and uploads a thumbnail
+ */
+export async function storagePutImage(
+  relKey: string,
+  data: Buffer | Uint8Array,
+  options: {
+    maxWidth?: number;
+    maxHeight?: number;
+    quality?: number;
+    generateThumbnail?: boolean;
+  } = {}
+): Promise<{
+  key: string;
+  url: string;
+  width: number;
+  height: number;
+  size: number;
+  thumbnail?: { key: string; url: string };
+}> {
+  // Dynamic import to avoid loading sharp unless needed
+  const { optimizeImage } = await import("./imageOptimizer");
+  
+  const optimized = await optimizeImage(data, {
+    maxWidth: options.maxWidth || 1200,
+    maxHeight: options.maxHeight || 1600,
+    quality: options.quality || 80,
+    format: "jpeg",
+    generateThumbnail: options.generateThumbnail ?? true,
+    thumbnailSize: 200,
+  });
+  
+  // Ensure key ends with .jpg
+  const imageKey = relKey.replace(/\.[^.]+$/, "") + ".jpg";
+  
+  // Upload optimized image
+  const { key, url } = await storagePut(imageKey, optimized.buffer, "image/jpeg");
+  
+  const result: {
+    key: string;
+    url: string;
+    width: number;
+    height: number;
+    size: number;
+    thumbnail?: { key: string; url: string };
+  } = {
+    key,
+    url,
+    width: optimized.width,
+    height: optimized.height,
+    size: optimized.size,
+  };
+  
+  // Upload thumbnail if generated
+  if (optimized.thumbnail) {
+    const thumbKey = imageKey.replace(/\.jpg$/, "_thumb.jpg");
+    const thumbResult = await storagePut(thumbKey, optimized.thumbnail.buffer, "image/jpeg");
+    result.thumbnail = { key: thumbResult.key, url: thumbResult.url };
+  }
+  
+  return result;
 }
 
 export async function storageGet(relKey: string): Promise<{ key: string; url: string; }> {
