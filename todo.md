@@ -138,3 +138,9 @@
 - [x] Add demo sections for: Core Experience, Auth, Members, Events, Partners, Admin
 - [x] Include quick links to test each feature with demo points
 - [x] Add system features overview and database status
+
+## Routing Fixes
+- [x] Fix 404 error when clicking on products (updated links to use /marks/:id)
+- [x] Audit all routes in App.tsx (added /marks, /gatherings, /partners, /ranks, /refer aliases)
+- [x] Ensure all pages are properly registered
+- [x] Updated all navigation links across pages (Home, Drops, Events, Inside, Leaderboard, Referral, DropDetail, EventDetail)

@@ -49,8 +49,10 @@ function Router() {
       <Route path="/artifact/:serial" component={Verify} />
       <Route path="/mark/:serial" component={Mark} />
       <Route path="/drops" component={Drops} />
+      <Route path="/marks" component={Drops} />
       <Route path="/drop/:id" component={DropDetail} />
       <Route path="/sponsors" component={Sponsors} />
+      <Route path="/partners" component={Sponsors} />
       <Route path="/admin/sponsor/:sponsorId/analytics" component={SponsorAnalytics} />
       <Route path="/apply" component={Apply} />
       <Route path="/acquire/:dropId" component={Acquire} />
@@ -59,10 +61,14 @@ function Router() {
       <Route path="/inside" component={Inside} />
       <Route path="/profile" component={Profile} />
       <Route path="/events" component={Events} />
+      <Route path="/gatherings" component={Events} />
       <Route path="/events/:id" component={EventDetail} />
+      <Route path="/gatherings/:id" component={EventDetail} />
       <Route path="/archive" component={Archive} />
       <Route path="/leaderboard" component={Leaderboard} />
+      <Route path="/ranks" component={Leaderboard} />
       <Route path="/referral" component={Referral} />
+      <Route path="/refer" component={Referral} />
       
       {/* Staff routes */}
       <Route path="/staff" component={Staff} />

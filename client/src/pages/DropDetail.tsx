@@ -81,8 +81,8 @@ export default function DropDetail() {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <p className="text-zinc-500 mb-4">Drop not found</p>
-          <Link href="/drops">
-            <button className="text-#9333EA hover:underline">← Back to Drops</button>
+          <Link href="/marks">
+            <button className="text-#9333EA hover:underline">← Back to Marks</button>
           </Link>
         </div>
       </div>
@@ -103,8 +103,8 @@ export default function DropDetail() {
           </Link>
           <nav className="flex gap-8 text-sm">
             <Link href="/verify" className="text-zinc-400 hover:text-white transition-colors">Verify</Link>
-            <Link href="/drops" className="text-zinc-400 hover:text-white transition-colors">Drops</Link>
-            <Link href="/events" className="text-zinc-400 hover:text-white transition-colors">Events</Link>
+            <Link href="/marks" className="text-zinc-400 hover:text-white transition-colors">Marks</Link>
+            <Link href="/gatherings" className="text-zinc-400 hover:text-white transition-colors">Gatherings</Link>
           </nav>
         </div>
       </header>
@@ -113,10 +113,10 @@ export default function DropDetail() {
       <main className="pt-24">
         {/* Back Link */}
         <div className="container mx-auto px-6 py-6">
-          <Link href="/drops">
+          <Link href="/marks">
             <span className="inline-flex items-center gap-2 text-zinc-500 hover:text-#9333EA transition-colors cursor-pointer">
               <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm uppercase tracking-wider">Back to Drops</span>
+              <span className="text-sm uppercase tracking-wider">Back to Marks</span>
             </span>
           </Link>
         </div>
@@ -334,7 +334,7 @@ export default function DropDetail() {
             <div className="flex gap-8 text-zinc-600 text-sm">
               <Link href="/verify" className="hover:text-#9333EA transition-colors">Verify</Link>
               <Link href="/inside" className="hover:text-#9333EA transition-colors">Inside</Link>
-              <Link href="/events" className="hover:text-#9333EA transition-colors">Events</Link>
+              <Link href="/gatherings" className="hover:text-#9333EA transition-colors">Gatherings</Link>
             </div>
           </div>
         </div>

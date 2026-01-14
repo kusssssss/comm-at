@@ -241,7 +241,7 @@ export function SponsorShowcase() {
           className="text-center mt-12"
         >
           <a 
-            href="/sponsors" 
+            href="/partners" 
             className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
           >
             Become a Partner →

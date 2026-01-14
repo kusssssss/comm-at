@@ -83,8 +83,8 @@ export default function EventDetail() {
           <p className="text-muted-foreground mb-6">
             This gathering does not exist or you don't have access.
           </p>
-          <Link href="/events" className="text-sm text-[#9333EA] hover:text-[#9333EA]/80">
-            ← Back to Events
+          <Link href="/gatherings" className="text-sm text-[#9333EA] hover:text-[#9333EA]/80">
+            ← Back to Gatherings
           </Link>
         </div>
       </div>
@@ -113,7 +113,7 @@ export default function EventDetail() {
       {/* Header */}
       <header className="px-6 py-4 border-b border-border/30">
         <nav className="flex items-center justify-between max-w-4xl mx-auto">
-          <Link href="/events" className="text-mono text-sm tracking-[0.3em] text-foreground/80 hover:text-foreground transition-colors">
+          <Link href="/gatherings" className="text-mono text-sm tracking-[0.3em] text-foreground/80 hover:text-foreground transition-colors">
             COMM@
           </Link>
           <span className="text-xs text-muted-foreground tracking-wider">GATHERING</span>
@@ -293,8 +293,8 @@ export default function EventDetail() {
 
           {/* Back link */}
           <div className="text-center">
-            <Link href="/events" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              ← Back to Events
+            <Link href="/gatherings" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              ← Back to Gatherings
             </Link>
           </div>
         </div>

@@ -36,17 +36,17 @@ export default function Nav({
 
   // Public navigation links
   const publicLinks = [
-    { href: "/drops", label: "MARKS", icon: Sparkles },
+    { href: "/marks", label: "MARKS", icon: Sparkles },
     { href: "/verify", label: "VERIFY", icon: Shield },
-    { href: "/events", label: "GATHERINGS", icon: Calendar },
-    { href: "/sponsors", label: "PARTNERS", icon: Handshake },
+    { href: "/gatherings", label: "GATHERINGS", icon: Calendar },
+    { href: "/partners", label: "PARTNERS", icon: Handshake },
   ];
 
   // Member-only links (shown when logged in)
   const memberLinks = [
     { href: "/inside", label: "INSIDE", icon: Users },
-    { href: "/leaderboard", label: "RANKS", icon: Trophy },
-    { href: "/referral", label: "REFER", icon: Gift },
+    { href: "/ranks", label: "RANKS", icon: Trophy },
+    { href: "/refer", label: "REFER", icon: Gift },
   ];
 
   // Combine links based on auth state

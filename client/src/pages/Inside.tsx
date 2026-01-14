@@ -92,13 +92,13 @@ export default function Inside() {
             COMM@
           </Link>
           <div className="flex items-center gap-6">
-            <Link href="/events" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/gatherings" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Events
             </Link>
-            <Link href="/leaderboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/ranks" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Leaderboard
             </Link>
-            <Link href="/referral" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/refer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Refer
             </Link>
             <Link href="/profile" className="text-sm text-[#9333EA] hover:text-[#9333EA]/80 transition-colors">
@@ -200,7 +200,7 @@ export default function Inside() {
             <section className="animate-slide-up" style={{ animationDelay: "0.1s" }}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm text-muted-foreground tracking-wider uppercase">Upcoming Gatherings</h2>
-                <Link href="/events" className="text-xs text-[#9333EA] hover:text-[#9333EA]/80">
+                <Link href="/gatherings" className="text-xs text-[#9333EA] hover:text-[#9333EA]/80">
                   View All →
                 </Link>
               </div>
@@ -268,7 +268,7 @@ export default function Inside() {
           {/* Quick Links */}
           <section className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
             <div className="grid grid-cols-2 gap-4">
-              <Link href="/events">
+              <Link href="/gatherings">
                 <div className="card-noir p-4 text-center hover:border-[#9333EA]/30 transition-colors cursor-pointer">
                   <Calendar className="w-6 h-6 mx-auto text-muted-foreground mb-2" />
                   <p className="text-sm text-foreground">Events</p>

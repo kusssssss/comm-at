@@ -134,7 +134,7 @@ export function AccessLock({
 
         {/* CTA */}
         {!currentTier || currentTier === 'outside' ? (
-          <Link href="/drops">
+          <Link href="/marks">
             <Button
               variant="outline"
               size="sm"

@@ -35,7 +35,7 @@ export default function Leaderboard() {
             <span className="text-2xl font-bold text-purple-400 hover:text-purple-300 transition-colors cursor-pointer">@</span>
           </Link>
           <nav className="flex items-center gap-6">
-            <Link href="/drops" className="text-sm tracking-wider text-gray-400 hover:text-white transition-colors">DROPS</Link>
+            <Link href="/marks" className="text-sm tracking-wider text-gray-400 hover:text-white transition-colors">MARKS</Link>
             <Link href="/verify" className="text-sm tracking-wider text-gray-400 hover:text-white transition-colors">VERIFY</Link>
             {user && (
               <Link href="/inside" className="text-sm tracking-wider text-gray-400 hover:text-white transition-colors">INSIDE</Link>

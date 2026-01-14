@@ -544,7 +544,7 @@ export default function Home() {
               className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-0"
             >
               <GlitchHover>
-                <Link href="/drops">
+                <Link href="/marks">
                   <GlowPulse color="#9333EA">
                     <button className="w-full sm:w-auto px-8 py-4 bg-[#9333EA] text-white font-bold text-sm tracking-widest uppercase btn-gradient-hover min-h-[48px] transition-all duration-300 hover:shadow-[0_0_30px_rgba(147,51,234,0.5)]">
                       <span>BROWSE MARKS</span>
@@ -554,7 +554,7 @@ export default function Home() {
               </GlitchHover>
               
               <GlitchHover>
-                <Link href="/events">
+                <Link href="/gatherings">
                   <button className="w-full sm:w-auto px-8 py-4 border border-[#333333] text-white font-bold text-sm tracking-widest uppercase min-h-[48px] transition-all duration-300 hover:border-[#9333EA] hover:text-[#9333EA] hover:shadow-[0_0_20px_rgba(147,51,234,0.3)] shimmer-hover">
                     VIEW GATHERINGS
                   </button>
@@ -593,7 +593,7 @@ export default function Home() {
                     LATEST MARKS
                   </p>
                 </div>
-                <Link href="/drops">
+                <Link href="/marks">
                   <span className="text-[#9333EA] text-xs font-mono tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
                     VIEW ALL <ArrowRight className="w-3 h-3" />
                   </span>
@@ -611,7 +611,7 @@ export default function Home() {
               {recentDrops.length > 0 ? (
                 recentDrops.map((drop: any, i: number) => (
                   <RevealOnScroll key={drop.id} delay={200 + i * 100}>
-                    <Link href={`/drops/${drop.id}`}>
+                    <Link href={`/drop/${drop.id}`}>
                       <DropPreviewCard drop={drop} />
                     </Link>
                   </RevealOnScroll>
@@ -641,7 +641,7 @@ export default function Home() {
                     SECRET GATHERINGS
                   </p>
                 </div>
-                <Link href="/events">
+                <Link href="/gatherings">
                   <span className="text-[#9333EA] text-xs font-mono tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
                     VIEW ALL <ArrowRight className="w-3 h-3" />
                   </span>
@@ -707,7 +707,7 @@ export default function Home() {
             {/* CTA to get access */}
             <RevealOnScroll delay={600}>
               <div className="mt-8 text-center">
-                <Link href="/drops">
+                <Link href="/marks">
                   <GlowPulse color="#9333EA">
                     <button className="px-8 py-4 bg-[#9333EA] text-white font-bold text-sm tracking-widest uppercase hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all">
                       GET A MARK TO UNLOCK
@@ -1074,7 +1074,7 @@ export default function Home() {
             <RevealOnScroll delay={500}>
               <div className="mt-12 pt-8 border-t border-[#1a1a1a]">
                 <p className="text-[#666666] text-sm mb-4">Don't have a mark yet?</p>
-                <Link href="/drops">
+                <Link href="/marks">
                   <button className="text-[#9333EA] text-sm font-mono tracking-widest hover:underline">
                     BROWSE AVAILABLE MARKS →
                   </button>
@@ -1156,10 +1156,10 @@ export default function Home() {
               <div>
                 <h4 className="text-white text-sm font-bold mb-4">EXPLORE</h4>
                 <div className="space-y-2">
-                  <Link href="/drops" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/marks" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
                     Marks
                   </Link>
-                  <Link href="/events" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/gatherings" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
                     Gatherings
                   </Link>
                   <Link href="/verify" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
@@ -1175,10 +1175,10 @@ export default function Home() {
                   <Link href="/inside" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
                     Inside Feed
                   </Link>
-                  <Link href="/leaderboard" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/ranks" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
                     Leaderboard
                   </Link>
-                  <Link href="/referral" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/refer" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
                     Referrals
                   </Link>
                 </div>
@@ -1188,7 +1188,7 @@ export default function Home() {
               <div>
                 <h4 className="text-white text-sm font-bold mb-4">PARTNERS</h4>
                 <div className="space-y-2">
-                  <Link href="/sponsors" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/partners" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
                     Become a Partner
                   </Link>
                   <Link href="/apply" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">

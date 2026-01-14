@@ -79,7 +79,7 @@ export default function Referral() {
           </Link>
           <nav className="flex items-center gap-6">
             <Link href="/inside" className="text-sm tracking-wider text-gray-400 hover:text-white transition-colors">INSIDE</Link>
-            <Link href="/leaderboard" className="text-sm tracking-wider text-gray-400 hover:text-white transition-colors">LEADERBOARD</Link>
+            <Link href="/ranks" className="text-sm tracking-wider text-gray-400 hover:text-white transition-colors">RANKS</Link>
           </nav>
         </div>
       </header>
