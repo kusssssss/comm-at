@@ -36,9 +36,9 @@ export default function Nav({
 
   // Public navigation links
   const publicLinks = [
-    { href: "/drops", label: "DROPS", icon: Sparkles },
+    { href: "/drops", label: "MARKS", icon: Sparkles },
     { href: "/verify", label: "VERIFY", icon: Shield },
-    { href: "/events", label: "EVENTS", icon: Calendar },
+    { href: "/events", label: "GATHERINGS", icon: Calendar },
     { href: "/sponsors", label: "PARTNERS", icon: Handshake },
   ];
 

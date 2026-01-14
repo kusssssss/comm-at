@@ -475,7 +475,7 @@ export default function Home() {
                 <div className="text-3xl md:text-4xl font-bold text-white">
                   <CycleNumber value={stats?.totalEvents || 0} delay={1500} duration={1000} />
                 </div>
-                <div className="text-xs text-[#666666] font-mono tracking-widest uppercase mt-1">Events</div>
+                <div className="text-xs text-[#666666] font-mono tracking-widest uppercase mt-1">Gatherings</div>
               </div>
             </motion.div>
             
@@ -547,7 +547,7 @@ export default function Home() {
                 <Link href="/drops">
                   <GlowPulse color="#9333EA">
                     <button className="w-full sm:w-auto px-8 py-4 bg-[#9333EA] text-white font-bold text-sm tracking-widest uppercase btn-gradient-hover min-h-[48px] transition-all duration-300 hover:shadow-[0_0_30px_rgba(147,51,234,0.5)]">
-                      <span>BROWSE DROPS</span>
+                      <span>BROWSE MARKS</span>
                     </button>
                   </GlowPulse>
                 </Link>
@@ -556,7 +556,7 @@ export default function Home() {
               <GlitchHover>
                 <Link href="/events">
                   <button className="w-full sm:w-auto px-8 py-4 border border-[#333333] text-white font-bold text-sm tracking-widest uppercase min-h-[48px] transition-all duration-300 hover:border-[#9333EA] hover:text-[#9333EA] hover:shadow-[0_0_20px_rgba(147,51,234,0.3)] shimmer-hover">
-                    VIEW EVENTS
+                    VIEW GATHERINGS
                   </button>
                 </Link>
               </GlitchHover>
@@ -581,7 +581,7 @@ export default function Home() {
         </section>
         
         {/* ================================================================ */}
-        {/* RECENT DROPS PREVIEW */}
+        {/* RECENT MARKS PREVIEW */}
         {/* ================================================================ */}
         <section className="relative py-20 md:py-28 px-4 bg-[#050505]">
           <div className="max-w-6xl mx-auto">
@@ -590,7 +590,7 @@ export default function Home() {
                 <div className="flex items-center gap-3">
                   <Sparkles className="w-4 h-4 text-[#9333EA]" />
                   <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase">
-                    LATEST DROPS
+                    LATEST MARKS
                   </p>
                 </div>
                 <Link href="/drops">
@@ -629,7 +629,7 @@ export default function Home() {
         </section>
         
         {/* ================================================================ */}
-        {/* UPCOMING EVENTS PREVIEW */}
+        {/* UPCOMING GATHERINGS PREVIEW */}
         {/* ================================================================ */}
         <section className="relative py-20 md:py-28 px-4">
           <div className="max-w-6xl mx-auto">
@@ -638,7 +638,7 @@ export default function Home() {
                 <div className="flex items-center gap-3">
                   <Calendar className="w-4 h-4 text-[#9333EA]" />
                   <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase">
-                    SECRET EVENTS
+                    SECRET GATHERINGS
                   </p>
                 </div>
                 <Link href="/events">
@@ -1076,7 +1076,7 @@ export default function Home() {
                 <p className="text-[#666666] text-sm mb-4">Don't have a mark yet?</p>
                 <Link href="/drops">
                   <button className="text-[#9333EA] text-sm font-mono tracking-widest hover:underline">
-                    BROWSE AVAILABLE DROPS →
+                    BROWSE AVAILABLE MARKS →
                   </button>
                 </Link>
               </div>
@@ -1157,10 +1157,10 @@ export default function Home() {
                 <h4 className="text-white text-sm font-bold mb-4">EXPLORE</h4>
                 <div className="space-y-2">
                   <Link href="/drops" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
-                    Drops
+                    Marks
                   </Link>
                   <Link href="/events" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
-                    Events
+                    Gatherings
                   </Link>
                   <Link href="/verify" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
                     Verify Mark

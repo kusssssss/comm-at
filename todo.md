@@ -118,3 +118,8 @@
 - [x] Create missing drops table
 - [x] Create missing marking_logs table
 - [x] Create all other missing tables from schema (28 tables total)
+
+## Navigation Label Changes
+- [x] Change "DROPS" to "MARKS" in navigation
+- [x] Change "EVENTS" to "GATHERINGS" (more secretive) in navigation
+- [x] Update page titles and headings to match

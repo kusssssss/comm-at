@@ -218,7 +218,7 @@ export default function Drops() {
         <div className="fixed top-20 left-0 right-0 z-30 px-6">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div>
-              <p className="text-xs text-[#888888] tracking-widest uppercase">DROPS</p>
+              <p className="text-xs text-[#888888] tracking-widest uppercase">MARKS</p>
               <p className="text-sm text-[#666666] mt-1">Swipe or tap arrows to browse</p>
             </div>
             <div className="text-right flex items-center gap-4">
@@ -450,7 +450,7 @@ export default function Drops() {
                     <div className="bg-[#1a1a1a] border border-[#333333] p-4 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Sparkles className="w-4 h-4 text-[#9333EA]" />
-                        <span className="text-[#9333EA] text-xs font-mono tracking-widest uppercase">DROPPING IN</span>
+                        <span className="text-[#9333EA] text-xs font-mono tracking-widest uppercase">AVAILABLE IN</span>
                       </div>
                       <InlineCountdown 
                         targetDate={new Date(currentDrop.saleWindowStart)} 
