@@ -156,3 +156,13 @@
 - [x] Confirmed tier system working
 - [x] Confirmed admin panel accessible
 - [x] Confirmed referral system functional
+
+## OAuth Configuration Fix
+- [ ] Fix "Permission denied - Redirect URI is not set" error
+- [ ] Configure OAuth redirect URI for production domain
+
+## Branding Updates
+- [x] Create purple glow @ logo/favicon (generated and resized to all icon sizes)
+- [x] Update app icon for PWA (manifest.json created)
+- [x] Change "streetwear collective" to "secret society" throughout site
+- [x] Update meta descriptions and SEO text in index.html

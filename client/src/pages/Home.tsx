@@ -426,7 +426,7 @@ export default function Home() {
                 <ChromaticText intensity={3}>
                   <DecryptText text="JXL" delay={700} speed={50} />
                 </ChromaticText>
-                <span className="sr-only">COMM@ - Exclusive Streetwear Collective Jakarta</span>
+                <span className="sr-only">COMM@ - Exclusive Secret Society Jakarta</span>
               </h1>
             </motion.div>
             
