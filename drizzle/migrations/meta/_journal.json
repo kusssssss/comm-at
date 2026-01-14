@@ -1,0 +1,83 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1768134804232,
+      "tag": "0000_mysterious_pride",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1768185830045,
+      "tag": "0001_steady_marten_broadcloak",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1768199083192,
+      "tag": "0002_warm_ezekiel",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1768199149078,
+      "tag": "0003_round_mandarin",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1768199180585,
+      "tag": "0004_fast_ricochet",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1768207913855,
+      "tag": "0005_luxuriant_lucky_pierre",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1768224027820,
+      "tag": "0006_panoramic_colonel_america",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1768358757543,
+      "tag": "0007_many_blacklash",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1768390080876,
+      "tag": "0008_quick_eternals",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1768390309138,
+      "tag": "0009_glorious_sister_grimm",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1768390689343,
+      "tag": "0010_sour_wendigo",
+      "breakpoints": true
+    }
+  ]
+}

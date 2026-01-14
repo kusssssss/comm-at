@@ -1,0 +1,1 @@
+ALTER TABLE `artifacts` ADD `editionNumber` int DEFAULT 1 NOT NULL;

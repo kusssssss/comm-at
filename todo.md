@@ -100,3 +100,6 @@
 - [x] Run pnpm test (tier tests passing)
 - [x] Verify dev server runs correctly
 - [ ] Test authentication flow (OAuth configured)
+
+## Bugs
+- [x] Fix OAuth callback failed error when logging in with Google (added missing columns to users table)
