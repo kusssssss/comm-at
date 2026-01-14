@@ -127,3 +127,14 @@
 ## Sample Content
 - [x] Create sample Mark (product drop) with realistic data (2 marks: Noodle Bowl Chain, Varsity Jacket)
 - [x] Create sample Gathering (event) with realistic data (2 events: The Midnight Session, Chapter Initiation)
+
+## Bug Fixes
+- [x] Fix Stratified Reality test showing "free" incorrectly (changed to "INQUIRE")
+- [x] Reviewed Clearance Test - it's a knowledge quiz about the collective, working correctly
+- [x] Clearance Test flow is functional (5 questions, 60% pass threshold)
+
+## Dev Page for Client Demo
+- [x] Create comprehensive Dev page with all feature demos
+- [x] Add demo sections for: Core Experience, Auth, Members, Events, Partners, Admin
+- [x] Include quick links to test each feature with demo points
+- [x] Add system features overview and database status

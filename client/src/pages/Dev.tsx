@@ -1,14 +1,18 @@
 import { Link } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, ExternalLink, Play, Users, Calendar, Shield, Zap, Gift, Eye, Lock, Star, Trophy, MessageSquare, Settings, Database, Image, QrCode } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
 
 /**
- * Development Navigation Page
- * Quick access to all routes in the application for testing purposes
+ * Development & Demo Page
+ * Comprehensive feature showcase for client demonstrations
  */
 export default function Dev() {
+  const { user, isAuthenticated } = useAuth();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [activeDemo, setActiveDemo] = useState<string | null>(null);
 
   const copyToClipboard = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -16,159 +20,417 @@ export default function Dev() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  // Going Noodles test data
+  // Test activation codes for demo
   const testCodes = [
-    { serial: 'GN001-001', drop: 'MSG Vol. 1 Sukajan', code: 'F5B5945C1A690C0D' },
-    { serial: 'GN002-001', drop: 'Ca$hmere Chain Longsleeve', code: 'F73B875A043E81D7' },
-    { serial: 'GN003-001', drop: 'Team Tomodachi Bomber', code: '86CD95C4BD285B5F' },
-    { serial: 'GN004-001', drop: 'Good Girl Cropped Hoodie', code: '59EB3B403E137ED7' },
-    { serial: 'GN005-001', drop: 'BOMBAE Varsity Jacket', code: '48E4678E76CFFB4C' },
-    { serial: 'GN006-001', drop: 'Noodle Bowl Chain', code: '2C3A3C6D1F1E04D0' },
+    { serial: 'NBC-001', drop: 'Noodle Bowl Chain', code: 'DEMO-NBC-2024' },
+    { serial: 'VJ-001', drop: 'Varsity Jacket', code: 'DEMO-VJ-2024' },
   ];
 
-  const routes = [
+  const featureCategories = [
     {
-      category: "Public Pages",
-      items: [
-        { path: "/", label: "Home / Landing Page", description: "Main landing page with manifesto" },
-        { path: "/artifact/GN001-001", label: "Verify: MSG Vol. 1 Sukajan #001", description: "Going Noodles artifact" },
-        { path: "/artifact/GN002-001", label: "Verify: Ca$hmere Chain #001", description: "Going Noodles artifact" },
-        { path: "/artifact/GN003-001", label: "Verify: Team Tomodachi Bomber #001", description: "Going Noodles artifact" },
+      category: "🏠 Core Experience",
+      icon: Zap,
+      color: "#9333EA",
+      description: "The main user journey and landing experience",
+      features: [
+        { 
+          path: "/", 
+          label: "Homepage / Landing", 
+          description: "Hero section, manifesto, tier system, and call-to-action",
+          demoPoints: ["Glitch text effects", "Tier progression display", "Live member count", "Sponsor showcase"]
+        },
+        { 
+          path: "/marks", 
+          label: "MARKS (Products)", 
+          description: "Browse limited edition drops with stratified visibility",
+          demoPoints: ["Edition tracking", "Price display", "Clearance requirements", "Image gallery"]
+        },
+        { 
+          path: "/gatherings", 
+          label: "GATHERINGS (Events)", 
+          description: "Secret events with location reveal system",
+          demoPoints: ["Hidden location until reveal time", "RSVP system", "Capacity tracking", "Pass generation"]
+        },
       ]
     },
     {
-      category: "Drop Pages (Going Noodles)",
-      items: [
-        { path: "/drop/30043", label: "Drop: MSG Vol. 1 Sukajan", description: "30 edition sukajan jacket" },
-        { path: "/drop/30044", label: "Drop: Ca$hmere Chain Longsleeve", description: "100 edition longsleeve" },
-        { path: "/drop/30045", label: "Drop: Team Tomodachi Bomber", description: "50 edition bomber jacket" },
-        { path: "/drop/30046", label: "Drop: Good Girl Cropped Hoodie", description: "75 edition cropped hoodie" },
-        { path: "/drop/30047", label: "Drop: BOMBAE Varsity Jacket", description: "40 edition varsity jacket" },
-        { path: "/drop/30048", label: "Drop: Noodle Bowl Chain", description: "25 edition accessory" },
+      category: "🔐 Authentication & Access",
+      icon: Lock,
+      color: "#22c55e",
+      description: "Member verification and tiered access control",
+      features: [
+        { 
+          path: "/verify", 
+          label: "Mark Verification", 
+          description: "Verify authenticity of physical products via serial number",
+          demoPoints: ["Serial number lookup", "Activation code entry", "Ownership transfer", "Fraud detection"]
+        },
+        { 
+          path: "/apply", 
+          label: "Apply for Clearance", 
+          description: "New member application with vouch system",
+          demoPoints: ["Application form", "Vouch by existing member", "Admin approval flow", "48hr expiry window"]
+        },
       ]
     },
     {
-      category: "Marking Flow",
-      items: [
-        { path: "/mark/GN001-001", label: "Mark: MSG Vol. 1 Sukajan #001", description: "Test marking flow" },
-        { path: "/mark/GN002-001", label: "Mark: Ca$hmere Chain #001", description: "Test marking flow" },
+      category: "👥 Member Features",
+      icon: Users,
+      color: "#3b82f6",
+      description: "Features exclusive to marked members",
+      features: [
+        { 
+          path: "/inside", 
+          label: "Inside Feed", 
+          description: "Member-only activity feed and announcements",
+          demoPoints: ["Real-time activity", "Doctrine cards", "Member interactions", "Event announcements"]
+        },
+        { 
+          path: "/profile", 
+          label: "Member Profile", 
+          description: "Personal dashboard with marks and reputation",
+          demoPoints: ["Mark collection", "Tier progress", "Event history", "Reputation score"]
+        },
+        { 
+          path: "/ranks", 
+          label: "Leaderboard / Ranks", 
+          description: "Community rankings by reputation and activity",
+          demoPoints: ["Top members", "Chapter rankings", "Activity streaks", "Achievement badges"]
+        },
+        { 
+          path: "/referral", 
+          label: "Referral System", 
+          description: "Invite friends and earn reputation",
+          demoPoints: ["Unique referral codes", "Invite tracking", "Reputation rewards", "Tier bonuses"]
+        },
       ]
     },
     {
-      category: "Authenticated Pages (Marked Users)",
-      items: [
-        { path: "/inside", label: "Inside Feed", description: "Doctrine cards and event announcements" },
-        { path: "/profile", label: "Profile", description: "User profile and artifacts" },
-        { path: "/events", label: "Events List", description: "Browse upcoming gatherings" },
-        { path: "/events/30007", label: "Event: MSG Vol. 3", description: "Might Sound Good event" },
-        { path: "/events/30008", label: "Event: Noodle Sessions", description: "Studio Night event" },
-        { path: "/events/30009", label: "Event: MSG Vol. 4", description: "Zodiac Takeover event" },
+      category: "🎫 Event System",
+      icon: Calendar,
+      color: "#f59e0b",
+      description: "Complete event management and attendance",
+      features: [
+        { 
+          path: "/gatherings", 
+          label: "Event Discovery", 
+          description: "Browse upcoming secret gatherings",
+          demoPoints: ["Upcoming events", "Past events archive", "Eligibility check", "RSVP status"]
+        },
+        { 
+          path: "/staff", 
+          label: "Staff Check-in Portal", 
+          description: "QR scanning for event door control",
+          demoPoints: ["QR code scanner", "Pass validation", "Check-in logging", "Capacity tracking"]
+        },
       ]
     },
     {
-      category: "Staff Portal",
-      items: [
-        { path: "/staff", label: "Staff Portal", description: "QR scanning for event check-in" },
+      category: "🤝 Partners & Sponsors",
+      icon: Star,
+      color: "#ec4899",
+      description: "Sponsor integration and partnership features",
+      features: [
+        { 
+          path: "/partners", 
+          label: "Partners Page", 
+          description: "Sponsor showcase with tier-based visibility",
+          demoPoints: ["Platinum/Gold/Silver tiers", "Banner display", "Analytics tracking", "Inquiry form"]
+        },
+        { 
+          path: "/sponsors/analytics", 
+          label: "Sponsor Analytics", 
+          description: "Dashboard for sponsor performance metrics",
+          demoPoints: ["Impression tracking", "Click-through rates", "Event sponsorship", "ROI metrics"]
+        },
       ]
     },
     {
-      category: "Admin Panel",
-      items: [
-        { path: "/admin", label: "Admin Dashboard", description: "Full admin panel with tabs" },
-        { path: "/admin?tab=drops", label: "Admin: Drops", description: "Manage drops" },
-        { path: "/admin?tab=artifacts", label: "Admin: Artifacts", description: "Manage artifacts" },
-        { path: "/admin?tab=events", label: "Admin: Events", description: "Manage events" },
-        { path: "/admin?tab=users", label: "Admin: Users", description: "Manage users" },
-        { path: "/admin?tab=doctrine", label: "Admin: Doctrine", description: "Manage doctrine cards" },
-        { path: "/admin?tab=ugc", label: "Admin: UGC", description: "Manage user-generated content" },
-        { path: "/admin?tab=logs", label: "Admin: Audit Logs", description: "View audit logs" },
+      category: "⚙️ Administration",
+      icon: Settings,
+      color: "#6366f1",
+      description: "Backend management and content control",
+      features: [
+        { 
+          path: "/admin", 
+          label: "Admin Dashboard", 
+          description: "Full administrative control panel",
+          demoPoints: ["User management", "Drop creation", "Event management", "Analytics overview"]
+        },
+        { 
+          path: "/admin?tab=drops", 
+          label: "Manage Marks/Drops", 
+          description: "Create and edit product drops",
+          demoPoints: ["Create new drops", "Set pricing", "Upload images", "Generate artifacts"]
+        },
+        { 
+          path: "/admin?tab=events", 
+          label: "Manage Gatherings", 
+          description: "Create and manage events",
+          demoPoints: ["Event creation", "Location management", "Capacity settings", "Pass tracking"]
+        },
+        { 
+          path: "/admin?tab=users", 
+          label: "User Management", 
+          description: "Manage member accounts and roles",
+          demoPoints: ["Role assignment", "Tier adjustment", "Account suspension", "Activity logs"]
+        },
+        { 
+          path: "/admin?tab=sponsors", 
+          label: "Sponsor Management", 
+          description: "Manage sponsor partnerships",
+          demoPoints: ["Add sponsors", "Set tiers", "Upload banners", "Track performance"]
+        },
+        { 
+          path: "/admin?tab=doctrine", 
+          label: "Doctrine Cards", 
+          description: "Manage manifesto and announcement cards",
+          demoPoints: ["Create cards", "Set visibility", "Schedule posts", "Archive content"]
+        },
+        { 
+          path: "/admin?tab=logs", 
+          label: "Audit Logs", 
+          description: "System activity and security logs",
+          demoPoints: ["User actions", "Admin changes", "Security events", "Error tracking"]
+        },
       ]
+    },
+  ];
+
+  const systemFeatures = [
+    {
+      title: "Stratified Reality",
+      icon: Eye,
+      description: "Content visibility based on member tier - outside users see blurred/hidden content, members see full details",
+      status: "active"
+    },
+    {
+      title: "Tiered Membership",
+      icon: Trophy,
+      description: "4-tier system: Outside → Initiate → Member → Inner Circle with progressive access",
+      status: "active"
+    },
+    {
+      title: "Mark Verification",
+      icon: QrCode,
+      description: "Physical product authentication via serial number and activation code",
+      status: "active"
+    },
+    {
+      title: "Reputation System",
+      icon: Star,
+      description: "Earn points through events, referrals, and engagement to advance tiers",
+      status: "active"
+    },
+    {
+      title: "Location Reveal",
+      icon: Lock,
+      description: "Event locations hidden until X hours before, then revealed to RSVP holders",
+      status: "active"
+    },
+    {
+      title: "Sponsor Integration",
+      icon: Gift,
+      description: "Platinum/Gold/Silver sponsor tiers with analytics and event sponsorship",
+      status: "active"
     },
   ];
 
   return (
-    <div className="min-h-screen bg-noir-950 text-white p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-#9333EA mb-2">🛠 Dev Navigation</h1>
-          <p className="text-zinc-400">Quick access to all routes in comm@ for development and testing</p>
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-[#222222]">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link href="/">
+              <span className="text-2xl font-bold text-[#9333EA]">@</span>
+            </Link>
+            <div>
+              <h1 className="text-xl font-bold text-white">COMM@ Demo Console</h1>
+              <p className="text-xs text-[#666666]">Feature showcase for client demonstrations</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            {isAuthenticated && user && (
+              <div className="text-right">
+                <p className="text-sm text-white">{user.name || user.email}</p>
+                <p className="text-xs text-[#9333EA]">{user.role?.toUpperCase()}</p>
+              </div>
+            )}
+            <Link href="/">
+              <Button variant="outline" size="sm" className="border-[#333333] text-[#999999] hover:text-white hover:border-[#9333EA]">
+                <ExternalLink className="w-4 h-4 mr-2" />
+                View Site
+              </Button>
+            </Link>
+          </div>
         </div>
+      </header>
 
-        {/* Test Activation Codes */}
-        <div className="mb-8 p-6 bg-#9333EA/10 border border-#9333EA/30 rounded-lg">
-          <h3 className="text-#A855F7 font-semibold mb-4 text-lg">🔑 Test Activation Codes (Going Noodles)</h3>
-          <div className="grid gap-2">
-            {testCodes.map((item) => (
-              <div key={item.serial} className="flex items-center justify-between p-3 bg-zinc-900/50 rounded-lg">
-                <div>
-                  <span className="font-mono text-#A855F7">{item.serial}</span>
-                  <span className="text-zinc-500 mx-2">—</span>
-                  <span className="text-zinc-300">{item.drop}</span>
+      <main className="max-w-6xl mx-auto px-6 py-8">
+        {/* System Overview */}
+        <section className="mb-12">
+          <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <Zap className="w-5 h-5 text-[#9333EA]" />
+            System Features Overview
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {systemFeatures.map((feature) => (
+              <div key={feature.title} className="bg-[#111111] border border-[#222222] rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#9333EA]/10 flex items-center justify-center flex-shrink-0">
+                    <feature.icon className="w-5 h-5 text-[#9333EA]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white mb-1">{feature.title}</h3>
+                    <p className="text-xs text-[#666666] leading-relaxed">{feature.description}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <code className="font-mono text-sm text-zinc-400 bg-zinc-800 px-2 py-1 rounded">{item.code}</code>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyToClipboard(item.code)}
-                    className="h-8 w-8 p-0"
-                  >
-                    {copiedCode === item.code ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Copy className="h-4 w-4 text-zinc-400" />
-                    )}
-                  </Button>
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#22c55e]"></span>
+                  <span className="text-xs text-[#22c55e]">Active</span>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div className="space-y-8">
-          {routes.map((section) => (
-            <div key={section.category} className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-#A855F7 mb-4 uppercase tracking-wider">
-                {section.category}
-              </h2>
-              <div className="grid gap-3">
-                {section.items.map((route) => (
-                  <Link key={route.path} href={route.path}>
-                    <div className="flex items-center justify-between p-3 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer group">
-                      <div>
-                        <div className="font-medium text-white group-hover:text-#A855F7 transition-colors">
-                          {route.label}
+        {/* Test Activation Codes */}
+        <section className="mb-12">
+          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <QrCode className="w-5 h-5 text-[#9333EA]" />
+            Test Activation Codes
+          </h2>
+          <div className="bg-[#111111] border border-[#9333EA]/30 rounded-lg p-6">
+            <p className="text-sm text-[#666666] mb-4">Use these codes to test the mark verification flow:</p>
+            <div className="grid gap-3">
+              {testCodes.map((item) => (
+                <div key={item.serial} className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-lg border border-[#222222]">
+                  <div className="flex items-center gap-4">
+                    <span className="font-mono text-[#9333EA] text-sm">{item.serial}</span>
+                    <span className="text-[#444444]">—</span>
+                    <span className="text-[#cccccc] text-sm">{item.drop}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <code className="font-mono text-xs text-[#666666] bg-[#1a1a1a] px-3 py-1.5 rounded">{item.code}</code>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyToClipboard(item.code)}
+                      className="h-8 w-8 p-0 hover:bg-[#9333EA]/10"
+                    >
+                      {copiedCode === item.code ? (
+                        <Check className="h-4 w-4 text-[#22c55e]" />
+                      ) : (
+                        <Copy className="h-4 w-4 text-[#666666]" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Feature Categories */}
+        <section className="space-y-8">
+          {featureCategories.map((category) => (
+            <div key={category.category} className="bg-[#111111] border border-[#222222] rounded-lg overflow-hidden">
+              <div className="px-6 py-4 border-b border-[#222222] flex items-center gap-3">
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: `${category.color}20` }}
+                >
+                  <category.icon className="w-5 h-5" style={{ color: category.color }} />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-white">{category.category}</h2>
+                  <p className="text-xs text-[#666666]">{category.description}</p>
+                </div>
+              </div>
+              
+              <div className="divide-y divide-[#1a1a1a]">
+                {category.features.map((feature) => (
+                  <div key={feature.path} className="p-4 hover:bg-[#0a0a0a] transition-colors">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Link href={feature.path}>
+                            <span className="text-sm font-bold text-white hover:text-[#9333EA] transition-colors cursor-pointer">
+                              {feature.label}
+                            </span>
+                          </Link>
+                          <code className="text-xs text-[#444444] font-mono">{feature.path}</code>
                         </div>
-                        <div className="text-sm text-zinc-500">{route.description}</div>
+                        <p className="text-xs text-[#666666] mb-3">{feature.description}</p>
+                        {feature.demoPoints && (
+                          <div className="flex flex-wrap gap-2">
+                            {feature.demoPoints.map((point, idx) => (
+                              <span 
+                                key={idx}
+                                className="text-[10px] px-2 py-1 bg-[#1a1a1a] text-[#888888] rounded"
+                              >
+                                {point}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <div className="text-zinc-600 font-mono text-sm">
-                        {route.path}
-                      </div>
+                      <Link href={feature.path}>
+                        <Button 
+                          size="sm" 
+                          className="bg-[#9333EA] hover:bg-[#7e22ce] text-white flex-shrink-0"
+                        >
+                          <Play className="w-3 h-3 mr-1" />
+                          Demo
+                        </Button>
+                      </Link>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             </div>
           ))}
-        </div>
+        </section>
 
-        <div className="mt-8 p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg">
-          <h3 className="text-#A855F7 font-semibold mb-2">Going Noodles Sample Data</h3>
-          <ul className="text-sm text-zinc-400 space-y-1">
-            <li>• <strong>6 Drops</strong> — MSG Vol. 1 Sukajan, Ca$hmere Chain, Team Tomodachi Bomber, Good Girl Hoodie, BOMBAE Varsity, Noodle Bowl Chain</li>
-            <li>• <strong>320 Artifacts</strong> — Various sizes (S, M, L, XL, OS) with 70% unmarked, 20% marked, 10% flagged</li>
-            <li>• <strong>3 Events</strong> — MSG Vol. 3, Noodle Sessions: Studio Night, MSG Vol. 4: Zodiac Takeover</li>
-            <li>• <strong>10 UGC entries</strong> — Scene proof photos linked to drops</li>
-            <li>• <strong>4 Doctrine Cards</strong> — Going Noodles manifesto content</li>
-          </ul>
-        </div>
+        {/* Quick Stats */}
+        <section className="mt-12 mb-8">
+          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <Database className="w-5 h-5 text-[#9333EA]" />
+            Database Status
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-[#111111] border border-[#222222] rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-[#9333EA]">28</p>
+              <p className="text-xs text-[#666666]">Tables</p>
+            </div>
+            <div className="bg-[#111111] border border-[#222222] rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-[#22c55e]">2</p>
+              <p className="text-xs text-[#666666]">Sample Marks</p>
+            </div>
+            <div className="bg-[#111111] border border-[#222222] rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-[#f59e0b]">2</p>
+              <p className="text-xs text-[#666666]">Sample Gatherings</p>
+            </div>
+            <div className="bg-[#111111] border border-[#222222] rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-[#3b82f6]">1</p>
+              <p className="text-xs text-[#666666]">Admin User</p>
+            </div>
+          </div>
+        </section>
 
-        <div className="mt-4 text-center text-zinc-600 text-sm">
-          <Link href="/" className="hover:text-#A855F7 transition-colors">
-            ← Back to Home
+        {/* Footer */}
+        <footer className="mt-12 pt-8 border-t border-[#222222] text-center">
+          <p className="text-xs text-[#444444]">
+            COMM@ Demo Console • Built for client demonstrations
+          </p>
+          <Link href="/">
+            <span className="text-xs text-[#9333EA] hover:text-[#a855f7] transition-colors cursor-pointer">
+              ← Return to Homepage
+            </span>
           </Link>
-        </div>
-      </div>
+        </footer>
+      </main>
     </div>
   );
 }

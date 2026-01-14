@@ -272,7 +272,7 @@ function DropPreviewCard({ drop, isBlurred = false }: { drop: any, isBlurred?: b
         {/* Price and edition */}
         <div className="flex items-center justify-between">
           <span className={`text-sm font-mono ${isBlurred ? 'blur-[2px] text-[#666666]' : 'text-[#9333EA]'}`}>
-            {isBlurred ? '███' : (drop.priceIdr ? `IDR ${drop.priceIdr.toLocaleString()}` : 'FREE')}
+            {isBlurred ? '███' : (drop.priceIdr && drop.priceIdr > 0 ? `IDR ${drop.priceIdr.toLocaleString()}` : 'INQUIRE')}
           </span>
           <span className="text-[10px] text-[#444444] font-mono">
             {drop.totalArtifacts || '??'} editions
