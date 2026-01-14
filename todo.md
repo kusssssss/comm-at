@@ -170,3 +170,14 @@
 ## Bug Fixes - Events & Favicon
 - [x] Fix events not showing on Gatherings page (fixed event_passes table schema mismatch - added missing columns)
 - [x] Fix favicon not loading on production site (added cache-busting query parameters to favicon links)
+
+## Bug Fixes - View Gathering Button
+- [ ] Fix View Gathering button not working on homepage
+
+## Bug Fixes - Branding
+- [ ] Fix remaining "streetwear collective" references to "secret society" (Open Graph meta tags showing old branding in share preview)
+
+## Bug Fixes - Stratified Reality
+- [x] Fix price visibility inconsistency (fixed by adding 'public' visibility level and consistent filtering)
+- [x] Add minimum tier indicator when content is restricted (added minimumTierRequired field to visibility filters)
+- [x] Ensure consistent visibility logic across all pages (updated Drops.tsx, Events.tsx, EventDetail.tsx)

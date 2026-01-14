@@ -120,6 +120,15 @@ export default function Events() {
                           </span>
                         </div>
                       </div>
+                      
+                      {/* Show minimum tier required if user can't claim pass */}
+                      {(event as any).minimumTierRequired && !(event as any).canClaimPass && (
+                        <div className="mt-3 pt-3 border-t border-border/30">
+                          <span className="text-xs text-[#9333EA] uppercase tracking-wider">
+                            Requires {(event as any).minimumTierRequired} tier to claim pass
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </Link>
                 ))}

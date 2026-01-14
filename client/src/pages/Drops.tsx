@@ -32,6 +32,7 @@ export default function Drops() {
   // Check if content is restricted (from stratified reality filtering)
   const isBlurred = (currentDrop as any)?.isBlurred ?? false;
   const isRestricted = (currentDrop as any)?.isRestricted ?? false;
+  const minimumTierRequired = (currentDrop as any)?.minimumTierRequired ?? null;
 
   // Fetch UGC for current drop (only if not restricted)
   const { data: ugcList } = trpc.ugc.getByDrop.useQuery(
@@ -271,6 +272,11 @@ export default function Drops() {
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
                         <Lock className="w-12 h-12 text-[#9333EA] mb-4" />
                         <p className="text-white text-lg font-medium mb-2">Content Restricted</p>
+                        {minimumTierRequired && (
+                          <p className="text-[#9333EA] text-xs uppercase tracking-widest mb-2">
+                            Requires {minimumTierRequired} tier or higher
+                          </p>
+                        )}
                         <p className="text-[#888888] text-sm text-center px-8 max-w-xs">
                           {getAccessMessage()}
                         </p>
@@ -403,9 +409,16 @@ export default function Drops() {
                       IDR {Number(currentDrop.priceIdr).toLocaleString()}
                     </p>
                   ) : isRestricted ? (
-                    <div className="flex items-center gap-2 text-[#666666]">
-                      <Lock className="w-4 h-4" />
-                      <span className="text-lg">Price hidden</span>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2 text-[#666666]">
+                        <Lock className="w-4 h-4" />
+                        <span className="text-lg">Price hidden</span>
+                      </div>
+                      {minimumTierRequired && (
+                        <span className="text-xs text-[#9333EA] uppercase tracking-wider">
+                          Requires {minimumTierRequired} tier
+                        </span>
+                      )}
                     </div>
                   ) : null}
 

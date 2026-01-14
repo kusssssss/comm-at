@@ -93,7 +93,9 @@ export default function EventDetail() {
 
   const isPast = event.eventDate && new Date(event.eventDate) <= new Date();
   const isFull = event.passCount >= event.capacity;
-  const canClaim = !event.hasPass && !isPast && !isFull;
+  const canClaimPass = (event as any).canClaimPass ?? true;
+  const minimumTierRequired = (event as any).minimumTierRequired ?? null;
+  const canClaim = !event.hasPass && !isPast && !isFull && canClaimPass;
 
   // Calculate countdown to location reveal
   let countdown = null;
@@ -249,6 +251,19 @@ export default function EventDetail() {
                 <p className="text-sm text-muted-foreground text-center">This gathering has ended.</p>
               ) : isFull ? (
                 <p className="text-sm text-muted-foreground text-center">This gathering is at capacity.</p>
+              ) : !canClaimPass && minimumTierRequired ? (
+                <div className="text-center space-y-2">
+                  <div className="flex items-center justify-center gap-2 text-[#9333EA]">
+                    <Lock className="w-4 h-4" />
+                    <span className="text-sm font-medium">Tier Restricted</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Requires <span className="text-[#9333EA] font-medium">{minimumTierRequired}</span> tier or higher to claim pass
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Earn your place in the hierarchy to unlock this gathering.
+                  </p>
+                </div>
               ) : (
                 <div className="space-y-4">
                   {/* Plus-one option */}

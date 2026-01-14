@@ -12,11 +12,38 @@ import type { User } from "../drizzle/schema";
 
 // Visibility levels from lowest to highest access
 export const VISIBILITY_LEVELS = {
-  public_fragment: 0,   // Outside users - fragments only
+  public: 0,            // Everyone can see
+  public_fragment: 0,   // Outside users - fragments only (alias for public)
   marked_fragment: 1,   // Initiates - more but not full
   full_context: 2,      // Members - everything
   inner_only: 3,        // Inner circle - exclusive content
 } as const;
+
+// Human-readable tier names for UI display
+export const TIER_DISPLAY_NAMES: Record<string, string> = {
+  public: 'Everyone',
+  public_fragment: 'Everyone',
+  marked_fragment: 'Initiate',
+  full_context: 'Member',
+  inner_only: 'Inner Circle',
+};
+
+// Get the minimum tier required to view content
+export function getMinimumTierForContent(visibilityLevel: string): string {
+  switch (visibilityLevel) {
+    case 'public':
+    case 'public_fragment':
+      return 'Everyone';
+    case 'marked_fragment':
+      return 'Initiate';
+    case 'full_context':
+      return 'Member';
+    case 'inner_only':
+      return 'Inner Circle';
+    default:
+      return 'Member'; // Default to member if unknown
+  }
+}
 
 export type VisibilityLevel = keyof typeof VISIBILITY_LEVELS;
 
@@ -81,13 +108,20 @@ export function filterDropForVisibility<T extends {
   productImages?: string | null;
   storyBlurb?: string | null;
   visibilityLevel?: string | null;
-}>(drop: T, user: User | null): T & { isBlurred: boolean; isRestricted: boolean } {
+}>(drop: T, user: User | null): T & { isBlurred: boolean; isRestricted: boolean; minimumTierRequired: string | null } {
   const markState = getMarkState(user);
-  const dropVisibility = (drop.visibilityLevel || 'public_fragment') as VisibilityLevel;
-  const canSee = canSeeContent(user, dropVisibility);
+  const dropVisibility = drop.visibilityLevel || 'public';
+  
+  // Handle 'public' visibility - everyone can see
+  if (dropVisibility === 'public') {
+    return { ...drop, isBlurred: false, isRestricted: false, minimumTierRequired: null };
+  }
+  
+  const canSee = canSeeContent(user, dropVisibility as VisibilityLevel);
+  const minimumTier = getMinimumTierForContent(dropVisibility);
   
   if (canSee) {
-    return { ...drop, isBlurred: false, isRestricted: false };
+    return { ...drop, isBlurred: false, isRestricted: false, minimumTierRequired: null };
   }
   
   // Apply restrictions based on mark state
@@ -100,6 +134,7 @@ export function filterDropForVisibility<T extends {
       storyBlurb: null, // Hide story
       isBlurred: true,
       isRestricted: true,
+      minimumTierRequired: minimumTier,
     };
   }
   
@@ -112,10 +147,11 @@ export function filterDropForVisibility<T extends {
       storyBlurb: drop.storyBlurb ? drop.storyBlurb.substring(0, 200) + '...' : null,
       isBlurred: false,
       isRestricted: true,
+      minimumTierRequired: minimumTier,
     };
   }
   
-  return { ...drop, isBlurred: false, isRestricted: false };
+  return { ...drop, isBlurred: false, isRestricted: false, minimumTierRequired: null };
 }
 
 // Filter UGC based on visibility
@@ -167,10 +203,15 @@ export function filterEventForVisibility<T extends {
   isRestricted: boolean;
   locationRevealed: boolean;
   canClaimPass: boolean;
+  minimumTierRequired: string | null;
 } {
   const markState = getMarkState(user);
   const eligibility = (event.eligibilityMinState || 'member') as 'initiate' | 'member' | 'inner_circle';
   const contentVisibility = (event.contentVisibility || 'member') as 'member' | 'inner_circle';
+  
+  // Get minimum tier for this event
+  const minimumTier = eligibility === 'initiate' ? 'Initiate' : 
+                      eligibility === 'member' ? 'Member' : 'Inner Circle';
   
   // Check if location should be revealed
   const now = new Date();
@@ -198,6 +239,7 @@ export function filterEventForVisibility<T extends {
       isRestricted: true,
       locationRevealed: false,
       canClaimPass: false,
+      minimumTierRequired: minimumTier,
     };
   }
   
@@ -210,6 +252,7 @@ export function filterEventForVisibility<T extends {
       isRestricted: true,
       locationRevealed,
       canClaimPass,
+      minimumTierRequired: canClaimPass ? null : minimumTier,
     };
   }
   
@@ -221,6 +264,7 @@ export function filterEventForVisibility<T extends {
     isRestricted: false,
     locationRevealed,
     canClaimPass,
+    minimumTierRequired: null,
   };
 }
 

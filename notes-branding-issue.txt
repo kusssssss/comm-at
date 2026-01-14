@@ -1,0 +1,14 @@
+Issue: Share preview on iOS shows "Exclusive Streetwear Collective" instead of "Exclusive Secret Society"
+
+Analysis:
+1. The index.html Open Graph tags are already correct - they show "Exclusive Secret Society"
+2. The share preview is likely coming from:
+   - Cached data on the device
+   - The published version hasn't been updated yet
+   - Or there's a server-side meta tag generator
+
+The current index.html has:
+- og:title: "COMM@ | Exclusive Secret Society"
+- og:description: "Invitation-only secret society. Exclusive marks, secret gatherings, and inner circle access in South Jakarta."
+
+Solution: Need to republish the site to update the cached Open Graph data.
