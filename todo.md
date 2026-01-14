@@ -181,3 +181,9 @@
 - [x] Fix price visibility inconsistency (fixed by adding 'public' visibility level and consistent filtering)
 - [x] Add minimum tier indicator when content is restricted (added minimumTierRequired field to visibility filters)
 - [x] Ensure consistent visibility logic across all pages (updated Drops.tsx, Events.tsx, EventDetail.tsx)
+
+## Test Users
+- [x] Create test user with marked_initiate role (Test Initiate / INITIATE_TEST)
+- [x] Create test user with marked_member role (Test Member / MEMBER_TEST)
+- [x] Create test user with marked_inner_circle role (Test Inner Circle / INNER_TEST)
+- [x] Add Test User Impersonation UI to Dev Console page

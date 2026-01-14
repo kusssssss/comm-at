@@ -1,9 +1,125 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, ExternalLink, Play, Users, Calendar, Shield, Zap, Gift, Eye, Lock, Star, Trophy, MessageSquare, Settings, Database, Image, QrCode } from "lucide-react";
+import { Copy, Check, ExternalLink, Play, Users, Calendar, Shield, Zap, Gift, Eye, Lock, Star, Trophy, MessageSquare, Settings, Database, Image, QrCode, UserCircle, RefreshCw } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
+
+/**
+ * Test User Switcher Component
+ * Allows admins to impersonate test users for testing stratified visibility
+ */
+function TestUserSwitcher() {
+  const [, navigate] = useLocation();
+  const { data: testUsers, isLoading } = trpc.dev.getTestUsers.useQuery();
+  const impersonateMutation = trpc.dev.impersonate.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Now viewing as ${data.user.name}`);
+      // Reload the page to apply new session
+      window.location.reload();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  const stopImpersonatingMutation = trpc.dev.stopImpersonating.useMutation({
+    onSuccess: () => {
+      toast.success('Session ended. Please log in again.');
+      window.location.href = '/';
+    },
+  });
+
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'marked_initiate': return 'bg-blue-500/20 text-blue-400';
+      case 'marked_member': return 'bg-purple-500/20 text-purple-400';
+      case 'marked_inner_circle': return 'bg-amber-500/20 text-amber-400';
+      default: return 'bg-gray-500/20 text-gray-400';
+    }
+  };
+
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'marked_initiate': return 'Initiate';
+      case 'marked_member': return 'Member';
+      case 'marked_inner_circle': return 'Inner Circle';
+      default: return role;
+    }
+  };
+
+  return (
+    <section className="mb-12">
+      <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+        <UserCircle className="w-5 h-5 text-[#9333EA]" />
+        Test User Impersonation
+      </h2>
+      <div className="bg-[#111111] border border-[#9333EA]/30 rounded-lg p-6">
+        <p className="text-sm text-[#666666] mb-4">
+          Switch to a test user to experience the app from different tier perspectives. 
+          This is useful for testing Stratified Reality visibility.
+        </p>
+        
+        {isLoading ? (
+          <div className="text-center py-4">
+            <RefreshCw className="w-5 h-5 animate-spin text-[#9333EA] mx-auto" />
+          </div>
+        ) : testUsers && testUsers.length > 0 ? (
+          <div className="grid gap-3">
+            {testUsers.map((testUser) => (
+              <div 
+                key={testUser.id} 
+                className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-lg border border-[#222222]"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-[#9333EA]/20 flex items-center justify-center">
+                    <UserCircle className="w-6 h-6 text-[#9333EA]" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium">{testUser.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`text-xs px-2 py-0.5 rounded ${getRoleBadgeColor(testUser.role || '')}`}>
+                        {getRoleLabel(testUser.role || '')}
+                      </span>
+                      <span className="text-xs text-[#666666]">{testUser.callSign}</span>
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => impersonateMutation.mutate({ userId: testUser.id })}
+                  disabled={impersonateMutation.isPending}
+                  className="bg-[#9333EA] hover:bg-[#7e22ce] text-white"
+                >
+                  {impersonateMutation.isPending ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    'View As'
+                  )}
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-[#666666] text-center py-4">
+            No test users found. Create test users in the database first.
+          </p>
+        )}
+        
+        <div className="mt-4 pt-4 border-t border-[#222222]">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => stopImpersonatingMutation.mutate()}
+            className="border-[#333333] text-[#999999] hover:text-white hover:border-[#9333EA]"
+          >
+            End Session & Return to Login
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 /**
  * Development & Demo Page
@@ -294,6 +410,11 @@ export default function Dev() {
             ))}
           </div>
         </section>
+
+        {/* Test User Impersonation */}
+        {isAuthenticated && user?.role === 'admin' && (
+          <TestUserSwitcher />
+        )}
 
         {/* Test Activation Codes */}
         <section className="mb-12">

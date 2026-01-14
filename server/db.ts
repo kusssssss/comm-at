@@ -1,4 +1,4 @@
-import { eq, and, desc, gte, lt, sql, count, gt, inArray } from "drizzle-orm";
+import { eq, and, desc, gte, lt, sql, count, gt, inArray, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import * as crypto from "crypto";
 import { nanoid } from "nanoid";
@@ -111,6 +111,21 @@ export async function getUserByCallSign(callSign: string) {
   if (!db) return undefined;
   const result = await db.select().from(users).where(eq(users.callSign, callSign)).limit(1);
   return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getTestUsers() {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select({
+    id: users.id,
+    openId: users.openId,
+    name: users.name,
+    email: users.email,
+    role: users.role,
+    markState: users.markState,
+    callSign: users.callSign,
+  }).from(users).where(like(users.openId, 'test-%'));
+  return result;
 }
 
 export async function updateUserRole(userId: number, role: User['role'], callSign?: string, chapter?: string) {

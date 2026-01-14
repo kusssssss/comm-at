@@ -1,0 +1,37 @@
+{
+  "query": "SELECT id, openId, name, email, userRole, markState, callSign FROM users WHERE openId LIKE 'test-%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, openId, name, email, userRole, markState, callSign FROM users WHERE openId LIKE 'test-%';",
+  "rows": [
+    {
+      "id": "90009",
+      "openId": "test-initiate-001",
+      "name": "Test Initiate",
+      "email": "initiate@test.com",
+      "userRole": "marked_initiate",
+      "markState": "initiate",
+      "callSign": "INITIATE_TEST"
+    },
+    {
+      "id": "90010",
+      "openId": "test-member-001",
+      "name": "Test Member",
+      "email": "member@test.com",
+      "userRole": "marked_member",
+      "markState": "member",
+      "callSign": "MEMBER_TEST"
+    },
+    {
+      "id": "90011",
+      "openId": "test-inner-001",
+      "name": "Test Inner Circle",
+      "email": "inner@test.com",
+      "userRole": "marked_inner_circle",
+      "markState": "inner_circle",
+      "callSign": "INNER_TEST"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\tuserRole\tmarkState\tcallSign\n90009\ttest-initiate-001\tTest Initiate\tinitiate@test.com\tmarked_initiate\tinitiate\tINITIATE_TEST\n90010\ttest-member-001\tTest Member\tmember@test.com\tmarked_member\tmember\tMEMBER_TEST\n90011\ttest-inner-001\tTest Inner Circle\tinner@test.com\tmarked_inner_circle\tinner_circle\tINNER_TEST\n",
+  "stderr": "",
+  "execution_time_ms": 1650
+}

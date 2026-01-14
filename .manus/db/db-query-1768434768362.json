@@ -1,0 +1,9 @@
+{
+  "query": "\nINSERT INTO users (openId, name, email, role, userRole, markState, callSign, chapter, createdAt, updatedAt, lastSignedIn)\nVALUES \n  ('test-initiate-001', 'Test Initiate', 'initiate@test.com', 'user', 'marked_initiate', 'initiate', 'INITIATE_TEST', 'South Jakarta', NOW(), NOW(), NOW()),\n  ('test-member-001', 'Test Member', 'member@test.com', 'user', 'marked_member', 'member', 'MEMBER_TEST', 'South Jakarta', NOW(), NOW(), NOW()),\n  ('test-inner-001', 'Test Inner Circle', 'inner@test.com', 'user', 'marked_inner_circle', 'inner_circle', 'INNER_TEST', 'South Jakarta', NOW(), NOW(), NOW())\nON DUPLICATE KEY UPDATE name = VALUES(name), userRole = VALUES(userRole), markState = VALUES(markState);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute \nINSERT INTO users (openId, name, email, role, userRole, markState, callSign, chapter, createdAt, updatedAt, lastSignedIn)\nVALUES \n  ('test-initiate-001', 'Test Initiate', 'initiate@test.com', 'user', 'marked_initiate', 'initiate', 'INITIATE_TEST', 'South Jakarta', NOW(), NOW(), NOW()),\n  ('test-member-001', 'Test Member', 'member@test.com', 'user', 'marked_member', 'member', 'MEMBER_TEST', 'South Jakarta', NOW(), NOW(), NOW()),\n  ('test-inner-001', 'Test Inner Circle', 'inner@test.com', 'user', 'marked_inner_circle', 'inner_circle', 'INNER_TEST', 'South Jakarta', NOW(), NOW(), NOW())\nON DUPLICATE KEY UPDATE name = VALUES(name), userRole = VALUES(userRole), markState = VALUES(markState);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1566
+}

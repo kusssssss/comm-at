@@ -71,6 +71,50 @@ export const appRouter = router({
       return { success: true } as const;
     }),
   }),
+  
+  // ============================================================================
+  // DEV ROUTER - Development/testing utilities (admin only)
+  // ============================================================================
+  dev: router({
+    // Get list of test users for impersonation
+    getTestUsers: adminProcedure.query(async () => {
+      const testUsers = await db.getTestUsers();
+      return testUsers;
+    }),
+    
+    // Impersonate a test user (creates a new session as that user)
+    impersonate: adminProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const targetUser = await db.getUserById(input.userId);
+        if (!targetUser) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+        }
+        
+        // Only allow impersonating test users (openId starts with 'test-')
+        if (!targetUser.openId.startsWith('test-')) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Can only impersonate test users" });
+        }
+        
+        // Create a new session for the target user using sdk
+        const { sdk } = await import("./_core/sdk");
+        const token = await sdk.createSessionToken(targetUser.openId, {
+          name: targetUser.name || 'Test User',
+        });
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+        
+        return { success: true, user: targetUser };
+      }),
+      
+    // Return to original admin session
+    stopImpersonating: protectedProcedure.mutation(async ({ ctx }) => {
+      // Clear the current session - user will need to log in again
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      return { success: true };
+    }),
+  }),
 
   // ============================================================================
   // OTP ROUTER - Phone verification
