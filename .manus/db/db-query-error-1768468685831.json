@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, name, tier, logoUrl, bannerUrl FROM sponsors;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, name, tier, logoUrl, bannerUrl FROM sponsors;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'tier' in 'field list'"
+  ]
+}

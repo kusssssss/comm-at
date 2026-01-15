@@ -187,3 +187,6 @@
 - [x] Create test user with marked_member role (Test Member / MEMBER_TEST)
 - [x] Create test user with marked_inner_circle role (Test Inner Circle / INNER_TEST)
 - [x] Add Test User Impersonation UI to Dev Console page
+
+## Sponsor Image Fix
+- [x] Add octopus NFT image to FEELBERT GROUP sponsor section (generated NEO-OCTO #888 cyberpunk octopus NFT)

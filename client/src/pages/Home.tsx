@@ -1125,7 +1125,7 @@ export default function Home() {
                 </div>
                 <div className="flex-1 text-center">
                   <div className="inline-block bg-gradient-to-br from-yellow-400/30 to-amber-600/20 border border-yellow-400/50 rounded-xl p-4 overflow-hidden">
-                    <img src="/monkey-nft.png" alt="FEELBERT Group Monkey NFT" className="w-48 h-48 object-contain" />
+                    <img src="/sponsors/feelbert-octopus.png" alt="FEELBERT Group Octopus NFT" className="w-48 h-48 object-contain" />
                   </div>
                 </div>
               </div>
