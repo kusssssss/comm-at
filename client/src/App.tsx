@@ -38,6 +38,9 @@ import Admin from "./pages/Admin";
 import Dev from "./pages/Dev";
 import HomeTest from "./pages/HomeTest";
 
+// Auth pages
+import Login from "./pages/Login";
+
 function Router() {
   return (
     <Switch>
@@ -56,6 +59,7 @@ function Router() {
       <Route path="/admin/sponsor/:sponsorId/analytics" component={SponsorAnalytics} />
       <Route path="/apply" component={Apply} />
       <Route path="/acquire/:dropId" component={Acquire} />
+      <Route path="/login" component={Login} />
       
       {/* Protected routes (marked users) */}
       <Route path="/inside" component={Inside} />

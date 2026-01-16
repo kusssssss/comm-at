@@ -190,3 +190,15 @@
 
 ## Sponsor Image Fix
 - [x] Add octopus NFT image to FEELBERT GROUP sponsor section (generated NEO-OCTO #888 cyberpunk octopus NFT)
+
+## Custom Authentication System (Replace Manus OAuth)
+- [x] Design database schema for user credentials (username, password hash, phone)
+- [x] Add user_credentials table to store login info
+- [x] Build admin UI for creating user accounts with password
+- [x] Build admin UI for managing user credentials (reset password, bind phone)
+- [x] Implement custom login page (/login)
+- [x] Implement password hashing and verification (bcryptjs)
+- [x] Add phone number binding to user accounts
+- [x] Create session management (JWT tokens)
+- [x] Add migration path for existing Manus OAuth users (admin can create credentials for any existing user)
+- [x] Test complete authentication flow (login page, admin panel, phone verification)

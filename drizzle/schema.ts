@@ -104,6 +104,30 @@ export type OtpCode = typeof otpCodes.$inferSelect;
 export type InsertOtpCode = typeof otpCodes.$inferInsert;
 
 // ============================================================================
+// USER CREDENTIALS TABLE - Custom auth (admin-created accounts)
+// ============================================================================
+export const userCredentials = mysqlTable("user_credentials", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(), // Links to users table
+  username: varchar("username", { length: 64 }).notNull().unique(),
+  passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
+  phoneNumber: varchar("phoneNumber", { length: 32 }),
+  phoneVerified: boolean("phoneVerified").default(false).notNull(),
+  phoneVerifiedAt: timestamp("phoneVerifiedAt"),
+  mustChangePassword: boolean("mustChangePassword").default(true).notNull(),
+  failedAttempts: int("failedAttempts").default(0).notNull(),
+  lockedUntil: timestamp("lockedUntil"),
+  lastLoginAt: timestamp("lastLoginAt"),
+  lastLoginIp: varchar("lastLoginIp", { length: 45 }),
+  createdById: int("createdById").notNull(), // Admin who created this account
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserCredential = typeof userCredentials.$inferSelect;
+export type InsertUserCredential = typeof userCredentials.$inferInsert;
+
+// ============================================================================
 // CLEARANCE REQUESTS TABLE - Applications to join the collective
 // ============================================================================
 export const clearanceRequestStatusEnum = mysqlEnum("clearanceRequestStatus", [
@@ -422,7 +446,13 @@ export const auditActionEnum = mysqlEnum("auditAction", [
   "clearance_approved",
   "clearance_denied",
   "image_uploaded",
-  "ugc_uploaded"
+  "ugc_uploaded",
+  "password_reset",
+  "credential_created",
+  "credential_deleted",
+  "account_locked",
+  "account_unlocked",
+  "phone_verified"
 ]);
 
 export const auditLogs = mysqlTable("audit_logs", {

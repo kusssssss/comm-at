@@ -16,7 +16,8 @@ import {
   rateLimits,
   clearanceRequests, InsertClearanceRequest,
   memoryLogs, InsertMemoryLog,
-  marks, InsertMark
+  marks, InsertMark,
+  userCredentials, InsertUserCredential, UserCredential
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1862,4 +1863,333 @@ export async function updateSponsorInquiry(id: number, data: { status?: string; 
   await db.update(sponsorInquiries)
     .set({ ...data, updatedAt: new Date() })
     .where(eq(sponsorInquiries.id, id));
+}
+
+// ============================================================================
+// USER CREDENTIALS FUNCTIONS - Custom Authentication System
+// ============================================================================
+
+import * as bcrypt from "bcryptjs";
+
+const SALT_ROUNDS = 12;
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MINUTES = 30;
+
+/**
+ * Hash a password using bcrypt
+ */
+export async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, SALT_ROUNDS);
+}
+
+/**
+ * Verify a password against a hash
+ */
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
+}
+
+/**
+ * Generate a random temporary password
+ */
+export function generateTempPassword(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let password = '';
+  for (let i = 0; i < 12; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
+
+/**
+ * Create user credentials (admin-only)
+ */
+export async function createUserCredentials(data: {
+  userId: number;
+  username: string;
+  password: string;
+  phoneNumber?: string;
+  createdById: number;
+}): Promise<{ id: number; tempPassword?: string }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if username already exists
+  const existing = await db.select()
+    .from(userCredentials)
+    .where(eq(userCredentials.username, data.username))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    throw new Error("Username already exists");
+  }
+  
+  // Check if user already has credentials
+  const existingUser = await db.select()
+    .from(userCredentials)
+    .where(eq(userCredentials.userId, data.userId))
+    .limit(1);
+  
+  if (existingUser.length > 0) {
+    throw new Error("User already has credentials");
+  }
+  
+  const passwordHash = await hashPassword(data.password);
+  
+  const result = await db.insert(userCredentials).values({
+    userId: data.userId,
+    username: data.username,
+    passwordHash,
+    phoneNumber: data.phoneNumber || null,
+    mustChangePassword: true,
+    createdById: data.createdById,
+  });
+  
+  return { id: result[0].insertId };
+}
+
+/**
+ * Get user credentials by username
+ */
+export async function getCredentialsByUsername(username: string): Promise<UserCredential | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(userCredentials)
+    .where(eq(userCredentials.username, username))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Get user credentials by user ID
+ */
+export async function getCredentialsByUserId(userId: number): Promise<UserCredential | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(userCredentials)
+    .where(eq(userCredentials.userId, userId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Authenticate user with username and password
+ */
+export async function authenticateUser(username: string, password: string, ipAddress?: string): Promise<{
+  success: boolean;
+  user?: User;
+  credential?: UserCredential;
+  error?: string;
+  mustChangePassword?: boolean;
+}> {
+  const db = await getDb();
+  if (!db) return { success: false, error: "Database not available" };
+  
+  const credential = await getCredentialsByUsername(username);
+  
+  if (!credential) {
+    return { success: false, error: "Invalid username or password" };
+  }
+  
+  // Check if account is locked
+  if (credential.lockedUntil && new Date(credential.lockedUntil) > new Date()) {
+    const remainingMinutes = Math.ceil((new Date(credential.lockedUntil).getTime() - Date.now()) / 60000);
+    return { success: false, error: `Account locked. Try again in ${remainingMinutes} minutes.` };
+  }
+  
+  // Verify password
+  const isValid = await verifyPassword(password, credential.passwordHash);
+  
+  if (!isValid) {
+    // Increment failed attempts
+    const newAttempts = credential.failedAttempts + 1;
+    const updates: any = { failedAttempts: newAttempts };
+    
+    if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+      const lockUntil = new Date();
+      lockUntil.setMinutes(lockUntil.getMinutes() + LOCKOUT_DURATION_MINUTES);
+      updates.lockedUntil = lockUntil;
+    }
+    
+    await db.update(userCredentials)
+      .set(updates)
+      .where(eq(userCredentials.id, credential.id));
+    
+    const remaining = MAX_FAILED_ATTEMPTS - newAttempts;
+    if (remaining > 0) {
+      return { success: false, error: `Invalid username or password. ${remaining} attempts remaining.` };
+    } else {
+      return { success: false, error: `Account locked for ${LOCKOUT_DURATION_MINUTES} minutes due to too many failed attempts.` };
+    }
+  }
+  
+  // Get the user
+  const user = await getUserById(credential.userId);
+  if (!user) {
+    return { success: false, error: "User not found" };
+  }
+  
+  // Check if user is banned or revoked
+  if (user.status === 'banned' || user.status === 'revoked') {
+    return { success: false, error: "Account has been suspended" };
+  }
+  
+  // Reset failed attempts and update last login
+  await db.update(userCredentials)
+    .set({
+      failedAttempts: 0,
+      lockedUntil: null,
+      lastLoginAt: new Date(),
+      lastLoginIp: ipAddress || null,
+    })
+    .where(eq(userCredentials.id, credential.id));
+  
+  // Update user's last signed in
+  await db.update(users)
+    .set({ lastSignedIn: new Date(), lastActiveAt: new Date() })
+    .where(eq(users.id, user.id));
+  
+  return {
+    success: true,
+    user,
+    credential,
+    mustChangePassword: credential.mustChangePassword,
+  };
+}
+
+/**
+ * Change user password
+ */
+export async function changePassword(userId: number, newPassword: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const passwordHash = await hashPassword(newPassword);
+  
+  await db.update(userCredentials)
+    .set({
+      passwordHash,
+      mustChangePassword: false,
+    })
+    .where(eq(userCredentials.userId, userId));
+  
+  return true;
+}
+
+/**
+ * Reset user password (admin)
+ */
+export async function resetUserPassword(userId: number, adminId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const tempPassword = generateTempPassword();
+  const passwordHash = await hashPassword(tempPassword);
+  
+  await db.update(userCredentials)
+    .set({
+      passwordHash,
+      mustChangePassword: true,
+      failedAttempts: 0,
+      lockedUntil: null,
+    })
+    .where(eq(userCredentials.userId, userId));
+  
+  // Log the action
+  await createAuditLog({
+    userId: adminId,
+    action: 'password_reset',
+    targetType: 'user',
+    targetId: userId,
+    description: `Password reset by admin ID ${adminId}`,
+  });
+  
+  return tempPassword;
+}
+
+/**
+ * Bind phone number to credentials
+ */
+export async function bindPhoneToCredentials(userId: number, phoneNumber: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.update(userCredentials)
+    .set({
+      phoneNumber,
+      phoneVerified: false,
+      phoneVerifiedAt: null,
+    })
+    .where(eq(userCredentials.userId, userId));
+  
+  return true;
+}
+
+/**
+ * Verify phone number
+ */
+export async function verifyCredentialPhone(userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.update(userCredentials)
+    .set({
+      phoneVerified: true,
+      phoneVerifiedAt: new Date(),
+    })
+    .where(eq(userCredentials.userId, userId));
+  
+  return true;
+}
+
+/**
+ * Get all users with credentials (for admin)
+ */
+export async function getAllUsersWithCredentials(): Promise<Array<User & { credential?: UserCredential }>> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const allUsers = await db.select().from(users).orderBy(desc(users.createdAt));
+  const allCredentials = await db.select().from(userCredentials);
+  
+  const credentialMap = new Map(allCredentials.map(c => [c.userId, c]));
+  
+  return allUsers.map(user => ({
+    ...user,
+    credential: credentialMap.get(user.id),
+  }));
+}
+
+/**
+ * Delete user credentials
+ */
+export async function deleteUserCredentials(userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.delete(userCredentials).where(eq(userCredentials.userId, userId));
+  return true;
+}
+
+/**
+ * Unlock user account
+ */
+export async function unlockUserAccount(userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.update(userCredentials)
+    .set({
+      failedAttempts: 0,
+      lockedUntil: null,
+    })
+    .where(eq(userCredentials.userId, userId));
+  
+  return true;
 }

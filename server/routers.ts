@@ -117,6 +117,233 @@ export const appRouter = router({
   }),
 
   // ============================================================================
+  // CREDENTIALS ROUTER - Custom Authentication System
+  // ============================================================================
+  credentials: router({
+    // Admin: Create credentials for a user
+    create: adminProcedure
+      .input(z.object({
+        userId: z.number(),
+        username: z.string().min(3).max(64).regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+        password: z.string().min(8).max(128),
+        phoneNumber: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await db.createUserCredentials({
+          userId: input.userId,
+          username: input.username,
+          password: input.password,
+          phoneNumber: input.phoneNumber,
+          createdById: ctx.user.id,
+        });
+        
+        await db.createAuditLog({
+          userId: ctx.user.id,
+          action: 'credential_created',
+          targetType: 'user',
+          targetId: input.userId,
+          description: `Created credentials for user ${input.username}`,
+        });
+        
+        return { success: true, id: result.id };
+      }),
+    
+    // Admin: Get all users with their credential status
+    listUsers: adminProcedure.query(async () => {
+      const users = await db.getAllUsersWithCredentials();
+      return users.map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        status: u.status,
+        hasCredentials: !!u.credential,
+        username: u.credential?.username,
+        phoneNumber: u.credential?.phoneNumber,
+        phoneVerified: u.credential?.phoneVerified,
+        mustChangePassword: u.credential?.mustChangePassword,
+        failedAttempts: u.credential?.failedAttempts,
+        isLocked: u.credential?.lockedUntil ? new Date(u.credential.lockedUntil) > new Date() : false,
+        lastLoginAt: u.credential?.lastLoginAt,
+        createdAt: u.createdAt,
+      }));
+    }),
+    
+    // Admin: Reset user password
+    resetPassword: adminProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const tempPassword = await db.resetUserPassword(input.userId, ctx.user.id);
+        return { success: true, tempPassword };
+      }),
+    
+    // Admin: Unlock user account
+    unlock: adminProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        await db.unlockUserAccount(input.userId);
+        
+        await db.createAuditLog({
+          userId: ctx.user.id,
+          action: 'account_unlocked',
+          targetType: 'user',
+          targetId: input.userId,
+          description: `Account unlocked by admin`,
+        });
+        
+        return { success: true };
+      }),
+    
+    // Admin: Delete user credentials
+    delete: adminProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        await db.deleteUserCredentials(input.userId);
+        
+        await db.createAuditLog({
+          userId: ctx.user.id,
+          action: 'credential_deleted',
+          targetType: 'user',
+          targetId: input.userId,
+          description: `Credentials deleted`,
+        });
+        
+        return { success: true };
+      }),
+    
+    // Admin: Bind phone to user credentials
+    bindPhone: adminProcedure
+      .input(z.object({
+        userId: z.number(),
+        phoneNumber: z.string().min(10).max(20),
+      }))
+      .mutation(async ({ input }) => {
+        await db.bindPhoneToCredentials(input.userId, input.phoneNumber);
+        return { success: true };
+      }),
+    
+    // Public: Login with username/password
+    login: publicProcedure
+      .input(z.object({
+        username: z.string(),
+        password: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const ip = ctx.req.ip || ctx.req.headers["x-forwarded-for"] || "unknown";
+        const ipAddress = typeof ip === "string" ? ip : String(ip);
+        
+        const result = await db.authenticateUser(input.username, input.password, ipAddress);
+        
+        if (!result.success || !result.user) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: result.error || "Invalid credentials" });
+        }
+        
+        // Create session token
+        const { sdk } = await import("./_core/sdk");
+        const token = await sdk.createSessionToken(result.user.openId, {
+          name: result.user.name || result.user.callSign || 'User',
+        });
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+        
+        return {
+          success: true,
+          user: result.user,
+          mustChangePassword: result.mustChangePassword,
+        };
+      }),
+    
+    // Protected: Change own password
+    changePassword: protectedProcedure
+      .input(z.object({
+        currentPassword: z.string(),
+        newPassword: z.string().min(8).max(128),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const credential = await db.getCredentialsByUserId(ctx.user.id);
+        if (!credential) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "No credentials found" });
+        }
+        
+        const isValid = await db.verifyPassword(input.currentPassword, credential.passwordHash);
+        if (!isValid) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Current password is incorrect" });
+        }
+        
+        await db.changePassword(ctx.user.id, input.newPassword);
+        return { success: true };
+      }),
+    
+    // Protected: Get own credential status
+    me: protectedProcedure.query(async ({ ctx }) => {
+      const credential = await db.getCredentialsByUserId(ctx.user.id);
+      if (!credential) {
+        return { hasCredentials: false };
+      }
+      return {
+        hasCredentials: true,
+        username: credential.username,
+        phoneNumber: credential.phoneNumber,
+        phoneVerified: credential.phoneVerified,
+        mustChangePassword: credential.mustChangePassword,
+      };
+    }),
+    
+    // Protected: Request phone verification OTP
+    requestPhoneVerification: protectedProcedure
+      .input(z.object({ phoneNumber: z.string().min(10).max(20) }))
+      .mutation(async ({ input, ctx }) => {
+        const ip = ctx.req.ip || ctx.req.headers["x-forwarded-for"] || "unknown";
+        const identifier = typeof ip === "string" ? ip : String(ip);
+        
+        // Rate limit
+        const allowed = await db.checkRateLimit(identifier, "phone_verify", 3, 15);
+        if (!allowed) {
+          throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many requests. Try again later." });
+        }
+        
+        // Bind phone to credentials first
+        await db.bindPhoneToCredentials(ctx.user.id, input.phoneNumber);
+        
+        // Create OTP
+        const code = await db.createOtp(input.phoneNumber);
+        
+        // In production, send SMS here. For now, log it.
+        console.log(`[Phone Verify] Code for ${input.phoneNumber}: ${code}`);
+        
+        return { success: true, message: "Verification code sent" };
+      }),
+    
+    // Protected: Verify phone with OTP
+    verifyPhone: protectedProcedure
+      .input(z.object({ code: z.string().length(6) }))
+      .mutation(async ({ input, ctx }) => {
+        const credential = await db.getCredentialsByUserId(ctx.user.id);
+        if (!credential || !credential.phoneNumber) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "No phone number to verify" });
+        }
+        
+        const valid = await db.verifyOtp(credential.phoneNumber, input.code);
+        if (!valid) {
+          await db.incrementOtpAttempts(credential.phoneNumber);
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid or expired code" });
+        }
+        
+        await db.verifyCredentialPhone(ctx.user.id);
+        
+        await db.createAuditLog({
+          userId: ctx.user.id,
+          action: 'phone_verified',
+          targetType: 'user',
+          targetId: ctx.user.id,
+          description: `Phone ${credential.phoneNumber} verified`,
+        });
+        
+        return { success: true };
+      }),
+  }),
+
+  // ============================================================================
   // OTP ROUTER - Phone verification
   // ============================================================================
   otp: router({

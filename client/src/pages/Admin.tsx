@@ -13,7 +13,7 @@ import {
   Loader2, Plus, Download, Eye, Ban, UserX, Shield, 
   Calendar, Package, Users, FileText, AlertTriangle, CheckCircle2,
   Image, Video, Upload, Trash2, ExternalLink, ClipboardCheck, Clock,
-  Building2, TrendingUp
+  Building2, TrendingUp, Key, Lock, Unlock, RefreshCw, Phone
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -93,6 +93,9 @@ export default function Admin() {
               <TabsTrigger value="sponsors" className="data-[state=active]:bg-[#9333EA]/10">
                 <Building2 className="w-4 h-4 mr-2" />Sponsors
               </TabsTrigger>
+              <TabsTrigger value="credentials" className="data-[state=active]:bg-[#9333EA]/10">
+                <Key className="w-4 h-4 mr-2" />Credentials
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="clearance"><ClearancePanel /></TabsContent>
@@ -103,6 +106,7 @@ export default function Admin() {
             <TabsContent value="ugc"><UgcPanel /></TabsContent>
             <TabsContent value="logs"><LogsPanel /></TabsContent>
             <TabsContent value="sponsors"><SponsorsPanel /></TabsContent>
+            <TabsContent value="credentials"><CredentialsPanel /></TabsContent>
           </Tabs>
         </div>
       </main>
@@ -1429,6 +1433,335 @@ function SponsorForm({
         {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
         Save Sponsor
       </Button>
+    </div>
+  );
+}
+
+
+// ============================================================================
+// CREDENTIALS PANEL - Custom Authentication Management
+// ============================================================================
+function CredentialsPanel() {
+  const { data: users, refetch, isLoading } = trpc.credentials.listUsers.useQuery();
+  const [selectedUser, setSelectedUser] = useState<number | null>(null);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [tempPassword, setTempPassword] = useState<string | null>(null);
+  
+  // Create credentials form
+  const [createForm, setCreateForm] = useState({
+    userId: 0,
+    username: "",
+    password: "",
+    phoneNumber: "",
+  });
+  
+  const createMutation = trpc.credentials.create.useMutation({
+    onSuccess: () => {
+      toast.success("Credentials created successfully");
+      setShowCreateDialog(false);
+      setCreateForm({ userId: 0, username: "", password: "", phoneNumber: "" });
+      refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+  
+  const resetPasswordMutation = trpc.credentials.resetPassword.useMutation({
+    onSuccess: (data) => {
+      setTempPassword(data.tempPassword);
+      setShowResetDialog(true);
+      refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+  
+  const unlockMutation = trpc.credentials.unlock.useMutation({
+    onSuccess: () => {
+      toast.success("Account unlocked");
+      refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+  
+  const deleteMutation = trpc.credentials.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Credentials deleted");
+      refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+  
+  const usersWithoutCredentials = users?.filter(u => !u.hasCredentials) || [];
+  const usersWithCredentials = users?.filter(u => u.hasCredentials) || [];
+  
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setCreateForm({ ...createForm, password });
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold">User Credentials</h2>
+          <p className="text-sm text-muted-foreground">Manage custom login credentials for members</p>
+        </div>
+        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+          <DialogTrigger asChild>
+            <Button className="bg-[#9333EA] hover:bg-[#7928CA]">
+              <Plus className="w-4 h-4 mr-2" />
+              Create Credentials
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-card border-border">
+            <DialogHeader>
+              <DialogTitle>Create User Credentials</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="text-sm text-muted-foreground">Select User *</label>
+                <Select
+                  value={createForm.userId.toString()}
+                  onValueChange={(v) => setCreateForm({ ...createForm, userId: parseInt(v) })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a user..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {usersWithoutCredentials.map((u) => (
+                      <SelectItem key={u.id} value={u.id.toString()}>
+                        {u.name || u.email || `User #${u.id}`} ({u.role})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm text-muted-foreground">Username *</label>
+                <Input
+                  value={createForm.username}
+                  onChange={(e) => setCreateForm({ ...createForm, username: e.target.value })}
+                  placeholder="e.g., john_doe"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Letters, numbers, and underscores only</p>
+              </div>
+              
+              <div>
+                <label className="text-sm text-muted-foreground">Password *</label>
+                <div className="flex gap-2">
+                  <Input
+                    value={createForm.password}
+                    onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+                    placeholder="Minimum 8 characters"
+                  />
+                  <Button type="button" variant="outline" onClick={generatePassword}>
+                    Generate
+                  </Button>
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-sm text-muted-foreground">Phone Number (optional)</label>
+                <Input
+                  value={createForm.phoneNumber}
+                  onChange={(e) => setCreateForm({ ...createForm, phoneNumber: e.target.value })}
+                  placeholder="+62 812 1234 5678"
+                />
+              </div>
+              
+              <Button
+                onClick={() => createMutation.mutate(createForm)}
+                disabled={createMutation.isPending || !createForm.userId || !createForm.username || createForm.password.length < 8}
+                className="w-full bg-[#9333EA] hover:bg-[#7928CA]"
+              >
+                {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Create Credentials
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+      
+      {/* Password Reset Dialog */}
+      <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle>Password Reset</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <p className="text-sm text-muted-foreground">
+              A temporary password has been generated. Share this with the user securely.
+            </p>
+            <div className="bg-[#0a0a0a] p-4 rounded-lg border border-[#333333]">
+              <p className="text-xs text-muted-foreground mb-1">Temporary Password</p>
+              <p className="text-lg font-mono text-white">{tempPassword}</p>
+            </div>
+            <p className="text-xs text-amber-500">
+              The user will be required to change this password on first login.
+            </p>
+            <Button
+              onClick={() => {
+                navigator.clipboard.writeText(tempPassword || "");
+                toast.success("Password copied to clipboard");
+              }}
+              variant="outline"
+              className="w-full"
+            >
+              Copy to Clipboard
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Users with Credentials */}
+      <div className="card-noir p-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Key className="w-5 h-5 text-[#9333EA]" />
+          Users with Login Credentials ({usersWithCredentials.length})
+        </h3>
+        
+        {usersWithCredentials.length === 0 ? (
+          <p className="text-muted-foreground text-sm">No users have custom credentials yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {usersWithCredentials.map((user) => (
+              <div key={user.id} className="flex items-center justify-between p-4 bg-[#0a0a0a] rounded-lg border border-[#222222]">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30 flex items-center justify-center">
+                    <span className="text-sm font-bold text-purple-400">
+                      {(user.name || user.username || "?").charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-medium">{user.name || user.username}</p>
+                    <p className="text-xs text-muted-foreground">
+                      @{user.username} • {user.role}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  {/* Status badges */}
+                  {user.isLocked && (
+                    <span className="px-2 py-1 text-xs bg-red-500/20 text-red-400 rounded">
+                      <Lock className="w-3 h-3 inline mr-1" />
+                      Locked
+                    </span>
+                  )}
+                  {user.mustChangePassword && (
+                    <span className="px-2 py-1 text-xs bg-amber-500/20 text-amber-400 rounded">
+                      Must Change Password
+                    </span>
+                  )}
+                  {user.phoneVerified && (
+                    <span className="px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded">
+                      <Phone className="w-3 h-3 inline mr-1" />
+                      Verified
+                    </span>
+                  )}
+                  
+                  {/* Actions */}
+                  {user.isLocked && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => unlockMutation.mutate({ userId: user.id })}
+                      disabled={unlockMutation.isPending}
+                    >
+                      <Unlock className="w-4 h-4 mr-1" />
+                      Unlock
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedUser(user.id);
+                      resetPasswordMutation.mutate({ userId: user.id });
+                    }}
+                    disabled={resetPasswordMutation.isPending}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-1" />
+                    Reset
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-red-400 hover:text-red-300"
+                    onClick={() => {
+                      if (confirm("Delete credentials for this user? They will need to use OAuth to login.")) {
+                        deleteMutation.mutate({ userId: user.id });
+                      }
+                    }}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Users without Credentials */}
+      <div className="card-noir p-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Users className="w-5 h-5 text-muted-foreground" />
+          Users without Credentials ({usersWithoutCredentials.length})
+        </h3>
+        
+        {usersWithoutCredentials.length === 0 ? (
+          <p className="text-muted-foreground text-sm">All users have custom credentials.</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {usersWithoutCredentials.slice(0, 12).map((user) => (
+              <div key={user.id} className="p-3 bg-[#0a0a0a] rounded-lg border border-[#222222]">
+                <p className="font-medium text-sm truncate">{user.name || user.email || `User #${user.id}`}</p>
+                <p className="text-xs text-muted-foreground">{user.role}</p>
+              </div>
+            ))}
+            {usersWithoutCredentials.length > 12 && (
+              <div className="p-3 bg-[#0a0a0a] rounded-lg border border-[#222222] flex items-center justify-center">
+                <p className="text-sm text-muted-foreground">+{usersWithoutCredentials.length - 12} more</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      
+      {/* Info box */}
+      <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+        <h4 className="font-semibold text-purple-400 mb-2">Custom Authentication System</h4>
+        <ul className="text-sm text-muted-foreground space-y-1">
+          <li>• Admin-created accounts with username/password</li>
+          <li>• Optional phone number binding for verification</li>
+          <li>• Account lockout after 5 failed attempts (30 min)</li>
+          <li>• Users must change password on first login</li>
+          <li>• Login page: <code className="bg-[#0a0a0a] px-1 rounded">/login</code></li>
+        </ul>
+      </div>
     </div>
   );
 }
