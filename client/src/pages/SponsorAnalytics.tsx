@@ -168,8 +168,8 @@ export default function SponsorAnalytics() {
                   className="card-noir p-6"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                      <Percent className="w-5 h-5 text-purple-400" />
+                    <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                      <Percent className="w-5 h-5 text-blue-400" />
                     </div>
                     <span className="text-sm text-muted-foreground">Click-Through Rate</span>
                   </div>
@@ -186,7 +186,7 @@ export default function SponsorAnalytics() {
                 className="card-noir p-6"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <BarChart3 className="w-5 h-5 text-purple-400" />
+                  <BarChart3 className="w-5 h-5 text-blue-400" />
                   <h3 className="text-lg font-medium text-white">Performance by Page</h3>
                 </div>
                 

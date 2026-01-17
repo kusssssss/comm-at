@@ -142,7 +142,7 @@ export function Countdown({
                   'flex items-center justify-center rounded-lg font-mono font-bold',
                   boxSizeClasses[size],
                   sizeClasses[size],
-                  variant === 'default' && 'bg-purple-500/20 border border-purple-500/30 text-purple-300',
+                  variant === 'default' && 'bg-blue-500/20 border border-blue-500/30 text-blue-300',
                   variant === 'urgent' && 'bg-red-500/20 border border-red-500/30 text-red-300 animate-pulse',
                   variant === 'minimal' && 'text-foreground'
                 )}
@@ -166,7 +166,7 @@ export function Countdown({
               'flex items-center justify-center rounded-lg font-mono font-bold',
               boxSizeClasses[size],
               sizeClasses[size],
-              variant === 'default' && 'bg-purple-500/20 border border-purple-500/30 text-purple-300',
+              variant === 'default' && 'bg-blue-500/20 border border-blue-500/30 text-blue-300',
               variant === 'urgent' && 'bg-red-500/20 border border-red-500/30 text-red-300 animate-pulse',
               variant === 'minimal' && 'text-foreground',
               isUrgent && variant === 'default' && 'bg-orange-500/20 border-orange-500/30 text-orange-300'
@@ -189,7 +189,7 @@ export function Countdown({
               'flex items-center justify-center rounded-lg font-mono font-bold',
               boxSizeClasses[size],
               sizeClasses[size],
-              variant === 'default' && 'bg-purple-500/20 border border-purple-500/30 text-purple-300',
+              variant === 'default' && 'bg-blue-500/20 border border-blue-500/30 text-blue-300',
               variant === 'urgent' && 'bg-red-500/20 border border-red-500/30 text-red-300 animate-pulse',
               variant === 'minimal' && 'text-foreground',
               isUrgent && variant === 'default' && 'bg-orange-500/20 border-orange-500/30 text-orange-300'
@@ -212,7 +212,7 @@ export function Countdown({
               'flex items-center justify-center rounded-lg font-mono font-bold',
               boxSizeClasses[size],
               sizeClasses[size],
-              variant === 'default' && 'bg-purple-500/20 border border-purple-500/30 text-purple-300',
+              variant === 'default' && 'bg-blue-500/20 border border-blue-500/30 text-blue-300',
               variant === 'urgent' && 'bg-red-500/20 border border-red-500/30 text-red-300 animate-pulse',
               variant === 'minimal' && 'text-foreground',
               isUrgent && variant === 'default' && 'bg-orange-500/20 border-orange-500/30 text-orange-300'

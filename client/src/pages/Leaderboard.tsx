@@ -6,7 +6,7 @@ import { DecryptText, ChromaticText } from '@/components/Effects2200';
 import { Crown, Medal, Award, Trophy, Star, ChevronUp, Zap } from 'lucide-react';
 
 function getTierInfo(points: number) {
-  if (points >= 5000) return { name: 'Platinum', color: 'text-purple-300', bg: 'bg-purple-500/20', icon: Crown };
+  if (points >= 5000) return { name: 'Platinum', color: 'text-blue-300', bg: 'bg-blue-500/20', icon: Crown };
   if (points >= 2000) return { name: 'Gold', color: 'text-yellow-400', bg: 'bg-yellow-500/20', icon: Trophy };
   if (points >= 500) return { name: 'Silver', color: 'text-gray-300', bg: 'bg-gray-500/20', icon: Medal };
   return { name: 'Bronze', color: 'text-amber-600', bg: 'bg-amber-500/20', icon: Award };
@@ -29,10 +29,10 @@ export default function Leaderboard() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-purple-500/20">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-blue-500/20">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/">
-            <span className="text-2xl font-bold text-purple-400 hover:text-purple-300 transition-colors cursor-pointer">@</span>
+            <span className="text-2xl font-bold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">@</span>
           </Link>
           <nav className="flex items-center gap-6">
             <Link href="/marks" className="text-sm tracking-wider text-gray-400 hover:text-white transition-colors">MARKS</Link>
@@ -66,13 +66,13 @@ export default function Leaderboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="mb-12 p-6 border border-purple-500/30 bg-purple-500/5 rounded-lg"
+              className="mb-12 p-6 border border-blue-500/30 bg-blue-500/5 rounded-lg"
             >
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
                   <p className="text-gray-500 text-sm tracking-wider mb-1">YOUR RANK</p>
                   <div className="flex items-center gap-3">
-                    <span className="text-4xl font-bold text-purple-400">#{myReputation.rank}</span>
+                    <span className="text-4xl font-bold text-blue-400">#{myReputation.rank}</span>
                     <div className={`px-3 py-1 rounded-full ${getTierInfo(myReputation.points).bg}`}>
                       <span className={`text-sm font-medium ${getTierInfo(myReputation.points).color}`}>
                         {myReputation.tier}
@@ -83,7 +83,7 @@ export default function Leaderboard() {
                 <div className="text-right">
                   <p className="text-gray-500 text-sm tracking-wider mb-1">REPUTATION POINTS</p>
                   <div className="flex items-center gap-2 justify-end">
-                    <Zap className="w-5 h-5 text-purple-400" />
+                    <Zap className="w-5 h-5 text-blue-400" />
                     <span className="text-3xl font-bold text-white">{myReputation.points.toLocaleString()}</span>
                   </div>
                 </div>
@@ -91,7 +91,7 @@ export default function Leaderboard() {
 
               {/* Recent Activity */}
               {myReputation.events && myReputation.events.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-purple-500/20">
+                <div className="mt-6 pt-6 border-t border-blue-500/20">
                   <p className="text-gray-500 text-sm tracking-wider mb-3">RECENT ACTIVITY</p>
                   <div className="space-y-2">
                     {myReputation.events.slice(0, 3).map((event, i) => (
@@ -119,7 +119,7 @@ export default function Leaderboard() {
               { name: 'Bronze', points: '0+', color: 'text-amber-600' },
               { name: 'Silver', points: '500+', color: 'text-gray-300' },
               { name: 'Gold', points: '2000+', color: 'text-yellow-400' },
-              { name: 'Platinum', points: '5000+', color: 'text-purple-300' },
+              { name: 'Platinum', points: '5000+', color: 'text-blue-300' },
             ].map((tier) => (
               <div key={tier.name} className="flex items-center gap-2 text-sm">
                 <Star className={`w-4 h-4 ${tier.color}`} />
@@ -134,7 +134,7 @@ export default function Leaderboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="border border-purple-500/20 rounded-lg overflow-hidden"
+            className="border border-blue-500/20 rounded-lg overflow-hidden"
           >
             {isLoading ? (
               <div className="p-12 text-center">
@@ -145,7 +145,7 @@ export default function Leaderboard() {
                 <p className="text-gray-500">No rankings yet. Be the first to earn points!</p>
               </div>
             ) : (
-              <div className="divide-y divide-purple-500/10">
+              <div className="divide-y divide-blue-500/10">
                 {leaderboard.map((member, index) => {
                   const rank = index + 1;
                   const tier = getTierInfo(member.reputationPoints || 0);
@@ -158,7 +158,7 @@ export default function Leaderboard() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.1 * Math.min(index, 10) }}
                       className={`flex items-center gap-4 p-4 ${
-                        isCurrentUser ? 'bg-purple-500/10' : 'hover:bg-white/5'
+                        isCurrentUser ? 'bg-blue-500/10' : 'hover:bg-white/5'
                       } transition-colors`}
                     >
                       {/* Rank */}
@@ -169,11 +169,11 @@ export default function Leaderboard() {
                       {/* Member Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className={`font-medium truncate ${isCurrentUser ? 'text-purple-400' : 'text-white'}`}>
+                          <span className={`font-medium truncate ${isCurrentUser ? 'text-blue-400' : 'text-white'}`}>
                             {member.callSign || 'Anonymous'}
                           </span>
                           {isCurrentUser && (
-                            <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded">YOU</span>
+                            <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded">YOU</span>
                           )}
                         </div>
                         <p className="text-sm text-gray-500 truncate">{member.chapter}</p>
@@ -188,7 +188,7 @@ export default function Leaderboard() {
                       {/* Points */}
                       <div className="text-right">
                         <div className="flex items-center gap-1 justify-end">
-                          <Zap className="w-4 h-4 text-purple-400" />
+                          <Zap className="w-4 h-4 text-blue-400" />
                           <span className="font-bold text-white">{(member.reputationPoints || 0).toLocaleString()}</span>
                         </div>
                         <p className="text-xs text-gray-500">points</p>
@@ -205,9 +205,9 @@ export default function Leaderboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="mt-12 p-6 border border-purple-500/20 rounded-lg"
+            className="mt-12 p-6 border border-blue-500/20 rounded-lg"
           >
-            <h3 className="text-lg font-bold text-purple-400 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-blue-400 mb-4 flex items-center gap-2">
               <ChevronUp className="w-5 h-5" />
               HOW TO EARN POINTS
             </h3>

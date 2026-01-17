@@ -253,7 +253,7 @@ function InquiryForm() {
       
       <Button 
         type="submit" 
-        className="w-full bg-purple-600 hover:bg-purple-700"
+        className="w-full bg-blue-600 hover:bg-blue-700"
         disabled={inquiryMutation.isPending}
       >
         {inquiryMutation.isPending ? "Submitting..." : "Submit Inquiry"}
@@ -285,7 +285,7 @@ export default function Sponsors() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <p className="text-xs text-purple-400 tracking-[0.3em] uppercase mb-4">Partnership Opportunities</p>
+              <p className="text-xs text-blue-400 tracking-[0.3em] uppercase mb-4">Partnership Opportunities</p>
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
                 Partner With COMM@
               </h1>
@@ -313,7 +313,7 @@ export default function Sponsors() {
                     transition={{ delay: i * 0.1 }}
                     className="text-center"
                   >
-                    <Icon className="w-6 h-6 text-purple-500 mx-auto mb-2" />
+                    <Icon className="w-6 h-6 text-blue-500 mx-auto mb-2" />
                     <p className="text-3xl font-bold text-white">{stat.value}</p>
                     <p className="text-sm text-gray-400">{stat.label}</p>
                   </motion.div>

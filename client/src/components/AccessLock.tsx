@@ -36,9 +36,9 @@ const TIER_CONFIG = {
   member: {
     label: 'MEMBER',
     icon: Star,
-    color: 'text-purple-400',
-    bgColor: 'bg-purple-500/10',
-    borderColor: 'border-purple-500/30',
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-500/10',
+    borderColor: 'border-blue-500/30',
   },
   inner_circle: {
     label: 'INNER CIRCLE',
@@ -112,8 +112,8 @@ export function AccessLock({
           </div>
           
           {/* Sparkle effects */}
-          <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-purple-400 animate-pulse" />
-          <Sparkles className="absolute -bottom-1 -left-1 w-3 h-3 text-purple-300 animate-pulse delay-150" />
+          <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-blue-400 animate-pulse" />
+          <Sparkles className="absolute -bottom-1 -left-1 w-3 h-3 text-blue-300 animate-pulse delay-150" />
         </div>
 
         {/* Access level badge */}
@@ -139,7 +139,7 @@ export function AccessLock({
               variant="outline"
               size="sm"
               className={cn(
-                'gap-2 border-purple-500/50 text-purple-400 hover:bg-purple-500/10',
+                'gap-2 border-blue-500/50 text-blue-400 hover:bg-blue-500/10',
                 'transition-all duration-300 hover:scale-105'
               )}
             >
@@ -210,8 +210,8 @@ export function MembersOnlyBadge({
   return (
     <div className={cn(
       'inline-flex items-center gap-1.5 px-2 py-1 rounded-full',
-      'bg-purple-500/20 border border-purple-500/30',
-      'text-xs font-mono uppercase tracking-wider text-purple-400',
+      'bg-blue-500/20 border border-blue-500/30',
+      'text-xs font-mono uppercase tracking-wider text-blue-400',
       pulse && 'animate-pulse',
       className
     )}>

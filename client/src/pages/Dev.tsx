@@ -33,7 +33,7 @@ function TestUserSwitcher() {
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'marked_initiate': return 'bg-blue-500/20 text-blue-400';
-      case 'marked_member': return 'bg-purple-500/20 text-purple-400';
+      case 'marked_member': return 'bg-blue-500/20 text-blue-400';
       case 'marked_inner_circle': return 'bg-amber-500/20 text-amber-400';
       default: return 'bg-gray-500/20 text-gray-400';
     }

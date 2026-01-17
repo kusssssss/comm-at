@@ -46,7 +46,7 @@ function ProgressBar({ label, current, required, icon }: ProgressBarProps) {
       </div>
       <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
         <motion.div
-          className={`h-full rounded-full ${isComplete ? "bg-green-500" : "bg-purple-500"}`}
+          className={`h-full rounded-full ${isComplete ? "bg-green-500" : "bg-blue-500"}`}
           initial={{ width: 0 }}
           animate={{ width: `${progressPercent}%` }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -92,7 +92,7 @@ export function TierProgressCard() {
     >
       {/* Background glow for Inner Circle tier */}
       {currentTier?.name === 'INNER_CIRCLE' && (
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-none" />
       )}
       
       {/* Header */}
@@ -125,11 +125,11 @@ export function TierProgressCard() {
         <div className="mb-6">
           <div className="flex items-center justify-between text-xs mb-2">
             <span className="text-gray-400">Progress to {nextTier?.name}</span>
-            <ChevronRight className="w-4 h-4 text-purple-500" />
+            <ChevronRight className="w-4 h-4 text-blue-500" />
           </div>
           <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-purple-600 to-purple-400 rounded-full"
+              className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress.overallProgress}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
@@ -172,8 +172,8 @@ export function TierProgressCard() {
         </div>
       ) : (
         <div className="text-center py-4">
-          <Sparkles className="w-8 h-8 text-purple-500 mx-auto mb-2" />
-          <p className="text-purple-400 font-medium">Maximum Tier Achieved</p>
+          <Sparkles className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+          <p className="text-blue-400 font-medium">Maximum Tier Achieved</p>
           <p className="text-xs text-gray-500 mt-1">You have full access to everything</p>
         </div>
       )}

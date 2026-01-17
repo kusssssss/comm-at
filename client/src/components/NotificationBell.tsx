@@ -50,7 +50,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 text-white text-xs font-bold rounded-full flex items-center justify-center"
+            className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center justify-center"
           >
             {unreadCount > 9 ? '9+' : unreadCount}
           </motion.span>
@@ -74,15 +74,15 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
               initial={{ opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-hidden bg-[#1a1a1a] border border-purple-500/30 rounded-lg shadow-xl z-50"
+              className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-hidden bg-[#1a1a1a] border border-blue-500/30 rounded-lg shadow-xl z-50"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-3 border-b border-purple-500/20">
+              <div className="flex items-center justify-between p-3 border-b border-blue-500/20">
                 <span className="text-sm font-medium text-white">Notifications</span>
                 {unreadCount > 0 && (
                   <button
                     onClick={() => markAllReadMutation.mutate()}
-                    className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
                   >
                     Mark all read
                   </button>
@@ -99,8 +99,8 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                   notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-3 border-b border-purple-500/10 last:border-0 ${
-                        !notification.isRead ? 'bg-purple-500/5' : ''
+                      className={`p-3 border-b border-blue-500/10 last:border-0 ${
+                        !notification.isRead ? 'bg-blue-500/5' : ''
                       }`}
                     >
                       <div className="flex gap-3">
@@ -121,7 +121,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                         {!notification.isRead && (
                           <button
                             onClick={() => markReadMutation.mutate({ notificationId: notification.id })}
-                            className="p-1 text-gray-500 hover:text-purple-400 transition-colors shrink-0"
+                            className="p-1 text-gray-500 hover:text-blue-400 transition-colors shrink-0"
                             title="Mark as read"
                           >
                             <Check className="w-4 h-4" />
@@ -134,7 +134,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
               </div>
 
               {/* Footer */}
-              <div className="p-2 border-t border-purple-500/20">
+              <div className="p-2 border-t border-blue-500/20">
                 <button
                   onClick={() => setIsOpen(false)}
                   className="w-full text-center text-xs text-gray-500 hover:text-gray-400 py-1"

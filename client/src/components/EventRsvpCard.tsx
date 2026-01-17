@@ -84,7 +84,7 @@ export function EventRsvpCard({
 
   if (!isAuthenticated || !isMarked) {
     return (
-      <div className={`p-4 border border-purple-500/20 rounded-lg ${className}`}>
+      <div className={`p-4 border border-blue-500/20 rounded-lg ${className}`}>
         <p className="text-sm text-gray-500 text-center">
           Sign in as a marked member to RSVP
         </p>
@@ -94,9 +94,9 @@ export function EventRsvpCard({
 
   if (rsvpLoading) {
     return (
-      <div className={`p-6 border border-purple-500/20 rounded-lg ${className}`}>
+      <div className={`p-6 border border-blue-500/20 rounded-lg ${className}`}>
         <div className="flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+          <Loader2 className="w-6 h-6 animate-spin text-blue-400" />
         </div>
       </div>
     );
@@ -105,7 +105,7 @@ export function EventRsvpCard({
   // Already RSVPed
   if (rsvp && rsvp.status !== 'cancelled') {
     return (
-      <div className={`p-6 border border-purple-500/30 bg-purple-500/5 rounded-lg ${className}`}>
+      <div className={`p-6 border border-blue-500/30 bg-blue-500/5 rounded-lg ${className}`}>
         <div className="flex items-center gap-3 mb-4">
           {rsvp.status === 'attended' ? (
             <>
@@ -119,9 +119,9 @@ export function EventRsvpCard({
             </>
           ) : (
             <>
-              <Check className="w-6 h-6 text-purple-400" />
+              <Check className="w-6 h-6 text-blue-400" />
               <div>
-                <p className="font-medium text-purple-400">RSVP Confirmed</p>
+                <p className="font-medium text-blue-400">RSVP Confirmed</p>
                 <p className="text-xs text-gray-500">
                   {rsvp.plusOneName && `+1: ${rsvp.plusOneName}`}
                 </p>
@@ -135,7 +135,7 @@ export function EventRsvpCard({
             <Button
               onClick={() => setShowQR(!showQR)}
               variant="outline"
-              className="w-full mb-3 border-purple-500/30 hover:bg-purple-500/10"
+              className="w-full mb-3 border-blue-500/30 hover:bg-blue-500/10"
             >
               <QrCode className="w-4 h-4 mr-2" />
               {showQR ? 'Hide QR Code' : 'Show QR Code'}
@@ -183,10 +183,10 @@ export function EventRsvpCard({
 
   // Not RSVPed yet
   return (
-    <div className={`p-6 border border-purple-500/20 rounded-lg ${className}`}>
+    <div className={`p-6 border border-blue-500/20 rounded-lg ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-purple-400" />
+          <Users className="w-5 h-5 text-blue-400" />
           <span className="text-sm text-gray-400">
             {rsvpCount}{capacity ? ` / ${capacity}` : ''} attending
           </span>
@@ -211,7 +211,7 @@ export function EventRsvpCard({
                 type="checkbox"
                 checked={showPlusOne}
                 onChange={(e) => setShowPlusOne(e.target.checked)}
-                className="rounded border-purple-500/30 bg-transparent"
+                className="rounded border-blue-500/30 bg-transparent"
               />
               <span className="text-sm text-gray-400">Bringing a +1</span>
             </label>
@@ -229,7 +229,7 @@ export function EventRsvpCard({
                     placeholder="Guest name"
                     value={plusOneName}
                     onChange={(e) => setPlusOneName(e.target.value)}
-                    className="w-full px-3 py-2 bg-black/30 border border-purple-500/20 rounded text-white placeholder:text-gray-600 text-sm"
+                    className="w-full px-3 py-2 bg-black/30 border border-blue-500/20 rounded text-white placeholder:text-gray-600 text-sm"
                   />
                 </motion.div>
               )}
@@ -239,7 +239,7 @@ export function EventRsvpCard({
           <Button
             onClick={handleRsvp}
             disabled={createRsvpMutation.isPending}
-            className="w-full bg-purple-600 hover:bg-purple-500 text-white"
+            className="w-full bg-blue-600 hover:bg-blue-500 text-white"
           >
             {createRsvpMutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />

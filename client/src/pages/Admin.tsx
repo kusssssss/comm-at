@@ -1158,7 +1158,7 @@ function SponsorsPanel() {
                           {sponsor.status}
                         </span>
                         {sponsor.showOnHomepage && (
-                          <span className="text-xs text-purple-400">Homepage</span>
+                          <span className="text-xs text-blue-400">Homepage</span>
                         )}
                       </div>
                     </div>
@@ -1648,8 +1648,8 @@ function CredentialsPanel() {
             {usersWithCredentials.map((user) => (
               <div key={user.id} className="flex items-center justify-between p-4 bg-[#0a0a0a] rounded-lg border border-[#222222]">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30 flex items-center justify-center">
-                    <span className="text-sm font-bold text-purple-400">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 flex items-center justify-center">
+                    <span className="text-sm font-bold text-blue-400">
                       {(user.name || user.username || "?").charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -1752,8 +1752,8 @@ function CredentialsPanel() {
       </div>
       
       {/* Info box */}
-      <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
-        <h4 className="font-semibold text-purple-400 mb-2">Custom Authentication System</h4>
+      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+        <h4 className="font-semibold text-blue-400 mb-2">Custom Authentication System</h4>
         <ul className="text-sm text-muted-foreground space-y-1">
           <li>• Admin-created accounts with username/password</li>
           <li>• Optional phone number binding for verification</li>

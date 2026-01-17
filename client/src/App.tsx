@@ -116,7 +116,7 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
-          {/* Floating purple particles background */}
+          {/* Floating blue particles background */}
           <FloatingParticles particleCount={40} />
           {/* 2200 Scan lines overlay */}
           <ScanLines />

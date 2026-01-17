@@ -64,8 +64,8 @@ export function CheckInScanner({ eventId, onSuccess }: CheckInScannerProps) {
   };
 
   return (
-    <div className="p-6 border border-purple-500/20 rounded-lg">
-      <h3 className="text-lg font-bold text-purple-400 mb-4 flex items-center gap-2">
+    <div className="p-6 border border-blue-500/20 rounded-lg">
+      <h3 className="text-lg font-bold text-blue-400 mb-4 flex items-center gap-2">
         <ScanLine className="w-5 h-5" />
         Check-In Scanner
       </h3>
@@ -78,12 +78,12 @@ export function CheckInScanner({ eventId, onSuccess }: CheckInScannerProps) {
             value={manualCode}
             onChange={(e) => setManualCode(e.target.value)}
             placeholder="Enter QR code manually (RSVP-...)"
-            className="flex-1 px-3 py-2 bg-black/30 border border-purple-500/20 rounded text-white placeholder:text-gray-600 text-sm"
+            className="flex-1 px-3 py-2 bg-black/30 border border-blue-500/20 rounded text-white placeholder:text-gray-600 text-sm"
           />
           <Button
             type="submit"
             disabled={checkInMutation.isPending || !manualCode.trim()}
-            className="bg-purple-600 hover:bg-purple-500"
+            className="bg-blue-600 hover:bg-blue-500"
           >
             {checkInMutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
