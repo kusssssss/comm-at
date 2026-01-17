@@ -42,6 +42,20 @@ export default function Login() {
     }
   }, [authLoading, user, setLocation]);
   
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-blue-400 animate-pulse">Loading...</div>
+      </div>
+    );
+  }
+  
+  // If user is logged in, don't render (redirect will happen)
+  if (user) {
+    return null;
+  }
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -58,8 +72,8 @@ export default function Login() {
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
       {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/5 rounded-full blur-3xl" />
       </div>
       
       <motion.div
@@ -70,8 +84,8 @@ export default function Login() {
       >
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30 mb-4">
-            <span className="text-3xl font-bold text-purple-400">@</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-600/10 border border-blue-500/30 mb-4">
+            <span className="text-3xl font-bold text-blue-400">@</span>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-wider">COMM@</h1>
           <p className="text-gray-500 text-sm mt-1">Exclusive Secret Society</p>
@@ -95,7 +109,7 @@ export default function Login() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter your username"
-                  className="pl-10 bg-[#0a0a0a] border-[#333333] text-white placeholder:text-gray-600 focus:border-purple-500 focus:ring-purple-500/20"
+                  className="pl-10 bg-[#0a0a0a] border-[#333333] text-white placeholder:text-gray-600 focus:border-blue-500 focus:ring-blue-500/20"
                   autoComplete="username"
                   autoFocus
                 />
@@ -115,7 +129,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="pl-10 pr-10 bg-[#0a0a0a] border-[#333333] text-white placeholder:text-gray-600 focus:border-purple-500 focus:ring-purple-500/20"
+                  className="pl-10 pr-10 bg-[#0a0a0a] border-[#333333] text-white placeholder:text-gray-600 focus:border-blue-500 focus:ring-blue-500/20"
                   autoComplete="current-password"
                 />
                 <button
@@ -144,7 +158,7 @@ export default function Login() {
             <Button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-semibold py-5"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold py-5"
             >
               {loginMutation.isPending ? (
                 <>
@@ -170,7 +184,7 @@ export default function Login() {
           {/* OAuth Login */}
           <a
             href={getLoginUrl()}
-            className="flex items-center justify-center gap-2 w-full py-3 bg-[#0a0a0a] border border-[#333333] rounded-lg text-gray-300 hover:bg-[#151515] hover:border-[#444444] transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-3 bg-[#0a0a0a] border border-[#333333] rounded-lg text-gray-300 hover:bg-[#151515] hover:border-blue-500/50 transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
