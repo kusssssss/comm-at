@@ -117,7 +117,7 @@ export default function Acquire() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-8 h-8 border border-[#9333EA] border-t-transparent rounded-full mx-auto"
+                className="w-8 h-8 border border-[#3B82F6] border-t-transparent rounded-full mx-auto"
               />
             </motion.div>
           )}
@@ -131,7 +131,7 @@ export default function Acquire() {
               exit={{ opacity: 0 }}
               className="w-full max-w-md text-center"
             >
-              <Lock className="w-12 h-12 text-[#9333EA] mx-auto mb-6" />
+              <Lock className="w-12 h-12 text-[#3B82F6] mx-auto mb-6" />
               <h1 className="text-2xl font-light mb-4">Sign In Required</h1>
               <p className="text-[#666666] mb-8">
                 You must be signed in to acquire a Mark.
@@ -151,7 +151,7 @@ export default function Acquire() {
               exit={{ opacity: 0 }}
               className="w-full max-w-md text-center"
             >
-              <AlertCircle className="w-12 h-12 text-#9333EA mx-auto mb-6" />
+              <AlertCircle className="w-12 h-12 text-#3B82F6 mx-auto mb-6" />
               <h1 className="text-2xl font-light mb-4">Clearance Required</h1>
               <p className="text-[#666666] mb-8">
                 {user?.clearanceState === "applied" 
@@ -162,7 +162,7 @@ export default function Acquire() {
               </p>
               {user?.clearanceState !== "applied" && (
                 <Link href="/apply">
-                  <Button className="bg-[#9333EA] text-black hover:bg-[#A855F7]">
+                  <Button className="bg-[#3B82F6] text-black hover:bg-[#60A5FA]">
                     REQUEST CLEARANCE
                   </Button>
                 </Link>
@@ -181,8 +181,8 @@ export default function Acquire() {
             >
               {/* Clearance timer */}
               {clearanceTimeRemaining > 0 && (
-                <div className="mb-8 p-4 border border-#9333EA/30 rounded bg-#9333EA/10">
-                  <div className="flex items-center gap-2 text-#9333EA text-sm">
+                <div className="mb-8 p-4 border border-#3B82F6/30 rounded bg-#3B82F6/10">
+                  <div className="flex items-center gap-2 text-#3B82F6 text-sm">
                     <Clock className="w-4 h-4" />
                     <span>Clearance expires in {hoursRemaining}h {minutesRemaining}m</span>
                   </div>
@@ -200,11 +200,11 @@ export default function Acquire() {
               )}
 
               <div className="text-center mb-8">
-                <p className="text-micro text-[#9333EA] tracking-[0.3em] mb-2">ACQUIRE MARK</p>
+                <p className="text-micro text-[#3B82F6] tracking-[0.3em] mb-2">ACQUIRE MARK</p>
                 <h1 className="text-2xl font-light">{drop.title}</h1>
                 <p className="text-[#666666]">{drop.artistName}</p>
                 {drop.priceIdr && (
-                  <p className="text-xl text-[#9333EA] mt-2">
+                  <p className="text-xl text-[#3B82F6] mt-2">
                     Rp {drop.priceIdr.toLocaleString()}
                   </p>
                 )}
@@ -223,7 +223,7 @@ export default function Acquire() {
                           onClick={() => setSelectedSize(size)}
                           className={`px-4 py-2 border ${
                             selectedSize === size
-                              ? "border-[#9333EA] text-[#9333EA]"
+                              ? "border-[#3B82F6] text-[#3B82F6]"
                               : "border-[#333333] text-[#666666] hover:border-[#666666]"
                           } transition-colors`}
                         >
@@ -236,7 +236,7 @@ export default function Acquire() {
 
                 {/* Shipping info */}
                 <div className="space-y-4">
-                  <h3 className="text-sm text-[#9333EA] tracking-wider">SHIPPING INFORMATION</h3>
+                  <h3 className="text-sm text-[#3B82F6] tracking-wider">SHIPPING INFORMATION</h3>
                   
                   <div>
                     <Label htmlFor="fullName" className="text-[#666666]">Full Name</Label>
@@ -244,7 +244,7 @@ export default function Acquire() {
                       id="fullName"
                       value={shippingInfo.fullName}
                       onChange={(e) => setShippingInfo(prev => ({ ...prev, fullName: e.target.value }))}
-                      className="bg-transparent border-[#333333] focus:border-[#9333EA]"
+                      className="bg-transparent border-[#333333] focus:border-[#3B82F6]"
                       required
                     />
                   </div>
@@ -255,7 +255,7 @@ export default function Acquire() {
                       id="address"
                       value={shippingInfo.address}
                       onChange={(e) => setShippingInfo(prev => ({ ...prev, address: e.target.value }))}
-                      className="bg-transparent border-[#333333] focus:border-[#9333EA]"
+                      className="bg-transparent border-[#333333] focus:border-[#3B82F6]"
                       required
                     />
                   </div>
@@ -267,7 +267,7 @@ export default function Acquire() {
                         id="city"
                         value={shippingInfo.city}
                         onChange={(e) => setShippingInfo(prev => ({ ...prev, city: e.target.value }))}
-                        className="bg-transparent border-[#333333] focus:border-[#9333EA]"
+                        className="bg-transparent border-[#333333] focus:border-[#3B82F6]"
                         required
                       />
                     </div>
@@ -277,7 +277,7 @@ export default function Acquire() {
                         id="postalCode"
                         value={shippingInfo.postalCode}
                         onChange={(e) => setShippingInfo(prev => ({ ...prev, postalCode: e.target.value }))}
-                        className="bg-transparent border-[#333333] focus:border-[#9333EA]"
+                        className="bg-transparent border-[#333333] focus:border-[#3B82F6]"
                         required
                       />
                     </div>
@@ -289,7 +289,7 @@ export default function Acquire() {
                       id="phone"
                       value={shippingInfo.phone}
                       onChange={(e) => setShippingInfo(prev => ({ ...prev, phone: e.target.value }))}
-                      className="bg-transparent border-[#333333] focus:border-[#9333EA]"
+                      className="bg-transparent border-[#333333] focus:border-[#3B82F6]"
                       required
                     />
                   </div>
@@ -312,7 +312,7 @@ export default function Acquire() {
                 <Button
                   type="submit"
                   disabled={!acceptedTerms || !saleWindowOpen}
-                  className="w-full bg-[#9333EA] text-black hover:bg-[#A855F7] disabled:opacity-50"
+                  className="w-full bg-[#3B82F6] text-black hover:bg-[#60A5FA] disabled:opacity-50"
                 >
                   <ShoppingBag className="w-4 h-4 mr-2" />
                   CONTINUE TO PAYMENT
@@ -356,7 +356,7 @@ export default function Acquire() {
                     <div className="border-t border-[#222222] my-4" />
                     <div className="flex justify-between">
                       <span className="text-[#666666]">Total</span>
-                      <span className="text-[#9333EA] text-xl">
+                      <span className="text-[#3B82F6] text-xl">
                         Rp {drop.priceIdr.toLocaleString()}
                       </span>
                     </div>
@@ -379,7 +379,7 @@ export default function Acquire() {
                 </Button>
                 <Button
                   onClick={executeAcquisition}
-                  className="flex-1 bg-[#9333EA] text-black hover:bg-[#A855F7]"
+                  className="flex-1 bg-[#3B82F6] text-black hover:bg-[#60A5FA]"
                 >
                   CONFIRM
                 </Button>
@@ -399,7 +399,7 @@ export default function Acquire() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-12 h-12 border-2 border-[#9333EA] border-t-transparent rounded-full mx-auto mb-6"
+                className="w-12 h-12 border-2 border-[#3B82F6] border-t-transparent rounded-full mx-auto mb-6"
               />
               <p className="text-[#666666]">Processing your acquisition...</p>
             </motion.div>
@@ -414,8 +414,8 @@ export default function Acquire() {
               exit={{ opacity: 0 }}
               className="w-full max-w-md text-center"
             >
-              <div className="w-16 h-16 rounded-full bg-[#9333EA]/20 flex items-center justify-center mx-auto mb-6">
-                <Check className="w-8 h-8 text-[#9333EA]" />
+              <div className="w-16 h-16 rounded-full bg-[#3B82F6]/20 flex items-center justify-center mx-auto mb-6">
+                <Check className="w-8 h-8 text-[#3B82F6]" />
               </div>
               <h2 className="text-2xl font-light mb-4">Mark Reserved</h2>
               <p className="text-[#666666] mb-8">
@@ -424,7 +424,7 @@ export default function Acquire() {
               </p>
               <div className="space-y-4">
                 <Link href="/inside">
-                  <Button className="w-full bg-[#9333EA] text-black hover:bg-[#A855F7]">
+                  <Button className="w-full bg-[#3B82F6] text-black hover:bg-[#60A5FA]">
                     GO TO INSIDE
                   </Button>
                 </Link>

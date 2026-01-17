@@ -90,7 +90,7 @@ export default function Profile() {
                   showLabel={false}
                 />
               </div>
-              <h1 className="text-display text-[#9333EA] mb-2">{profile?.callSign}</h1>
+              <h1 className="text-display text-[#3B82F6] mb-2">{profile?.callSign}</h1>
               <p className="text-sm text-muted-foreground tracking-wider uppercase">
                 {ROLE_LABELS[profile?.role || ""] || profile?.role}
               </p>
@@ -121,7 +121,7 @@ export default function Profile() {
                 <Shield className="w-4 h-4 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Status</p>
-                  <p className={`${profile?.status === "active" ? "text-[#9333EA]" : "text-destructive"}`}>
+                  <p className={`${profile?.status === "active" ? "text-[#3B82F6]" : "text-destructive"}`}>
                     {profile?.status === "active" ? "Active" : "Revoked"}
                   </p>
                 </div>

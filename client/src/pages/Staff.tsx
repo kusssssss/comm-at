@@ -198,19 +198,19 @@ export default function Staff() {
                 {scanResult && (
                   <div className={`p-4 rounded border ${
                     scanResult.valid 
-                      ? "border-[#9333EA]/30 bg-[#9333EA]/5" 
+                      ? "border-[#3B82F6]/30 bg-[#3B82F6]/5" 
                       : "border-destructive/30 bg-destructive/5"
                   }`}>
                     <div className="flex items-start gap-3">
                       {scanResult.valid ? (
-                        <CheckCircle2 className="w-6 h-6 text-[#9333EA] flex-shrink-0" />
+                        <CheckCircle2 className="w-6 h-6 text-[#3B82F6] flex-shrink-0" />
                       ) : (
                         <XCircle className="w-6 h-6 text-destructive flex-shrink-0" />
                       )}
                       <div className="flex-1">
                         {scanResult.valid ? (
                           <>
-                            <p className="text-[#9333EA] font-medium">Valid Pass</p>
+                            <p className="text-[#3B82F6] font-medium">Valid Pass</p>
                             <p className="text-sm text-foreground mt-1">
                               {scanResult.userCallSign}
                             </p>
@@ -262,7 +262,7 @@ export default function Staff() {
                   >
                     <div className="flex items-center gap-2">
                       {log.result === "accepted" ? (
-                        <CheckCircle2 className="w-4 h-4 text-[#9333EA]" />
+                        <CheckCircle2 className="w-4 h-4 text-[#3B82F6]" />
                       ) : (
                         <XCircle className="w-4 h-4 text-destructive" />
                       )}

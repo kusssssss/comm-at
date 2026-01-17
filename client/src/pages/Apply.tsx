@@ -31,7 +31,7 @@ export default function Apply() {
   if (authLoading || requestLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#9333EA]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#3B82F6]" />
       </div>
     );
   }
@@ -48,7 +48,7 @@ export default function Apply() {
 
           <div className="text-center space-y-8">
             <div className="space-y-4">
-              <p className="text-[#9333EA]/80 text-sm tracking-[0.3em] uppercase">Request Clearance</p>
+              <p className="text-[#3B82F6]/80 text-sm tracking-[0.3em] uppercase">Request Clearance</p>
               <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
                 Join the Collective
               </h1>
@@ -59,7 +59,7 @@ export default function Apply() {
 
             <Button
               onClick={() => window.location.href = getLoginUrl()}
-              className="bg-[#9333EA] hover:bg-[#A855F7] text-black font-semibold px-8 py-6 text-lg"
+              className="bg-[#3B82F6] hover:bg-[#60A5FA] text-black font-semibold px-8 py-6 text-lg"
             >
               Sign In to Continue
             </Button>
@@ -87,7 +87,7 @@ export default function Apply() {
                 You have been granted clearance to acquire a Mark.
               </p>
               {user.clearanceExpiresAt && (
-                <p className="text-[#9333EA] text-sm">
+                <p className="text-[#3B82F6] text-sm">
                   Expires: {new Date(user.clearanceExpiresAt).toLocaleString()}
                 </p>
               )}
@@ -95,7 +95,7 @@ export default function Apply() {
 
             <Button
               onClick={() => setLocation('/drops')}
-              className="bg-[#9333EA] hover:bg-[#A855F7] text-black font-semibold px-8 py-6 text-lg"
+              className="bg-[#3B82F6] hover:bg-[#60A5FA] text-black font-semibold px-8 py-6 text-lg"
             >
               Browse Marks
             </Button>
@@ -116,7 +116,7 @@ export default function Apply() {
           </Link>
 
           <div className="text-center space-y-8">
-            <Clock className="w-16 h-16 text-[#9333EA] mx-auto" />
+            <Clock className="w-16 h-16 text-[#3B82F6] mx-auto" />
             <div className="space-y-4">
               <h1 className="text-4xl font-bold">Request Pending</h1>
               <p className="text-zinc-400 text-lg max-w-md mx-auto">
@@ -200,7 +200,7 @@ export default function Apply() {
         <div className="space-y-12">
           {/* Header */}
           <div className="text-center space-y-4">
-            <p className="text-[#9333EA]/80 text-sm tracking-[0.3em] uppercase">Request Clearance</p>
+            <p className="text-[#3B82F6]/80 text-sm tracking-[0.3em] uppercase">Request Clearance</p>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               Why Do You Protect<br />the Culture?
             </h1>
@@ -227,7 +227,7 @@ export default function Apply() {
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="What does protecting the culture mean to you? Why do you want to be part of this collective?"
-                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 min-h-[200px] resize-none focus:border-[#9333EA]/50 focus:ring-[#9333EA]/20"
+                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 min-h-[200px] resize-none focus:border-[#3B82F6]/50 focus:ring-[#3B82F6]/20"
                 required
                 minLength={50}
               />
@@ -245,7 +245,7 @@ export default function Apply() {
                 value={vouchCallSign}
                 onChange={(e) => setVouchCallSign(e.target.value)}
                 placeholder="Call sign of existing member"
-                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:border-[#9333EA]/50 focus:ring-[#9333EA]/20"
+                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:border-[#3B82F6]/50 focus:ring-[#3B82F6]/20"
               />
               <p className="text-zinc-600 text-xs">
                 If an existing member referred you, enter their call sign.
@@ -265,7 +265,7 @@ export default function Apply() {
             <Button
               type="submit"
               disabled={reason.trim().length < 50 || submitMutation.isPending}
-              className="w-full bg-[#9333EA] hover:bg-[#A855F7] text-black font-semibold py-6 text-lg disabled:opacity-50"
+              className="w-full bg-[#3B82F6] hover:bg-[#60A5FA] text-black font-semibold py-6 text-lg disabled:opacity-50"
             >
               {submitMutation.isPending ? (
                 <>

@@ -100,7 +100,7 @@ export default function Nav({
                 <span 
                   className={`text-xs tracking-widest transition-colors cursor-pointer flex items-center gap-1.5 ${
                     isActive(link.href) 
-                      ? "text-[#9333EA]" 
+                      ? "text-[#3B82F6]" 
                       : "text-[#666666] hover:text-white"
                   }`}
                 >
@@ -118,7 +118,7 @@ export default function Nav({
                 <span 
                   className={`text-xs tracking-widest transition-colors cursor-pointer flex items-center gap-1.5 ${
                     isActive(link.href) 
-                      ? "text-[#9333EA]" 
+                      ? "text-[#3B82F6]" 
                       : "text-[#666666] hover:text-white"
                   }`}
                 >
@@ -132,14 +132,14 @@ export default function Nav({
             {!loading && (
               user ? (
                 <Link href="/profile">
-                  <span className="flex items-center gap-2 text-xs tracking-widest text-[#9333EA] hover:text-white transition-colors cursor-pointer">
+                  <span className="flex items-center gap-2 text-xs tracking-widest text-[#3B82F6] hover:text-white transition-colors cursor-pointer">
                     <User className="w-3.5 h-3.5" />
                     {user.callSign || user.name?.split(' ')[0] || 'PROFILE'}
                   </span>
                 </Link>
               ) : (
                 <Link href="/inside">
-                  <span className="flex items-center gap-2 px-4 py-2 bg-[#9333EA] text-white text-xs tracking-widest hover:bg-[#7c28c9] transition-colors cursor-pointer">
+                  <span className="flex items-center gap-2 px-4 py-2 bg-[#3B82F6] text-white text-xs tracking-widest hover:bg-[#7c28c9] transition-colors cursor-pointer">
                     <LogIn className="w-3.5 h-3.5" />
                     ENTER
                   </span>
@@ -229,7 +229,7 @@ export default function Nav({
                         <span 
                           className={`flex items-center justify-center gap-3 text-lg tracking-[0.2em] ${
                             isActive(link.href) 
-                              ? "text-[#9333EA]" 
+                              ? "text-[#3B82F6]" 
                               : "text-white"
                           }`}
                         >
@@ -258,7 +258,7 @@ export default function Nav({
                           <span 
                             className={`flex items-center justify-center gap-3 text-lg tracking-[0.2em] ${
                               isActive(link.href) 
-                                ? "text-[#9333EA]" 
+                                ? "text-[#3B82F6]" 
                                 : "text-white"
                             }`}
                           >
@@ -281,14 +281,14 @@ export default function Nav({
               >
                 {user ? (
                   <Link href="/profile" onClick={() => setMenuOpen(false)}>
-                    <span className="flex items-center gap-3 text-[#9333EA] text-lg tracking-[0.2em]">
+                    <span className="flex items-center gap-3 text-[#3B82F6] text-lg tracking-[0.2em]">
                       <User className="w-4 h-4" />
                       {user.callSign || 'PROFILE'}
                     </span>
                   </Link>
                 ) : (
                   <Link href="/inside" onClick={() => setMenuOpen(false)}>
-                    <span className="flex items-center gap-3 px-8 py-3 bg-[#9333EA] text-white text-sm tracking-[0.2em]">
+                    <span className="flex items-center gap-3 px-8 py-3 bg-[#3B82F6] text-white text-sm tracking-[0.2em]">
                       <LogIn className="w-4 h-4" />
                       ENTER THE COLLECTIVE
                     </span>

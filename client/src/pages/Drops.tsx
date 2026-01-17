@@ -173,7 +173,7 @@ export default function Drops() {
         <Nav showBack backHref="/" backLabel="HOME" />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center px-6">
-            <p className="text-[#9333EA] text-6xl mb-8">@</p>
+            <p className="text-[#3B82F6] text-6xl mb-8">@</p>
             <p className="text-xl text-white mb-2">No drops available</p>
             <p className="text-sm text-[#888888] mb-8">Check back soon for new releases</p>
             <Link href="/">
@@ -207,7 +207,7 @@ export default function Drops() {
           <motion.span 
             animate={{ opacity: [0.3, 1, 0.3] }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            className="text-[#9333EA] text-4xl"
+            className="text-[#3B82F6] text-4xl"
           >
             @
           </motion.span>
@@ -225,7 +225,7 @@ export default function Drops() {
             <div className="text-right flex items-center gap-4">
               {/* Access level indicator */}
               {isRestricted && (
-                <div className="flex items-center gap-2 text-[#9333EA]">
+                <div className="flex items-center gap-2 text-[#3B82F6]">
                   <EyeOff className="w-4 h-4" />
                   <span className="text-xs uppercase tracking-wider">Limited View</span>
                 </div>
@@ -270,10 +270,10 @@ export default function Drops() {
                     {/* Blur overlay for restricted content */}
                     {isBlurred && (
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
-                        <Lock className="w-12 h-12 text-[#9333EA] mb-4" />
+                        <Lock className="w-12 h-12 text-[#3B82F6] mb-4" />
                         <p className="text-white text-lg font-medium mb-2">Content Restricted</p>
                         {minimumTierRequired && (
-                          <p className="text-[#9333EA] text-xs uppercase tracking-widest mb-2">
+                          <p className="text-[#3B82F6] text-xs uppercase tracking-widest mb-2">
                             Requires {minimumTierRequired} tier or higher
                           </p>
                         )}
@@ -283,7 +283,7 @@ export default function Drops() {
                         {!user && (
                           <button 
                             onClick={() => setLocation('/apply')}
-                            className="mt-4 bg-[#9333EA] text-black px-6 py-2 text-sm font-semibold tracking-wider uppercase hover:bg-[#A855F7] transition-all"
+                            className="mt-4 bg-[#3B82F6] text-black px-6 py-2 text-sm font-semibold tracking-wider uppercase hover:bg-[#60A5FA] transition-all"
                           >
                             Request Clearance
                           </button>
@@ -294,8 +294,8 @@ export default function Drops() {
                     {/* UGC Badge */}
                     {!isBlurred && currentImage?.type === 'ugc' && (
                       <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm px-3 py-2 flex items-center gap-2">
-                        <User className="w-3 h-3 text-[#9333EA]" />
-                        <span className="text-xs text-[#9333EA] uppercase tracking-wider">
+                        <User className="w-3 h-3 text-[#3B82F6]" />
+                        <span className="text-xs text-[#3B82F6] uppercase tracking-wider">
                           {currentImage.holderCallsign || 'Verified Member'}
                         </span>
                       </div>
@@ -333,9 +333,9 @@ export default function Drops() {
                             onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i); }}
                             className={`w-2 h-2 rounded-full transition-colors ${
                               i === currentImageIndex 
-                                ? 'bg-[#9333EA]' 
+                                ? 'bg-[#3B82F6]' 
                                 : img.type === 'ugc' 
-                                  ? 'bg-[#9333EA]/30' 
+                                  ? 'bg-[#3B82F6]/30' 
                                   : 'bg-white/30'
                             }`}
                           />
@@ -345,7 +345,7 @@ export default function Drops() {
 
                     {/* Edition Badge */}
                     <div className="absolute top-4 right-4 bg-black/80 px-4 py-2">
-                      <span className="text-[#9333EA] font-mono text-sm">{currentDrop.editionSize} EDITION</span>
+                      <span className="text-[#3B82F6] font-mono text-sm">{currentDrop.editionSize} EDITION</span>
                     </div>
                   </div>
 
@@ -357,12 +357,12 @@ export default function Drops() {
                           key={i}
                           onClick={() => setCurrentImageIndex(i)}
                           className={`relative flex-shrink-0 w-16 h-16 overflow-hidden border-2 transition-colors ${
-                            i === currentImageIndex ? 'border-[#9333EA]' : 'border-transparent'
+                            i === currentImageIndex ? 'border-[#3B82F6]' : 'border-transparent'
                           }`}
                         >
                           <img src={img.url} alt="" loading="lazy" className="w-full h-full object-cover" />
                           {img.type === 'ugc' && (
-                            <div className="absolute bottom-0 left-0 right-0 bg-[#9333EA]/80 py-0.5">
+                            <div className="absolute bottom-0 left-0 right-0 bg-[#3B82F6]/80 py-0.5">
                               <User className="w-2.5 h-2.5 text-black mx-auto" />
                             </div>
                           )}
@@ -374,7 +374,7 @@ export default function Drops() {
                   {/* UGC count - only if not restricted */}
                   {!isRestricted && ugcList && ugcList.filter(u => u.type === 'image').length > 0 && (
                     <p className="text-xs text-[#666666] mt-2">
-                      <span className="text-[#9333EA]">{ugcList.filter(u => u.type === 'image').length}</span> photos from verified members
+                      <span className="text-[#3B82F6]">{ugcList.filter(u => u.type === 'image').length}</span> photos from verified members
                     </p>
                   )}
                   
@@ -391,7 +391,7 @@ export default function Drops() {
                 <div className="space-y-6 lg:space-y-8">
                   {/* Artist & Chapter */}
                   <div className="flex items-center gap-4">
-                    <span className="text-[#9333EA] text-sm uppercase tracking-[0.2em]">{currentDrop.artistName}</span>
+                    <span className="text-[#3B82F6] text-sm uppercase tracking-[0.2em]">{currentDrop.artistName}</span>
                     {currentDrop.chapter && (
                       <>
                         <span className="text-[#444444]">|</span>
@@ -415,7 +415,7 @@ export default function Drops() {
                         <span className="text-lg">Price hidden</span>
                       </div>
                       {minimumTierRequired && (
-                        <span className="text-xs text-[#9333EA] uppercase tracking-wider">
+                        <span className="text-xs text-[#3B82F6] uppercase tracking-wider">
                           Requires {minimumTierRequired} tier
                         </span>
                       )}
@@ -446,10 +446,10 @@ export default function Drops() {
 
                   {/* Sale Window Countdown */}
                   {currentDrop.saleWindowEnd && new Date(currentDrop.saleWindowEnd) > new Date() && (
-                    <div className="bg-[#9333EA]/10 border border-[#9333EA]/30 p-4 rounded-lg">
+                    <div className="bg-[#3B82F6]/10 border border-[#3B82F6]/30 p-4 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
-                        <Clock className="w-4 h-4 text-[#9333EA]" />
-                        <span className="text-[#9333EA] text-xs font-mono tracking-widest uppercase">SALE ENDS IN</span>
+                        <Clock className="w-4 h-4 text-[#3B82F6]" />
+                        <span className="text-[#3B82F6] text-xs font-mono tracking-widest uppercase">SALE ENDS IN</span>
                       </div>
                       <InlineCountdown 
                         targetDate={new Date(currentDrop.saleWindowEnd)} 
@@ -462,12 +462,12 @@ export default function Drops() {
                   {currentDrop.saleWindowStart && new Date(currentDrop.saleWindowStart) > new Date() && (
                     <div className="bg-[#1a1a1a] border border-[#333333] p-4 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
-                        <Sparkles className="w-4 h-4 text-[#9333EA]" />
-                        <span className="text-[#9333EA] text-xs font-mono tracking-widest uppercase">AVAILABLE IN</span>
+                        <Sparkles className="w-4 h-4 text-[#3B82F6]" />
+                        <span className="text-[#3B82F6] text-xs font-mono tracking-widest uppercase">AVAILABLE IN</span>
                       </div>
                       <InlineCountdown 
                         targetDate={new Date(currentDrop.saleWindowStart)} 
-                        className="text-2xl text-[#9333EA] font-bold"
+                        className="text-2xl text-[#3B82F6] font-bold"
                       />
                     </div>
                   )}
@@ -490,7 +490,7 @@ export default function Drops() {
                   {/* Access level banner for restricted content */}
                   {isRestricted && (
                     <div className="bg-[#1a1a1a] border border-[#333333] p-4 space-y-3">
-                      <div className="flex items-center gap-2 text-[#9333EA]">
+                      <div className="flex items-center gap-2 text-[#3B82F6]">
                         <Eye className="w-4 h-4" />
                         <span className="text-sm font-medium uppercase tracking-wider">Limited Access</span>
                       </div>
@@ -500,21 +500,21 @@ export default function Drops() {
                       {!user ? (
                         <button 
                           onClick={() => setLocation('/apply')}
-                          className="w-full bg-[#9333EA] text-black px-6 py-3 text-sm font-semibold tracking-wider uppercase hover:bg-[#A855F7] transition-all"
+                          className="w-full bg-[#3B82F6] text-black px-6 py-3 text-sm font-semibold tracking-wider uppercase hover:bg-[#60A5FA] transition-all"
                         >
                           Request Clearance
                         </button>
                       ) : user.role === 'public' ? (
                         <button 
                           onClick={() => setLocation('/apply')}
-                          className="w-full bg-[#9333EA] text-black px-6 py-3 text-sm font-semibold tracking-wider uppercase hover:bg-[#A855F7] transition-all"
+                          className="w-full bg-[#3B82F6] text-black px-6 py-3 text-sm font-semibold tracking-wider uppercase hover:bg-[#60A5FA] transition-all"
                         >
                           Request Clearance
                         </button>
                       ) : user.role === 'marked_initiate' ? (
                         <button 
                           onClick={() => setLocation('/verify')}
-                          className="w-full bg-[#9333EA] text-black px-6 py-3 text-sm font-semibold tracking-wider uppercase hover:bg-[#A855F7] transition-all"
+                          className="w-full bg-[#3B82F6] text-black px-6 py-3 text-sm font-semibold tracking-wider uppercase hover:bg-[#60A5FA] transition-all"
                         >
                           Activate Your Mark
                         </button>
@@ -529,7 +529,7 @@ export default function Drops() {
                       {(currentDrop.saleWindowStart || currentDrop.saleWindowEnd) && (
                         <button 
                           onClick={() => setLocation(`/acquire/${currentDrop.id}`)}
-                          className="w-full bg-[#9333EA] text-black px-8 py-4 text-sm font-semibold tracking-wider uppercase hover:bg-[#A855F7] transition-all duration-300 flex items-center justify-center gap-2"
+                          className="w-full bg-[#3B82F6] text-black px-8 py-4 text-sm font-semibold tracking-wider uppercase hover:bg-[#60A5FA] transition-all duration-300 flex items-center justify-center gap-2"
                         >
                           <Sparkles className="w-4 h-4" />
                           Acquire This Mark
@@ -543,7 +543,7 @@ export default function Drops() {
                       <div className="flex flex-col sm:flex-row gap-4">
                         <button 
                           onClick={() => setLocation('/verify')}
-                          className="w-full sm:w-auto border border-[#9333EA] text-[#9333EA] px-8 py-4 text-sm font-semibold tracking-wider uppercase hover:bg-[#9333EA] hover:text-black transition-all duration-300"
+                          className="w-full sm:w-auto border border-[#3B82F6] text-[#3B82F6] px-8 py-4 text-sm font-semibold tracking-wider uppercase hover:bg-[#3B82F6] hover:text-black transition-all duration-300"
                         >
                           Verify Mark
                         </button>
@@ -566,7 +566,7 @@ export default function Drops() {
             className="fixed left-0 top-0 bottom-0 w-16 md:w-24 flex items-center justify-start pl-2 md:pl-4 z-40 group"
             aria-label="Previous drop"
           >
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#1a1a1a] border border-[#333333] flex items-center justify-center group-hover:bg-[#9333EA] group-hover:border-[#9333EA] group-active:scale-90 transition-all duration-300">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#1a1a1a] border border-[#333333] flex items-center justify-center group-hover:bg-[#3B82F6] group-hover:border-[#3B82F6] group-active:scale-90 transition-all duration-300">
               <svg 
                 width="18" 
                 height="18" 
@@ -587,7 +587,7 @@ export default function Drops() {
             className="fixed right-0 top-0 bottom-0 w-16 md:w-24 flex items-center justify-end pr-2 md:pr-4 z-40 group"
             aria-label="Next drop"
           >
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#1a1a1a] border border-[#333333] flex items-center justify-center group-hover:bg-[#9333EA] group-hover:border-[#9333EA] group-active:scale-90 transition-all duration-300">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#1a1a1a] border border-[#333333] flex items-center justify-center group-hover:bg-[#3B82F6] group-hover:border-[#3B82F6] group-active:scale-90 transition-all duration-300">
               <svg 
                 width="18" 
                 height="18" 
@@ -613,7 +613,7 @@ export default function Drops() {
               onClick={() => goToIndex(i)}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
                 i === currentIndex 
-                  ? "bg-[#9333EA] scale-125" 
+                  ? "bg-[#3B82F6] scale-125" 
                   : "bg-[#444444] hover:bg-[#666666]"
               }`}
               aria-label={`Go to drop ${i + 1}`}

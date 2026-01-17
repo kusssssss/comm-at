@@ -73,7 +73,7 @@ export default function SponsorAnalytics() {
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Back to Sponsors</span>
           </Link>
-          <span className="text-xs text-[#9333EA] tracking-wider">ANALYTICS</span>
+          <span className="text-xs text-[#3B82F6] tracking-wider">ANALYTICS</span>
         </nav>
       </header>
 

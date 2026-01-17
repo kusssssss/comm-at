@@ -30,7 +30,7 @@ const tierConfig = {
   },
   INNER_CIRCLE: {
     label: 'Inner Circle',
-    color: '#9333EA',
+    color: '#3B82F6',
     bgColor: '#1a0a2e',
     glowColor: 'rgba(147, 51, 234, 0.4)',
   },

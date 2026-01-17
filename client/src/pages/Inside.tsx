@@ -101,7 +101,7 @@ export default function Inside() {
             <Link href="/refer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Refer
             </Link>
-            <Link href="/profile" className="text-sm text-[#9333EA] hover:text-[#9333EA]/80 transition-colors">
+            <Link href="/profile" className="text-sm text-[#3B82F6] hover:text-[#3B82F6]/80 transition-colors">
               {user?.callSign}
             </Link>
           </div>
@@ -112,12 +112,12 @@ export default function Inside() {
         <div className="max-w-2xl mx-auto space-y-12">
           {/* Welcome */}
           <div className="text-center animate-fade-in">
-            <div className="w-12 h-12 mx-auto border border-[#9333EA]/30 rounded-full flex items-center justify-center mark-glow mb-4">
-              <span className="text-[#9333EA] text-lg">@</span>
+            <div className="w-12 h-12 mx-auto border border-[#3B82F6]/30 rounded-full flex items-center justify-center mark-glow mb-4">
+              <span className="text-[#3B82F6] text-lg">@</span>
             </div>
             <h1 className="text-headline mb-2">Inside</h1>
             <p className="text-muted-foreground">
-              Welcome back, <span className="text-[#9333EA]">{user?.callSign}</span>
+              Welcome back, <span className="text-[#3B82F6]">{user?.callSign}</span>
             </p>
           </div>
 
@@ -129,7 +129,7 @@ export default function Inside() {
             </div>
             <div className="grid grid-cols-4 gap-3">
               <div className="card-noir p-4 text-center">
-                <p className="text-2xl text-[#9333EA] font-light">{stats?.totalMarked || 0}</p>
+                <p className="text-2xl text-[#3B82F6] font-light">{stats?.totalMarked || 0}</p>
                 <p className="text-xs text-muted-foreground">Members</p>
               </div>
               <div className="card-noir p-4 text-center">
@@ -160,8 +160,8 @@ export default function Inside() {
                   recentMarkings.slice(0, 5).map((marking, i) => (
                     <div key={`marking-${i}`} className="flex items-center justify-between text-sm py-2 border-b border-border/20 last:border-0">
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-[#9333EA]"></span>
-                        <span className="text-[#9333EA]">@{marking.callSign}</span>
+                        <span className="w-2 h-2 rounded-full bg-[#3B82F6]"></span>
+                        <span className="text-[#3B82F6]">@{marking.callSign}</span>
                         <span className="text-muted-foreground">marked</span>
                         <span className="text-foreground">{marking.dropTitle}</span>
                       </div>
@@ -181,7 +181,7 @@ export default function Inside() {
                         <div key={`checkin-${i}`} className="flex items-center justify-between text-sm py-2 border-b border-border/20 last:border-0">
                           <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                            <span className="text-[#9333EA]">@{checkIn.callSign}</span>
+                            <span className="text-[#3B82F6]">@{checkIn.callSign}</span>
                             <span className="text-muted-foreground">attended</span>
                             <span className="text-foreground">{checkIn.eventTitle}</span>
                           </div>
@@ -200,14 +200,14 @@ export default function Inside() {
             <section className="animate-slide-up" style={{ animationDelay: "0.1s" }}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm text-muted-foreground tracking-wider uppercase">Upcoming Gatherings</h2>
-                <Link href="/gatherings" className="text-xs text-[#9333EA] hover:text-[#9333EA]/80">
+                <Link href="/gatherings" className="text-xs text-[#3B82F6] hover:text-[#3B82F6]/80">
                   View All →
                 </Link>
               </div>
               <div className="space-y-3">
                 {upcomingEvents.map((event) => (
                   <Link key={event.id} href={`/events/${event.id}`}>
-                    <div className="card-noir p-4 hover:border-[#9333EA]/30 transition-colors cursor-pointer">
+                    <div className="card-noir p-4 hover:border-[#3B82F6]/30 transition-colors cursor-pointer">
                       <div className="flex items-start justify-between">
                         <div>
                           <h3 className="text-foreground font-medium">{event.title}</h3>
@@ -223,7 +223,7 @@ export default function Inside() {
                             </p>
                           )}
                           {event.hasPass ? (
-                            <span className="text-xs text-[#9333EA]">Pass Claimed</span>
+                            <span className="text-xs text-[#3B82F6]">Pass Claimed</span>
                           ) : (
                             <span className="text-xs text-muted-foreground">
                               {event.passCount}/{event.capacity}
@@ -244,9 +244,9 @@ export default function Inside() {
             <div className="space-y-4">
               {feed?.doctrines && feed.doctrines.length > 0 ? (
                 feed.doctrines.map((card) => (
-                  <div key={card.id} className={`card-noir p-6 ${card.isPinned ? "border-[#9333EA]/20" : ""}`}>
+                  <div key={card.id} className={`card-noir p-6 ${card.isPinned ? "border-[#3B82F6]/20" : ""}`}>
                     {card.isPinned && (
-                      <span className="text-xs text-[#9333EA] tracking-wider mb-2 block">PINNED</span>
+                      <span className="text-xs text-[#3B82F6] tracking-wider mb-2 block">PINNED</span>
                     )}
                     <h3 className="text-foreground font-medium mb-2">{card.title}</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
@@ -269,13 +269,13 @@ export default function Inside() {
           <section className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
             <div className="grid grid-cols-2 gap-4">
               <Link href="/gatherings">
-                <div className="card-noir p-4 text-center hover:border-[#9333EA]/30 transition-colors cursor-pointer">
+                <div className="card-noir p-4 text-center hover:border-[#3B82F6]/30 transition-colors cursor-pointer">
                   <Calendar className="w-6 h-6 mx-auto text-muted-foreground mb-2" />
                   <p className="text-sm text-foreground">Events</p>
                 </div>
               </Link>
               <Link href="/profile">
-                <div className="card-noir p-4 text-center hover:border-[#9333EA]/30 transition-colors cursor-pointer">
+                <div className="card-noir p-4 text-center hover:border-[#3B82F6]/30 transition-colors cursor-pointer">
                   <User className="w-6 h-6 mx-auto text-muted-foreground mb-2" />
                   <p className="text-sm text-foreground">Profile</p>
                 </div>

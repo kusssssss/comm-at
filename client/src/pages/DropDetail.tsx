@@ -71,7 +71,7 @@ export default function DropDetail() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-#9333EA border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-#3B82F6 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -82,7 +82,7 @@ export default function DropDetail() {
         <div className="text-center">
           <p className="text-zinc-500 mb-4">Drop not found</p>
           <Link href="/marks">
-            <button className="text-#9333EA hover:underline">← Back to Marks</button>
+            <button className="text-#3B82F6 hover:underline">← Back to Marks</button>
           </Link>
         </div>
       </div>
@@ -99,7 +99,7 @@ export default function DropDetail() {
       <header className="fixed top-0 left-0 right-0 z-40 bg-black/80 backdrop-blur-sm border-b border-zinc-900">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <Link href="/">
-            <span className="text-#9333EA text-xl font-light cursor-pointer hover:text-#A855F7 transition-colors">COMM@</span>
+            <span className="text-#3B82F6 text-xl font-light cursor-pointer hover:text-#60A5FA transition-colors">COMM@</span>
           </Link>
           <nav className="flex gap-8 text-sm">
             <Link href="/verify" className="text-zinc-400 hover:text-white transition-colors">Verify</Link>
@@ -114,7 +114,7 @@ export default function DropDetail() {
         {/* Back Link */}
         <div className="container mx-auto px-6 py-6">
           <Link href="/marks">
-            <span className="inline-flex items-center gap-2 text-zinc-500 hover:text-#9333EA transition-colors cursor-pointer">
+            <span className="inline-flex items-center gap-2 text-zinc-500 hover:text-#3B82F6 transition-colors cursor-pointer">
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm uppercase tracking-wider">Back to Marks</span>
             </span>
@@ -145,8 +145,8 @@ export default function DropDetail() {
                 {/* UGC Badge - Show when viewing member photo */}
                 {currentImage?.type === 'ugc' && (
                   <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm px-3 py-2 flex items-center gap-2">
-                    <User className="w-3 h-3 text-#9333EA" />
-                    <span className="text-xs text-#9333EA uppercase tracking-wider">
+                    <User className="w-3 h-3 text-#3B82F6" />
+                    <span className="text-xs text-#3B82F6 uppercase tracking-wider">
                       {currentImage.holderCallsign || 'Verified Member'}
                     </span>
                   </div>
@@ -179,9 +179,9 @@ export default function DropDetail() {
                         onClick={() => setCurrentImageIndex(i)}
                         className={`w-2 h-2 rounded-full transition-colors ${
                           i === currentImageIndex 
-                            ? 'bg-#9333EA' 
+                            ? 'bg-#3B82F6' 
                             : img.type === 'ugc' 
-                              ? 'bg-#9333EA/30' 
+                              ? 'bg-#3B82F6/30' 
                               : 'bg-white/30'
                         }`}
                         title={img.type === 'ugc' ? `Photo by ${img.holderCallsign || 'Member'}` : 'Product Photo'}
@@ -192,7 +192,7 @@ export default function DropDetail() {
 
                 {/* Edition Badge */}
                 <div className="absolute top-4 right-4 bg-black/80 px-4 py-2">
-                  <span className="text-#9333EA font-mono">{drop.editionSize} EDITION</span>
+                  <span className="text-#3B82F6 font-mono">{drop.editionSize} EDITION</span>
                 </div>
               </div>
 
@@ -204,13 +204,13 @@ export default function DropDetail() {
                       key={i}
                       onClick={() => setCurrentImageIndex(i)}
                       className={`relative flex-shrink-0 w-20 h-20 overflow-hidden border-2 transition-colors ${
-                        i === currentImageIndex ? 'border-#9333EA' : 'border-transparent'
+                        i === currentImageIndex ? 'border-#3B82F6' : 'border-transparent'
                       }`}
                     >
                       <img src={img.url} alt="" className="w-full h-full object-cover" />
                       {/* UGC indicator on thumbnail */}
                       {img.type === 'ugc' && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-#9333EA/80 py-0.5">
+                        <div className="absolute bottom-0 left-0 right-0 bg-#3B82F6/80 py-0.5">
                           <User className="w-3 h-3 text-black mx-auto" />
                         </div>
                       )}
@@ -222,7 +222,7 @@ export default function DropDetail() {
               {/* UGC count indicator */}
               {ugcList && ugcList.length > 0 && (
                 <p className="text-xs text-zinc-500 mt-3">
-                  <span className="text-#9333EA">{ugcList.filter(u => u.type === 'image').length}</span> photos from verified members
+                  <span className="text-#3B82F6">{ugcList.filter(u => u.type === 'image').length}</span> photos from verified members
                 </p>
               )}
             </motion.div>
@@ -236,7 +236,7 @@ export default function DropDetail() {
             >
               {/* Artist & Chapter */}
               <div className="flex items-center gap-4 mb-6">
-                <span className="text-#9333EA text-sm uppercase tracking-[0.2em]">{drop.artistName}</span>
+                <span className="text-#3B82F6 text-sm uppercase tracking-[0.2em]">{drop.artistName}</span>
                 {drop.chapter && (
                   <>
                     <span className="text-zinc-700">|</span>
@@ -292,7 +292,7 @@ export default function DropDetail() {
                   Own this mark? Verify your possession to receive The Mark.
                 </p>
                 <Link href="/verify">
-                  <button className="w-full py-4 border border-#9333EA/50 text-#9333EA hover:bg-#9333EA hover:text-black transition-all uppercase tracking-[0.2em] text-sm">
+                  <button className="w-full py-4 border border-#3B82F6/50 text-#3B82F6 hover:bg-#3B82F6 hover:text-black transition-all uppercase tracking-[0.2em] text-sm">
                     Verify Mark
                   </button>
                 </Link>
@@ -314,7 +314,7 @@ export default function DropDetail() {
                 </div>
                 <div>
                   <p className="text-zinc-600 text-xs uppercase tracking-wider mb-1">Status</p>
-                  <p className="text-#9333EA uppercase">{drop.status}</p>
+                  <p className="text-#3B82F6 uppercase">{drop.status}</p>
                 </div>
               </div>
             </motion.div>
@@ -327,14 +327,14 @@ export default function DropDetail() {
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2">
-              <span className="text-#9333EA">COMM@</span>
+              <span className="text-#3B82F6">COMM@</span>
               <span className="text-zinc-700">|</span>
               <span className="text-zinc-600 text-sm">Season One · South Jakarta</span>
             </div>
             <div className="flex gap-8 text-zinc-600 text-sm">
-              <Link href="/verify" className="hover:text-#9333EA transition-colors">Verify</Link>
-              <Link href="/inside" className="hover:text-#9333EA transition-colors">Inside</Link>
-              <Link href="/gatherings" className="hover:text-#9333EA transition-colors">Gatherings</Link>
+              <Link href="/verify" className="hover:text-#3B82F6 transition-colors">Verify</Link>
+              <Link href="/inside" className="hover:text-#3B82F6 transition-colors">Inside</Link>
+              <Link href="/gatherings" className="hover:text-#3B82F6 transition-colors">Gatherings</Link>
             </div>
           </div>
         </div>

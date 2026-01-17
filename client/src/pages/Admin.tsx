@@ -61,7 +61,7 @@ export default function Admin() {
           <Link href="/" className="text-mono text-sm tracking-[0.3em] text-foreground/80 hover:text-foreground transition-colors">
             COMM@
           </Link>
-          <span className="text-xs text-[#9333EA] tracking-wider">ADMIN</span>
+          <span className="text-xs text-[#3B82F6] tracking-wider">ADMIN</span>
         </nav>
       </header>
 
@@ -69,31 +69,31 @@ export default function Admin() {
         <div className="max-w-6xl mx-auto">
           <Tabs value={activeTab} onValueChange={(v) => navigate(`/admin/${v}`)}>
             <TabsList className="bg-card border border-border/30 mb-8 flex-wrap">
-              <TabsTrigger value="clearance" className="data-[state=active]:bg-[#9333EA]/10">
+              <TabsTrigger value="clearance" className="data-[state=active]:bg-[#3B82F6]/10">
                 <ClipboardCheck className="w-4 h-4 mr-2" />Clearance
               </TabsTrigger>
-              <TabsTrigger value="drops" className="data-[state=active]:bg-[#9333EA]/10">
+              <TabsTrigger value="drops" className="data-[state=active]:bg-[#3B82F6]/10">
                 <Package className="w-4 h-4 mr-2" />Drops
               </TabsTrigger>
-              <TabsTrigger value="events" className="data-[state=active]:bg-[#9333EA]/10">
+              <TabsTrigger value="events" className="data-[state=active]:bg-[#3B82F6]/10">
                 <Calendar className="w-4 h-4 mr-2" />Events
               </TabsTrigger>
-              <TabsTrigger value="users" className="data-[state=active]:bg-[#9333EA]/10">
+              <TabsTrigger value="users" className="data-[state=active]:bg-[#3B82F6]/10">
                 <Users className="w-4 h-4 mr-2" />Users
               </TabsTrigger>
-              <TabsTrigger value="doctrine" className="data-[state=active]:bg-[#9333EA]/10">
+              <TabsTrigger value="doctrine" className="data-[state=active]:bg-[#3B82F6]/10">
                 <FileText className="w-4 h-4 mr-2" />Doctrine
               </TabsTrigger>
-              <TabsTrigger value="ugc" className="data-[state=active]:bg-[#9333EA]/10">
+              <TabsTrigger value="ugc" className="data-[state=active]:bg-[#3B82F6]/10">
                 <Image className="w-4 h-4 mr-2" />UGC
               </TabsTrigger>
-              <TabsTrigger value="logs" className="data-[state=active]:bg-[#9333EA]/10">
+              <TabsTrigger value="logs" className="data-[state=active]:bg-[#3B82F6]/10">
                 <Shield className="w-4 h-4 mr-2" />Logs
               </TabsTrigger>
-              <TabsTrigger value="sponsors" className="data-[state=active]:bg-[#9333EA]/10">
+              <TabsTrigger value="sponsors" className="data-[state=active]:bg-[#3B82F6]/10">
                 <Building2 className="w-4 h-4 mr-2" />Sponsors
               </TabsTrigger>
-              <TabsTrigger value="credentials" className="data-[state=active]:bg-[#9333EA]/10">
+              <TabsTrigger value="credentials" className="data-[state=active]:bg-[#3B82F6]/10">
                 <Key className="w-4 h-4 mr-2" />Credentials
               </TabsTrigger>
             </TabsList>
@@ -151,7 +151,7 @@ function ClearancePanel() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-headline">Pending Clearance Requests</h2>
-          <span className="text-xs text-[#9333EA] bg-[#9333EA]/10 px-2 py-1 rounded">
+          <span className="text-xs text-[#3B82F6] bg-[#3B82F6]/10 px-2 py-1 rounded">
             {pendingRequests.length} pending
           </span>
         </div>
@@ -187,7 +187,7 @@ function ClearancePanel() {
                     
                     {request.vouchCallSign && (
                       <p className="text-xs text-muted-foreground">
-                        Vouched by: <span className="text-[#9333EA]">{request.vouchCallSign}</span>
+                        Vouched by: <span className="text-[#3B82F6]">{request.vouchCallSign}</span>
                       </p>
                     )}
                   </div>
@@ -254,7 +254,7 @@ function ClearancePanel() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className={`text-xs px-2 py-0.5 rounded ${
-                      request.status === 'approved' ? 'bg-[#9333EA]/20 text-[#9333EA]' : 'bg-destructive/20 text-destructive'
+                      request.status === 'approved' ? 'bg-[#3B82F6]/20 text-[#3B82F6]' : 'bg-destructive/20 text-destructive'
                     }`}>
                       {request.status}
                     </span>
@@ -346,7 +346,7 @@ function DropsPanel() {
               <div>
                 <h3 className="text-foreground font-medium">{drop.artistName} - {drop.title}</h3>
                 <p className="text-sm text-muted-foreground">Edition: {drop.editionSize}</p>
-                <span className={`text-xs ${drop.status === "published" ? "text-[#9333EA]" : "text-muted-foreground"}`}>
+                <span className={`text-xs ${drop.status === "published" ? "text-[#3B82F6]" : "text-muted-foreground"}`}>
                   {drop.status}
                 </span>
               </div>
@@ -379,7 +379,7 @@ function DropsPanel() {
                     {artifacts.map((a) => (
                       <div key={a.id} className="flex items-center justify-between text-sm py-1">
                         <span className="font-mono">{a.serialNumber}</span>
-                        <span className={a.status === "marked" ? "text-[#9333EA]" : "text-muted-foreground"}>
+                        <span className={a.status === "marked" ? "text-[#3B82F6]" : "text-muted-foreground"}>
                           {a.status}
                         </span>
                       </div>
@@ -473,7 +473,7 @@ function EventsPanel() {
                   {event.eventDate && new Date(event.eventDate).toLocaleString()}
                 </p>
                 <span className={`text-xs ${
-                  event.status === "published" ? "text-[#9333EA]" : 
+                  event.status === "published" ? "text-[#3B82F6]" : 
                   event.status === "cancelled" ? "text-destructive" : "text-muted-foreground"
                 }`}>{event.status}</span>
               </div>
@@ -544,7 +544,7 @@ function UsersPanel() {
                   </Select>
                 </td>
                 <td className="py-2">
-                  <span className={u.status === "active" ? "text-[#9333EA]" : "text-destructive"}>
+                  <span className={u.status === "active" ? "text-[#3B82F6]" : "text-destructive"}>
                     {u.status}
                   </span>
                 </td>
@@ -618,10 +618,10 @@ function DoctrinePanel() {
 
       <div className="grid gap-4">
         {cards?.map((card) => (
-          <div key={card.id} className={`card-noir p-4 ${card.isPinned ? "border-[#9333EA]/20" : ""}`}>
+          <div key={card.id} className={`card-noir p-4 ${card.isPinned ? "border-[#3B82F6]/20" : ""}`}>
             <div className="flex items-start justify-between">
               <div>
-                {card.isPinned && <span className="text-xs text-[#9333EA]">PINNED</span>}
+                {card.isPinned && <span className="text-xs text-[#3B82F6]">PINNED</span>}
                 <h3 className="text-foreground font-medium">{card.title}</h3>
                 <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{card.content}</p>
               </div>
@@ -730,7 +730,7 @@ function UgcPanel() {
                 <Input type="file" accept="image/*,video/*" onChange={handleFileUpload} disabled={uploadingFile} />
                 {uploadingFile && <p className="text-xs text-muted-foreground mt-1">Uploading...</p>}
                 {newUgc.storageUrl && (
-                  <p className="text-xs text-[#9333EA] mt-1 truncate">Uploaded: {newUgc.storageUrl}</p>
+                  <p className="text-xs text-[#3B82F6] mt-1 truncate">Uploaded: {newUgc.storageUrl}</p>
                 )}
               </div>
               
@@ -895,7 +895,7 @@ function LogsPanel() {
           {auditLogs?.map((log) => (
             <div key={log.id} className="flex items-start justify-between py-2 border-b border-border/30 last:border-0">
               <div>
-                <span className="text-xs text-[#9333EA]">{log.action}</span>
+                <span className="text-xs text-[#3B82F6]">{log.action}</span>
                 <p className="text-sm text-foreground">{log.description || log.targetIdentifier}</p>
                 <p className="text-xs text-muted-foreground">by {log.userName}</p>
               </div>
@@ -914,7 +914,7 @@ function LogsPanel() {
             <div key={log.id} className="flex items-start justify-between py-2 border-b border-border/30 last:border-0">
               <div className="flex items-center gap-2">
                 {log.result === "success" ? (
-                  <CheckCircle2 className="w-4 h-4 text-[#9333EA]" />
+                  <CheckCircle2 className="w-4 h-4 text-[#3B82F6]" />
                 ) : (
                   <AlertTriangle className="w-4 h-4 text-destructive" />
                 )}
@@ -1063,7 +1063,7 @@ function SponsorsPanel() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-headline">New Inquiries</h2>
-            <span className="text-xs text-[#9333EA] bg-[#9333EA]/10 px-2 py-1 rounded">
+            <span className="text-xs text-[#3B82F6] bg-[#3B82F6]/10 px-2 py-1 rounded">
               {pendingInquiries.length} new
             </span>
           </div>
@@ -1108,7 +1108,7 @@ function SponsorsPanel() {
           <h2 className="text-headline">Sponsors</h2>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
-              <Button className="bg-[#9333EA] hover:bg-[#7928CA]">
+              <Button className="bg-[#3B82F6] hover:bg-[#1D4ED8]">
                 <Plus className="w-4 h-4 mr-2" />Add Sponsor
               </Button>
             </DialogTrigger>
@@ -1428,7 +1428,7 @@ function SponsorForm({
       <Button 
         onClick={onSubmit} 
         disabled={isLoading || !formData.name || !formData.slug}
-        className="w-full bg-[#9333EA] hover:bg-[#7928CA]"
+        className="w-full bg-[#3B82F6] hover:bg-[#1D4ED8]"
       >
         {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
         Save Sponsor
@@ -1528,7 +1528,7 @@ function CredentialsPanel() {
         </div>
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-[#9333EA] hover:bg-[#7928CA]">
+            <Button className="bg-[#3B82F6] hover:bg-[#1D4ED8]">
               <Plus className="w-4 h-4 mr-2" />
               Create Credentials
             </Button>
@@ -1593,7 +1593,7 @@ function CredentialsPanel() {
               <Button
                 onClick={() => createMutation.mutate(createForm)}
                 disabled={createMutation.isPending || !createForm.userId || !createForm.username || createForm.password.length < 8}
-                className="w-full bg-[#9333EA] hover:bg-[#7928CA]"
+                className="w-full bg-[#3B82F6] hover:bg-[#1D4ED8]"
               >
                 {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                 Create Credentials
@@ -1637,7 +1637,7 @@ function CredentialsPanel() {
       {/* Users with Credentials */}
       <div className="card-noir p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Key className="w-5 h-5 text-[#9333EA]" />
+          <Key className="w-5 h-5 text-[#3B82F6]" />
           Users with Login Credentials ({usersWithCredentials.length})
         </h3>
         

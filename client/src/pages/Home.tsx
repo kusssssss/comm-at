@@ -62,7 +62,7 @@ const MEMBER_TIERS = [
   { 
     name: "INNER CIRCLE", 
     description: "The core. Full clearance.", 
-    color: "#9333EA",
+    color: "#3B82F6",
     icon: Shield,
     howToAdvance: null,
     access: ["All events", "Early drops", "Governance rights", "Secret channels"]
@@ -99,8 +99,8 @@ function ClassifiedContent({ children, label = "CLASSIFIED" }: { children: React
         {children}
       </div>
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="px-4 py-2 bg-black/80 border border-[#9333EA]/50">
-          <span className="text-[#9333EA] text-xs font-mono tracking-widest flex items-center gap-2">
+        <div className="px-4 py-2 bg-black/80 border border-[#3B82F6]/50">
+          <span className="text-[#3B82F6] text-xs font-mono tracking-widest flex items-center gap-2">
             <Lock className="w-3 h-3" />
             {label}
           </span>
@@ -114,8 +114,8 @@ function ClassifiedContent({ children, label = "CLASSIFIED" }: { children: React
 function LivePulse() {
   return (
     <span className="relative flex h-2 w-2">
-      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9333EA] opacity-75"></span>
-      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9333EA]"></span>
+      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3B82F6] opacity-75"></span>
+      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3B82F6]"></span>
     </span>
   );
 }
@@ -133,7 +133,7 @@ function EventPreviewCard({ event, isBlurred = false }: { event: any, isBlurred?
       }`}
     >
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#9333EA]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       
       {/* Status badge */}
       <div className="flex items-center justify-between mb-4">
@@ -141,7 +141,7 @@ function EventPreviewCard({ event, isBlurred = false }: { event: any, isBlurred?
           {isUpcoming ? (
             <>
               <LivePulse />
-              <span className="text-[10px] text-[#9333EA] font-mono tracking-widest">UPCOMING</span>
+              <span className="text-[10px] text-[#3B82F6] font-mono tracking-widest">UPCOMING</span>
             </>
           ) : (
             <span className="text-[10px] text-[#666666] font-mono tracking-widest">PAST</span>
@@ -185,13 +185,13 @@ function EventPreviewCard({ event, isBlurred = false }: { event: any, isBlurred?
       
       {/* CTA */}
       {isBlurred ? (
-        <div className="flex items-center gap-2 text-[#9333EA] text-xs font-mono">
+        <div className="flex items-center gap-2 text-[#3B82F6] text-xs font-mono">
           <Lock className="w-3 h-3" />
           <span>MEMBERS ONLY</span>
         </div>
       ) : (
         <Link href={`/events`}>
-          <span className="flex items-center gap-2 text-[#9333EA] text-xs font-mono group-hover:gap-3 transition-all">
+          <span className="flex items-center gap-2 text-[#3B82F6] text-xs font-mono group-hover:gap-3 transition-all">
             VIEW DETAILS
             <ArrowRight className="w-3 h-3" />
           </span>
@@ -252,7 +252,7 @@ function DropPreviewCard({ drop, isBlurred = false }: { drop: any, isBlurred?: b
         <div className="absolute top-3 left-3">
           <span className={`px-2 py-1 text-[10px] font-mono tracking-wider ${
             drop.status === 'active' 
-              ? 'bg-[#9333EA] text-white' 
+              ? 'bg-[#3B82F6] text-white' 
               : 'bg-[#222222] text-[#666666]'
           }`}>
             {drop.status === 'active' ? 'AVAILABLE' : drop.status?.toUpperCase()}
@@ -271,7 +271,7 @@ function DropPreviewCard({ drop, isBlurred = false }: { drop: any, isBlurred?: b
         
         {/* Price and edition */}
         <div className="flex items-center justify-between">
-          <span className={`text-sm font-mono ${isBlurred ? 'blur-[2px] text-[#666666]' : 'text-[#9333EA]'}`}>
+          <span className={`text-sm font-mono ${isBlurred ? 'blur-[2px] text-[#666666]' : 'text-[#3B82F6]'}`}>
             {isBlurred ? '███' : (drop.priceIdr && drop.priceIdr > 0 ? `IDR ${drop.priceIdr.toLocaleString()}` : 'INQUIRE')}
           </span>
           <span className="text-[10px] text-[#444444] font-mono">
@@ -296,7 +296,7 @@ function InsideFeedPreview({ activity }: { activity: any[] }) {
           className="flex items-center gap-3 p-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg"
         >
           <div className="w-8 h-8 rounded-full bg-[#222222] flex items-center justify-center">
-            <span className="text-[10px] text-[#9333EA] font-mono">
+            <span className="text-[10px] text-[#3B82F6] font-mono">
               {item.callSign?.[0] || '?'}
             </span>
           </div>
@@ -375,7 +375,7 @@ export default function Home() {
           />
           
           {/* Radial glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(147,51,234,0.1)_0%,_transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(59,130,246,0.1)_0%,_transparent_70%)]" />
           
           <div className="relative z-10 text-center max-w-4xl mx-auto">
             {/* Live indicator */}
@@ -398,8 +398,8 @@ export default function Home() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="mb-8"
             >
-              <GlowPulse color="#9333EA">
-                <span className="inline-block px-4 py-2 border border-[#9333EA]/50 text-[#9333EA] text-xs font-mono tracking-[0.3em] uppercase">
+              <GlowPulse color="#3B82F6">
+                <span className="inline-block px-4 py-2 border border-[#3B82F6]/50 text-[#3B82F6] text-xs font-mono tracking-[0.3em] uppercase">
                   <FlickerText intensity="light">INVITATION ONLY</FlickerText>
                 </span>
               </GlowPulse>
@@ -437,7 +437,7 @@ export default function Home() {
               transition={{ delay: 0.8, duration: 0.6 }}
               className="mb-8"
             >
-              <span className="text-[8vw] md:text-[6vw] lg:text-[5rem] font-black text-[#9333EA] tracking-tight block">
+              <span className="text-[8vw] md:text-[6vw] lg:text-[5rem] font-black text-[#3B82F6] tracking-tight block">
                 <DecryptText text="TAKEOVER" delay={900} speed={40} />
               </span>
             </motion.div>
@@ -487,12 +487,12 @@ export default function Home() {
                 transition={{ delay: 1.3, duration: 0.6 }}
                 className="mb-12"
               >
-                <div className="inline-block p-6 border border-[#9333EA]/30 bg-[#9333EA]/5 rounded-lg backdrop-blur-sm">
+                <div className="inline-block p-6 border border-[#3B82F6]/30 bg-[#3B82F6]/5 rounded-lg backdrop-blur-sm">
                   {nextEvent?.eventDate ? (
                     <>
                       <div className="flex items-center justify-center gap-2 mb-3">
-                        <Calendar className="w-4 h-4 text-[#9333EA]" />
-                        <span className="text-[#9333EA] text-xs font-mono tracking-widest uppercase">NEXT SECRET EVENT</span>
+                        <Calendar className="w-4 h-4 text-[#3B82F6]" />
+                        <span className="text-[#3B82F6] text-xs font-mono tracking-widest uppercase">NEXT SECRET EVENT</span>
                       </div>
                       <Countdown 
                         targetDate={new Date(nextEvent.eventDate)} 
@@ -506,8 +506,8 @@ export default function Home() {
                   ) : nextDropEnd?.saleWindowEnd ? (
                     <>
                       <div className="flex items-center justify-center gap-2 mb-3">
-                        <Sparkles className="w-4 h-4 text-[#9333EA]" />
-                        <span className="text-[#9333EA] text-xs font-mono tracking-widest uppercase">DROP ENDS IN</span>
+                        <Sparkles className="w-4 h-4 text-[#3B82F6]" />
+                        <span className="text-[#3B82F6] text-xs font-mono tracking-widest uppercase">DROP ENDS IN</span>
                       </div>
                       <Countdown 
                         targetDate={new Date(nextDropEnd.saleWindowEnd)} 
@@ -545,8 +545,8 @@ export default function Home() {
             >
               <GlitchHover>
                 <Link href="/marks">
-                  <GlowPulse color="#9333EA">
-                    <button className="w-full sm:w-auto px-8 py-4 bg-[#9333EA] text-white font-bold text-sm tracking-widest uppercase btn-gradient-hover min-h-[48px] transition-all duration-300 hover:shadow-[0_0_30px_rgba(147,51,234,0.5)]">
+                  <GlowPulse color="#3B82F6">
+                    <button className="w-full sm:w-auto px-8 py-4 bg-[#3B82F6] text-white font-bold text-sm tracking-widest uppercase btn-gradient-hover min-h-[48px] transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]">
                       <span>BROWSE MARKS</span>
                     </button>
                   </GlowPulse>
@@ -555,7 +555,7 @@ export default function Home() {
               
               <GlitchHover>
                 <Link href="/gatherings">
-                  <button className="w-full sm:w-auto px-8 py-4 border border-[#333333] text-white font-bold text-sm tracking-widest uppercase min-h-[48px] transition-all duration-300 hover:border-[#9333EA] hover:text-[#9333EA] hover:shadow-[0_0_20px_rgba(147,51,234,0.3)] shimmer-hover">
+                  <button className="w-full sm:w-auto px-8 py-4 border border-[#333333] text-white font-bold text-sm tracking-widest uppercase min-h-[48px] transition-all duration-300 hover:border-[#3B82F6] hover:text-[#3B82F6] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] shimmer-hover">
                     VIEW GATHERINGS
                   </button>
                 </Link>
@@ -588,13 +588,13 @@ export default function Home() {
             <RevealOnScroll>
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
-                  <Sparkles className="w-4 h-4 text-[#9333EA]" />
+                  <Sparkles className="w-4 h-4 text-[#3B82F6]" />
                   <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase">
                     LATEST MARKS
                   </p>
                 </div>
                 <Link href="/marks">
-                  <span className="text-[#9333EA] text-xs font-mono tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
+                  <span className="text-[#3B82F6] text-xs font-mono tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
                     VIEW ALL <ArrowRight className="w-3 h-3" />
                   </span>
                 </Link>
@@ -636,13 +636,13 @@ export default function Home() {
             <RevealOnScroll>
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-[#9333EA]" />
+                  <Calendar className="w-4 h-4 text-[#3B82F6]" />
                   <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase">
                     SECRET GATHERINGS
                   </p>
                 </div>
                 <Link href="/gatherings">
-                  <span className="text-[#9333EA] text-xs font-mono tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
+                  <span className="text-[#3B82F6] text-xs font-mono tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
                     VIEW ALL <ArrowRight className="w-3 h-3" />
                   </span>
                 </Link>
@@ -708,8 +708,8 @@ export default function Home() {
             <RevealOnScroll delay={600}>
               <div className="mt-8 text-center">
                 <Link href="/marks">
-                  <GlowPulse color="#9333EA">
-                    <button className="px-8 py-4 bg-[#9333EA] text-white font-bold text-sm tracking-widest uppercase hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all">
+                  <GlowPulse color="#3B82F6">
+                    <button className="px-8 py-4 bg-[#3B82F6] text-white font-bold text-sm tracking-widest uppercase hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-all">
                       GET A MARK TO UNLOCK
                     </button>
                   </GlowPulse>
@@ -726,7 +726,7 @@ export default function Home() {
           <div className="max-w-6xl mx-auto">
             <RevealOnScroll>
               <div className="flex items-center gap-3 mb-8">
-                <Zap className="w-4 h-4 text-[#9333EA]" />
+                <Zap className="w-4 h-4 text-[#3B82F6]" />
                 <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase">
                   INSIDE THE COLLECTIVE
                 </p>
@@ -779,7 +779,7 @@ export default function Home() {
               <RevealOnScroll delay={400}>
                 <div className="p-6 border border-[#222222] bg-[#0a0a0a] rounded-lg h-full">
                   <div className="flex items-center gap-2 mb-4">
-                    <Trophy className="w-4 h-4 text-[#9333EA]" />
+                    <Trophy className="w-4 h-4 text-[#3B82F6]" />
                     <h3 className="text-white font-bold">Leaderboard</h3>
                   </div>
                   <p className="text-[#666666] text-sm mb-4">
@@ -790,7 +790,7 @@ export default function Home() {
                     <div className="space-y-3">
                       {[1, 2, 3, 4, 5].map((i) => (
                         <div key={i} className="flex items-center gap-3 p-2">
-                          <span className="text-[#9333EA] font-mono text-sm w-6">#{i}</span>
+                          <span className="text-[#3B82F6] font-mono text-sm w-6">#{i}</span>
                           <div className="w-6 h-6 rounded-full bg-[#222222]" />
                           <div className="flex-1 h-3 bg-[#222222] rounded" />
                           <span className="text-[#666666] text-xs">??? pts</span>
@@ -805,7 +805,7 @@ export default function Home() {
               <RevealOnScroll delay={500}>
                 <div className="p-6 border border-[#222222] bg-[#0a0a0a] rounded-lg h-full">
                   <div className="flex items-center gap-2 mb-4">
-                    <Gift className="w-4 h-4 text-[#9333EA]" />
+                    <Gift className="w-4 h-4 text-[#3B82F6]" />
                     <h3 className="text-white font-bold">Referrals</h3>
                   </div>
                   <p className="text-[#666666] text-sm mb-4">
@@ -826,7 +826,7 @@ export default function Home() {
                           <div className="text-[10px] text-[#666666]">Joined</div>
                         </div>
                         <div>
-                          <div className="text-xl font-bold text-[#9333EA]">?</div>
+                          <div className="text-xl font-bold text-[#3B82F6]">?</div>
                           <div className="text-[10px] text-[#666666]">Points</div>
                         </div>
                       </div>
@@ -854,7 +854,7 @@ export default function Home() {
               <p className="text-[#888888] text-lg md:text-xl italic mb-2">
                 "{CRYPTIC_TESTIMONIALS[activeTestimonial].quote}"
               </p>
-              <p className="text-[#9333EA] text-xs font-mono tracking-widest">
+              <p className="text-[#3B82F6] text-xs font-mono tracking-widest">
                 — {CRYPTIC_TESTIMONIALS[activeTestimonial].author}
               </p>
             </motion.div>
@@ -867,7 +867,7 @@ export default function Home() {
                 key={i}
                 onClick={() => setActiveTestimonial(i)}
                 className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                  i === activeTestimonial ? 'bg-[#9333EA]' : 'bg-[#333333]'
+                  i === activeTestimonial ? 'bg-[#3B82F6]' : 'bg-[#333333]'
                 }`}
               />
             ))}
@@ -900,7 +900,7 @@ export default function Home() {
             {/* Journey explanation */}
             <RevealOnScroll delay={250}>
               <div className="bg-[#0a0a0a] border border-[#222222] rounded-lg p-6 mb-12 max-w-3xl mx-auto">
-                <p className="text-[#9333EA] text-xs font-mono tracking-widest mb-4 text-center">HOW TO RISE</p>
+                <p className="text-[#3B82F6] text-xs font-mono tracking-widest mb-4 text-center">HOW TO RISE</p>
                 <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-2 text-center">
                   <div className="flex flex-col items-center">
                     <span className="text-[#444444] text-xs font-mono">OUTSIDE</span>
@@ -918,7 +918,7 @@ export default function Home() {
                   </div>
                   <ChevronRight className="w-4 h-4 text-[#333333] rotate-90 md:rotate-0" />
                   <div className="flex flex-col items-center">
-                    <span className="text-[#9333EA] text-xs font-mono">INNER CIRCLE</span>
+                    <span className="text-[#3B82F6] text-xs font-mono">INNER CIRCLE</span>
                     <span className="text-[#666666] text-[10px] mt-1">By invitation</span>
                   </div>
                 </div>
@@ -931,7 +931,7 @@ export default function Home() {
                   <div 
                     className={`relative p-6 border bg-[#0a0a0a] h-full transition-all duration-300 hover:scale-[1.02] rounded-lg card-gradient-hover ${
                       tier.name === 'INNER CIRCLE' 
-                        ? 'border-[#9333EA]/50 hover:border-[#9333EA]' 
+                        ? 'border-[#3B82F6]/50 hover:border-[#3B82F6]' 
                         : 'border-[#222222] hover:border-[#333333]'
                     }`}
                   >
@@ -962,13 +962,13 @@ export default function Home() {
                     {tier.howToAdvance && (
                       <div className="pt-3 border-t border-[#222222]">
                         <p className="text-[10px] text-[#444444] uppercase tracking-wider mb-1">Next level:</p>
-                        <p className="text-xs text-[#9333EA]">{tier.howToAdvance}</p>
+                        <p className="text-xs text-[#3B82F6]">{tier.howToAdvance}</p>
                       </div>
                     )}
                     
                     {/* Glow effect for Inner Circle */}
                     {tier.name === 'INNER CIRCLE' && (
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#9333EA]/5 to-transparent pointer-events-none rounded-lg" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#3B82F6]/5 to-transparent pointer-events-none rounded-lg" />
                     )}
                   </div>
                 </RevealOnScroll>
@@ -1009,7 +1009,7 @@ export default function Home() {
                     {line.text.split(line.emphasis).map((part, j) => (
                       <span key={j}>
                         {part}
-                        {j === 0 && <span className="text-[#9333EA] font-medium">{line.emphasis}</span>}
+                        {j === 0 && <span className="text-[#3B82F6] font-medium">{line.emphasis}</span>}
                       </span>
                     ))}
                   </p>
@@ -1049,13 +1049,13 @@ export default function Home() {
                   value={serialInput}
                   onChange={(e) => setSerialInput(e.target.value.toUpperCase())}
                   placeholder="GN001-001"
-                  className="flex-1 px-4 py-3 bg-[#0a0a0a] border border-[#333333] text-white font-mono text-center tracking-widest placeholder:text-[#444444] focus:border-[#9333EA] focus:outline-none transition-colors rounded-lg"
+                  className="flex-1 px-4 py-3 bg-[#0a0a0a] border border-[#333333] text-white font-mono text-center tracking-widest placeholder:text-[#444444] focus:border-[#3B82F6] focus:outline-none transition-colors rounded-lg"
                 />
                 <GlitchHover>
-                  <GlowPulse color="#9333EA">
+                  <GlowPulse color="#3B82F6">
                     <button 
                       onClick={() => serialInput && setLocation(`/verify/${serialInput}`)}
-                      className="px-6 py-3 bg-[#9333EA] text-white font-bold text-sm tracking-widest uppercase hover:bg-[#A855F7] transition-colors rounded-lg"
+                      className="px-6 py-3 bg-[#3B82F6] text-white font-bold text-sm tracking-widest uppercase hover:bg-[#60A5FA] transition-colors rounded-lg"
                     >
                       VERIFY
                     </button>
@@ -1075,7 +1075,7 @@ export default function Home() {
               <div className="mt-12 pt-8 border-t border-[#1a1a1a]">
                 <p className="text-[#666666] text-sm mb-4">Don't have a mark yet?</p>
                 <Link href="/marks">
-                  <button className="text-[#9333EA] text-sm font-mono tracking-widest hover:underline">
+                  <button className="text-[#3B82F6] text-sm font-mono tracking-widest hover:underline">
                     BROWSE AVAILABLE MARKS →
                   </button>
                 </Link>
@@ -1143,7 +1143,7 @@ export default function Home() {
             <div className="grid md:grid-cols-4 gap-8 mb-8">
               {/* Brand */}
               <div>
-                <div className="text-[#9333EA] text-3xl font-black mb-2">@</div>
+                <div className="text-[#3B82F6] text-3xl font-black mb-2">@</div>
                 <div className="text-[#444444] text-xs font-mono tracking-widest mb-4">
                   CHAPTER ONE — JXL TAKEOVER
                 </div>
@@ -1156,13 +1156,13 @@ export default function Home() {
               <div>
                 <h4 className="text-white text-sm font-bold mb-4">EXPLORE</h4>
                 <div className="space-y-2">
-                  <Link href="/marks" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/marks" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
                     Marks
                   </Link>
-                  <Link href="/gatherings" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/gatherings" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
                     Gatherings
                   </Link>
-                  <Link href="/verify" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/verify" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
                     Verify Mark
                   </Link>
                 </div>
@@ -1172,13 +1172,13 @@ export default function Home() {
               <div>
                 <h4 className="text-white text-sm font-bold mb-4">MEMBERS</h4>
                 <div className="space-y-2">
-                  <Link href="/inside" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/inside" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
                     Inside Feed
                   </Link>
-                  <Link href="/ranks" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/ranks" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
                     Leaderboard
                   </Link>
-                  <Link href="/refer" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/refer" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
                     Referrals
                   </Link>
                 </div>
@@ -1188,10 +1188,10 @@ export default function Home() {
               <div>
                 <h4 className="text-white text-sm font-bold mb-4">PARTNERS</h4>
                 <div className="space-y-2">
-                  <Link href="/partners" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/partners" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
                     Become a Partner
                   </Link>
-                  <Link href="/apply" className="block text-[#666666] hover:text-[#9333EA] text-sm transition-colors">
+                  <Link href="/apply" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
                     Apply for Clearance
                   </Link>
                 </div>

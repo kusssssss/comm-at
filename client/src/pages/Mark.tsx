@@ -136,7 +136,7 @@ export default function Mark() {
       {/* Minimal header - only @ symbol */}
       <header className="fixed top-0 left-0 right-0 z-50 px-6 py-6">
         <Link href="/">
-          <span className="text-[#9333EA] text-xl font-light cursor-crosshair">@</span>
+          <span className="text-[#3B82F6] text-xl font-light cursor-crosshair">@</span>
         </Link>
       </header>
 
@@ -151,7 +151,7 @@ export default function Mark() {
               exit={{ opacity: 0 }}
               className="text-center"
             >
-              <span className="text-[#9333EA] cursor-blink text-2xl" />
+              <span className="text-[#3B82F6] cursor-blink text-2xl" />
             </motion.div>
           )}
 
@@ -262,7 +262,7 @@ export default function Mark() {
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-micro text-[#9333EA] mt-4"
+                    className="text-micro text-[#3B82F6] mt-4"
                   >
                     VALIDATING...
                   </motion.p>
@@ -294,7 +294,7 @@ export default function Mark() {
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-micro text-[#9333EA] tracking-[0.3em] mb-16"
+                className="text-micro text-[#3B82F6] tracking-[0.3em] mb-16"
               >
                 THE CODE
               </motion.p>
@@ -318,7 +318,7 @@ export default function Mark() {
                   <div
                     key={i}
                     className={`w-1 h-1 transition-colors duration-500 ${
-                      i <= codeIndex ? "bg-[#9333EA]" : "bg-[#333333]"
+                      i <= codeIndex ? "bg-[#3B82F6]" : "bg-[#333333]"
                     }`}
                   />
                 ))}
@@ -413,7 +413,7 @@ export default function Mark() {
                 </div>
                 <div>
                   <p className="text-micro text-[#333333] tracking-[0.3em] mb-2">CALL SIGN</p>
-                  <p className="text-display text-[#9333EA]">{callSign}</p>
+                  <p className="text-display text-[#3B82F6]">{callSign}</p>
                 </div>
               </motion.div>
 
@@ -465,7 +465,7 @@ export default function Mark() {
               >
                 MARKING
               </motion.p>
-              <span className="text-[#9333EA] cursor-blink text-2xl mt-8 block" />
+              <span className="text-[#3B82F6] cursor-blink text-2xl mt-8 block" />
             </motion.div>
           )}
 
@@ -483,7 +483,7 @@ export default function Mark() {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               >
-                <p className="text-massive text-[#9333EA] mark-glow">
+                <p className="text-massive text-[#3B82F6] mark-glow">
                   MARKED
                 </p>
               </motion.div>

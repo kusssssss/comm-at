@@ -88,7 +88,7 @@ export default function Verify() {
                 transition={{ delay: 0.2 }}
                 className="mb-12"
               >
-                <p className="text-micro text-[#9333EA] tracking-[0.3em] mb-4">
+                <p className="text-micro text-[#3B82F6] tracking-[0.3em] mb-4">
                   <DecryptText text="VERIFY MARK" delay={200} speed={30} />
                 </p>
                 <h1 className="text-2xl md:text-3xl text-white font-light mb-4">
@@ -113,7 +113,7 @@ export default function Verify() {
                   type="text"
                   value={serialInput}
                   onChange={(e) => setSerialInput(e.target.value.toUpperCase())}
-                  className="w-full bg-transparent border-b-2 border-[#333333] focus:border-[#9333EA] text-white text-center text-xl md:text-2xl font-mono py-4 outline-none transition-colors placeholder:text-[#333333]"
+                  className="w-full bg-transparent border-b-2 border-[#333333] focus:border-[#3B82F6] text-white text-center text-xl md:text-2xl font-mono py-4 outline-none transition-colors placeholder:text-[#333333]"
                   placeholder="COMMA-XX-XXXX-XXXXXX"
                   autoComplete="off"
                   spellCheck={false}
@@ -123,7 +123,7 @@ export default function Verify() {
                   <button
                     type="submit"
                     disabled={!serialInput.trim()}
-                    className="w-full bg-[#9333EA] text-black py-4 text-sm font-semibold tracking-[0.2em] uppercase hover:bg-[#A855F7] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 animate-glow-pulse"
+                    className="w-full bg-[#3B82F6] text-black py-4 text-sm font-semibold tracking-[0.2em] uppercase hover:bg-[#60A5FA] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 animate-glow-pulse"
                   >
                     VERIFY
                   </button>
@@ -165,7 +165,7 @@ export default function Verify() {
               >
                 <p className="text-sm text-[#444444] mb-4">Don't have a mark yet?</p>
                 <Link href="/drops">
-                  <button className="text-micro text-[#9333EA] tracking-[0.2em] hover:text-white transition-colors border-b border-[#9333EA] pb-1">
+                  <button className="text-micro text-[#3B82F6] tracking-[0.2em] hover:text-white transition-colors border-b border-[#3B82F6] pb-1">
                     BROWSE DROPS →
                   </button>
                 </Link>
@@ -189,7 +189,7 @@ export default function Verify() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-8 h-8 border border-[#9333EA] border-t-transparent rounded-full mx-auto"
+                className="w-8 h-8 border border-[#3B82F6] border-t-transparent rounded-full mx-auto"
               />
               <p className="text-micro text-[#00FF41] tracking-[0.2em] mt-4 font-mono">
                 <DecryptText text="SCANNING DATABASE..." delay={0} speed={50} />
@@ -274,7 +274,7 @@ export default function Verify() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8 }}
                   >
-                    <p className="text-6xl md:text-8xl text-[#9333EA] font-light tracking-wider" style={{ textShadow: "0 0 60px rgba(201,162,39,0.5)" }}>
+                    <p className="text-6xl md:text-8xl text-[#3B82F6] font-light tracking-wider" style={{ textShadow: "0 0 60px rgba(201,162,39,0.5)" }}>
                       MARKED
                     </p>
                   </motion.div>
@@ -304,7 +304,7 @@ export default function Verify() {
                     
                     <div>
                       <p className="text-micro text-[#444444] tracking-[0.3em] mb-2">MARKED BY</p>
-                      <p className="text-2xl text-[#9333EA] font-light">{artifact.markerCallSign}</p>
+                      <p className="text-2xl text-[#3B82F6] font-light">{artifact.markerCallSign}</p>
                     </div>
                   </motion.div>
 
@@ -315,7 +315,7 @@ export default function Verify() {
                     className="mt-16 flex flex-col sm:flex-row justify-center gap-4"
                   >
                     <Link href={`/drop/${artifact.dropId}`}>
-                      <button className="bg-[#9333EA] text-black px-8 py-4 text-xs font-semibold tracking-[0.2em] uppercase hover:bg-[#A855F7] transition-all duration-500">
+                      <button className="bg-[#3B82F6] text-black px-8 py-4 text-xs font-semibold tracking-[0.2em] uppercase hover:bg-[#60A5FA] transition-all duration-500">
                         VIEW DROP
                       </button>
                     </Link>
@@ -381,7 +381,7 @@ export default function Verify() {
                     className="mt-16 flex flex-col sm:flex-row justify-center gap-4"
                   >
                     <Link href={`/mark/${artifact.serialNumber}`}>
-                      <button className="bg-[#9333EA] text-black px-8 py-4 text-xs font-semibold tracking-[0.2em] uppercase hover:bg-[#A855F7] transition-all duration-500 hover:shadow-[0_0_30px_rgba(201,162,39,0.3)]">
+                      <button className="bg-[#3B82F6] text-black px-8 py-4 text-xs font-semibold tracking-[0.2em] uppercase hover:bg-[#60A5FA] transition-all duration-500 hover:shadow-[0_0_30px_rgba(201,162,39,0.3)]">
                         RECEIVE THE MARK
                       </button>
                     </Link>

@@ -51,10 +51,10 @@ function TestUserSwitcher() {
   return (
     <section className="mb-12">
       <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-        <UserCircle className="w-5 h-5 text-[#9333EA]" />
+        <UserCircle className="w-5 h-5 text-[#3B82F6]" />
         Test User Impersonation
       </h2>
-      <div className="bg-[#111111] border border-[#9333EA]/30 rounded-lg p-6">
+      <div className="bg-[#111111] border border-[#3B82F6]/30 rounded-lg p-6">
         <p className="text-sm text-[#666666] mb-4">
           Switch to a test user to experience the app from different tier perspectives. 
           This is useful for testing Stratified Reality visibility.
@@ -62,7 +62,7 @@ function TestUserSwitcher() {
         
         {isLoading ? (
           <div className="text-center py-4">
-            <RefreshCw className="w-5 h-5 animate-spin text-[#9333EA] mx-auto" />
+            <RefreshCw className="w-5 h-5 animate-spin text-[#3B82F6] mx-auto" />
           </div>
         ) : testUsers && testUsers.length > 0 ? (
           <div className="grid gap-3">
@@ -72,8 +72,8 @@ function TestUserSwitcher() {
                 className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-lg border border-[#222222]"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#9333EA]/20 flex items-center justify-center">
-                    <UserCircle className="w-6 h-6 text-[#9333EA]" />
+                  <div className="w-10 h-10 rounded-full bg-[#3B82F6]/20 flex items-center justify-center">
+                    <UserCircle className="w-6 h-6 text-[#3B82F6]" />
                   </div>
                   <div>
                     <p className="text-white font-medium">{testUser.name}</p>
@@ -89,7 +89,7 @@ function TestUserSwitcher() {
                   size="sm"
                   onClick={() => impersonateMutation.mutate({ userId: testUser.id })}
                   disabled={impersonateMutation.isPending}
-                  className="bg-[#9333EA] hover:bg-[#7e22ce] text-white"
+                  className="bg-[#3B82F6] hover:bg-[#1D4ED8] text-white"
                 >
                   {impersonateMutation.isPending ? (
                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -111,7 +111,7 @@ function TestUserSwitcher() {
             variant="outline"
             size="sm"
             onClick={() => stopImpersonatingMutation.mutate()}
-            className="border-[#333333] text-[#999999] hover:text-white hover:border-[#9333EA]"
+            className="border-[#333333] text-[#999999] hover:text-white hover:border-[#3B82F6]"
           >
             End Session & Return to Login
           </Button>
@@ -146,7 +146,7 @@ export default function Dev() {
     {
       category: "🏠 Core Experience",
       icon: Zap,
-      color: "#9333EA",
+      color: "#3B82F6",
       description: "The main user journey and landing experience",
       features: [
         { 
@@ -359,7 +359,7 @@ export default function Dev() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/">
-              <span className="text-2xl font-bold text-[#9333EA]">@</span>
+              <span className="text-2xl font-bold text-[#3B82F6]">@</span>
             </Link>
             <div>
               <h1 className="text-xl font-bold text-white">COMM@ Demo Console</h1>
@@ -370,11 +370,11 @@ export default function Dev() {
             {isAuthenticated && user && (
               <div className="text-right">
                 <p className="text-sm text-white">{user.name || user.email}</p>
-                <p className="text-xs text-[#9333EA]">{user.role?.toUpperCase()}</p>
+                <p className="text-xs text-[#3B82F6]">{user.role?.toUpperCase()}</p>
               </div>
             )}
             <Link href="/">
-              <Button variant="outline" size="sm" className="border-[#333333] text-[#999999] hover:text-white hover:border-[#9333EA]">
+              <Button variant="outline" size="sm" className="border-[#333333] text-[#999999] hover:text-white hover:border-[#3B82F6]">
                 <ExternalLink className="w-4 h-4 mr-2" />
                 View Site
               </Button>
@@ -387,15 +387,15 @@ export default function Dev() {
         {/* System Overview */}
         <section className="mb-12">
           <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-            <Zap className="w-5 h-5 text-[#9333EA]" />
+            <Zap className="w-5 h-5 text-[#3B82F6]" />
             System Features Overview
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {systemFeatures.map((feature) => (
               <div key={feature.title} className="bg-[#111111] border border-[#222222] rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#9333EA]/10 flex items-center justify-center flex-shrink-0">
-                    <feature.icon className="w-5 h-5 text-[#9333EA]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center flex-shrink-0">
+                    <feature.icon className="w-5 h-5 text-[#3B82F6]" />
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-white mb-1">{feature.title}</h3>
@@ -419,16 +419,16 @@ export default function Dev() {
         {/* Test Activation Codes */}
         <section className="mb-12">
           <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <QrCode className="w-5 h-5 text-[#9333EA]" />
+            <QrCode className="w-5 h-5 text-[#3B82F6]" />
             Test Activation Codes
           </h2>
-          <div className="bg-[#111111] border border-[#9333EA]/30 rounded-lg p-6">
+          <div className="bg-[#111111] border border-[#3B82F6]/30 rounded-lg p-6">
             <p className="text-sm text-[#666666] mb-4">Use these codes to test the mark verification flow:</p>
             <div className="grid gap-3">
               {testCodes.map((item) => (
                 <div key={item.serial} className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-lg border border-[#222222]">
                   <div className="flex items-center gap-4">
-                    <span className="font-mono text-[#9333EA] text-sm">{item.serial}</span>
+                    <span className="font-mono text-[#3B82F6] text-sm">{item.serial}</span>
                     <span className="text-[#444444]">—</span>
                     <span className="text-[#cccccc] text-sm">{item.drop}</span>
                   </div>
@@ -438,7 +438,7 @@ export default function Dev() {
                       variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(item.code)}
-                      className="h-8 w-8 p-0 hover:bg-[#9333EA]/10"
+                      className="h-8 w-8 p-0 hover:bg-[#3B82F6]/10"
                     >
                       {copiedCode === item.code ? (
                         <Check className="h-4 w-4 text-[#22c55e]" />
@@ -477,7 +477,7 @@ export default function Dev() {
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <Link href={feature.path}>
-                            <span className="text-sm font-bold text-white hover:text-[#9333EA] transition-colors cursor-pointer">
+                            <span className="text-sm font-bold text-white hover:text-[#3B82F6] transition-colors cursor-pointer">
                               {feature.label}
                             </span>
                           </Link>
@@ -500,7 +500,7 @@ export default function Dev() {
                       <Link href={feature.path}>
                         <Button 
                           size="sm" 
-                          className="bg-[#9333EA] hover:bg-[#7e22ce] text-white flex-shrink-0"
+                          className="bg-[#3B82F6] hover:bg-[#1D4ED8] text-white flex-shrink-0"
                         >
                           <Play className="w-3 h-3 mr-1" />
                           Demo
@@ -517,12 +517,12 @@ export default function Dev() {
         {/* Quick Stats */}
         <section className="mt-12 mb-8">
           <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <Database className="w-5 h-5 text-[#9333EA]" />
+            <Database className="w-5 h-5 text-[#3B82F6]" />
             Database Status
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-[#111111] border border-[#222222] rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-[#9333EA]">28</p>
+              <p className="text-2xl font-bold text-[#3B82F6]">28</p>
               <p className="text-xs text-[#666666]">Tables</p>
             </div>
             <div className="bg-[#111111] border border-[#222222] rounded-lg p-4 text-center">
@@ -546,7 +546,7 @@ export default function Dev() {
             COMM@ Demo Console • Built for client demonstrations
           </p>
           <Link href="/">
-            <span className="text-xs text-[#9333EA] hover:text-[#a855f7] transition-colors cursor-pointer">
+            <span className="text-xs text-[#3B82F6] hover:text-[#a855f7] transition-colors cursor-pointer">
               ← Return to Homepage
             </span>
           </Link>

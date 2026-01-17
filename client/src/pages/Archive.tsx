@@ -77,8 +77,8 @@ export default function Archive() {
           {user && (
             <div className="card-noir p-6 mb-8 animate-slide-up">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#9333EA]/20 flex items-center justify-center">
-                  <span className="text-[#9333EA] font-bold text-lg">
+                <div className="w-12 h-12 rounded-full bg-[#3B82F6]/20 flex items-center justify-center">
+                  <span className="text-[#3B82F6] font-bold text-lg">
                     {(user.callSign || user.name || "?")[0].toUpperCase()}
                   </span>
                 </div>

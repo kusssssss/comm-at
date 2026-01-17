@@ -229,7 +229,7 @@ export function GlitchHover({
 export function GlowPulse({ 
   children,
   className = '',
-  color = '#9333EA',
+  color = '#3B82F6',
 }: { 
   children: ReactNode;
   className?: string;
@@ -718,7 +718,7 @@ export function Hologram({
 export function ElectricBorder({ 
   children,
   className = '',
-  color = '#9333EA',
+  color = '#3B82F6',
 }: { 
   children: ReactNode;
   className?: string;

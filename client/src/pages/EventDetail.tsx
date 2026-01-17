@@ -83,7 +83,7 @@ export default function EventDetail() {
           <p className="text-muted-foreground mb-6">
             This gathering does not exist or you don't have access.
           </p>
-          <Link href="/gatherings" className="text-sm text-[#9333EA] hover:text-[#9333EA]/80">
+          <Link href="/gatherings" className="text-sm text-[#3B82F6] hover:text-[#3B82F6]/80">
             ← Back to Gatherings
           </Link>
         </div>
@@ -179,7 +179,7 @@ export default function EventDetail() {
             <div className="py-4 border-b border-border/30">
               <div className="flex items-start gap-3">
                 {event.locationRevealed ? (
-                  <MapPin className="w-5 h-5 text-[#9333EA] mt-0.5" />
+                  <MapPin className="w-5 h-5 text-[#3B82F6] mt-0.5" />
                 ) : (
                   <Lock className="w-5 h-5 text-muted-foreground mt-0.5" />
                 )}
@@ -192,8 +192,8 @@ export default function EventDetail() {
                       <p className="text-muted-foreground">Hidden until reveal time</p>
                       {countdown && (
                         <div className="flex items-center gap-2 mt-2">
-                          <Clock className="w-4 h-4 text-[#9333EA]" />
-                          <span className="text-[#9333EA] text-sm">Reveals in {countdown}</span>
+                          <Clock className="w-4 h-4 text-[#3B82F6]" />
+                          <span className="text-[#3B82F6] text-sm">Reveals in {countdown}</span>
                         </div>
                       )}
                     </div>
@@ -214,7 +214,7 @@ export default function EventDetail() {
             <div className="pt-4">
               {event.hasPass ? (
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-[#9333EA]">
+                  <div className="flex items-center gap-3 text-[#3B82F6]">
                     <CheckCircle2 className="w-5 h-5" />
                     <span>Pass Claimed</span>
                   </div>
@@ -253,12 +253,12 @@ export default function EventDetail() {
                 <p className="text-sm text-muted-foreground text-center">This gathering is at capacity.</p>
               ) : !canClaimPass && minimumTierRequired ? (
                 <div className="text-center space-y-2">
-                  <div className="flex items-center justify-center gap-2 text-[#9333EA]">
+                  <div className="flex items-center justify-center gap-2 text-[#3B82F6]">
                     <Lock className="w-4 h-4" />
                     <span className="text-sm font-medium">Tier Restricted</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Requires <span className="text-[#9333EA] font-medium">{minimumTierRequired}</span> tier or higher to claim pass
+                    Requires <span className="text-[#3B82F6] font-medium">{minimumTierRequired}</span> tier or higher to claim pass
                   </p>
                   <p className="text-xs text-muted-foreground mt-2">
                     Earn your place in the hierarchy to unlock this gathering.

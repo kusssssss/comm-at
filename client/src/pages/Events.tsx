@@ -80,14 +80,14 @@ export default function Events() {
               <div className="space-y-4">
                 {upcomingEvents.map((event) => (
                   <Link key={event.id} href={`/events/${event.id}`}>
-                    <div className="card-noir p-6 hover:border-[#9333EA]/30 transition-colors cursor-pointer">
+                    <div className="card-noir p-6 hover:border-[#3B82F6]/30 transition-colors cursor-pointer">
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <h3 className="text-lg text-foreground font-medium mb-1">{event.title}</h3>
                           <p className="text-sm text-muted-foreground">{event.city}</p>
                         </div>
                         {event.hasPass && (
-                          <span className="text-xs text-[#9333EA] bg-[#9333EA]/10 px-2 py-1 rounded">
+                          <span className="text-xs text-[#3B82F6] bg-[#3B82F6]/10 px-2 py-1 rounded">
                             Pass Claimed
                           </span>
                         )}
@@ -111,11 +111,11 @@ export default function Events() {
                         </div>
                         <div className="flex items-center gap-2">
                           {event.locationRevealed ? (
-                            <MapPin className="w-4 h-4 text-[#9333EA]" />
+                            <MapPin className="w-4 h-4 text-[#3B82F6]" />
                           ) : (
                             <Lock className="w-4 h-4 text-muted-foreground" />
                           )}
-                          <span className={event.locationRevealed ? "text-[#9333EA]" : "text-muted-foreground"}>
+                          <span className={event.locationRevealed ? "text-[#3B82F6]" : "text-muted-foreground"}>
                             {event.locationRevealed ? "Location Revealed" : "Hidden"}
                           </span>
                         </div>
@@ -124,7 +124,7 @@ export default function Events() {
                       {/* Show minimum tier required if user can't claim pass */}
                       {(event as any).minimumTierRequired && !(event as any).canClaimPass && (
                         <div className="mt-3 pt-3 border-t border-border/30">
-                          <span className="text-xs text-[#9333EA] uppercase tracking-wider">
+                          <span className="text-xs text-[#3B82F6] uppercase tracking-wider">
                             Requires {(event as any).minimumTierRequired} tier to claim pass
                           </span>
                         </div>

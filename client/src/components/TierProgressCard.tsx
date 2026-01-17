@@ -17,7 +17,7 @@ const tierColors: Record<string, string> = {
   initiate: "#6B7280",
   prospect: "#10B981",
   member: "#3B82F6",
-  insider: "#8B5CF6",
+  insider: "#3B82F6",
   elite: "#F59E0B",
   legend: "#EF4444",
 };
