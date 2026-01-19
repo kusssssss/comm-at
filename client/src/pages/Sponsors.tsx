@@ -75,7 +75,7 @@ const TIER_BENEFITS = {
     ],
   },
   bronze: {
-    name: "Bronze",
+    name: "Broke",
     icon: Award,
     color: "text-orange-400",
     bgColor: "bg-gradient-to-br from-orange-700/20 to-orange-800/10",
@@ -235,7 +235,7 @@ function InquiryForm() {
             <SelectItem value="platinum">Platinum</SelectItem>
             <SelectItem value="gold">Gold</SelectItem>
             <SelectItem value="silver">Silver</SelectItem>
-            <SelectItem value="bronze">Bronze</SelectItem>
+            <SelectItem value="bronze">Broke</SelectItem>
           </SelectContent>
         </Select>
       </div>
