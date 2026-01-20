@@ -271,3 +271,11 @@
 - [x] Implement regular vertical scrolling with 100vh sections
 - [x] Sections reveal naturally as user scrolls (no snapping)
 - [x] Navigation dots kept for position indication and click-to-jump
+
+## Nocta Sticky Scroll Effect (EXACT Replication)
+- [x] Implement position: sticky with top: 0 for each event section
+- [x] Create tall parent wrapper (multiple viewport heights)
+- [x] Parent wrapper has position: relative
+- [x] Each section sticks to top and gets covered by next section as user scrolls
+- [x] Later sections have higher z-index to cover earlier ones
+- [x] Test the sticky scroll-to-reveal behavior - working!

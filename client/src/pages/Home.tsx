@@ -4,12 +4,15 @@ import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Calendar, MapPin, Users, ChevronDown } from 'lucide-react';
 
-// Full-viewport event section - natural scroll reveal
-function EventSection({ event, index }: { event: any; index: number }) {
+// Full-viewport sticky event section - Nocta style
+function EventSection({ event, index, isFirst }: { event: any; index: number; isFirst: boolean }) {
   const eventDate = event?.eventDate ? new Date(event.eventDate) : (event?.startDatetime ? new Date(event.startDatetime) : null);
 
   return (
-    <section className="h-screen w-full relative">
+    <section 
+      className="h-screen w-full sticky top-0 flex items-center"
+      style={{ zIndex: index + 1 }} // Later sections have higher z-index so they cover earlier ones as you scroll
+    >
       {/* Background Image - Full Bleed */}
       <div className="absolute inset-0">
         {event?.coverImageUrl ? (
@@ -81,7 +84,7 @@ function EventSection({ event, index }: { event: any; index: number }) {
       </div>
 
       {/* Scroll indicator on first slide only */}
-      {index === 0 && (
+      {isFirst && (
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce">
           <span className="text-xs text-neutral-500 tracking-wider uppercase">Scroll</span>
           <ChevronDown className="w-6 h-6 text-neutral-500" />
@@ -121,7 +124,7 @@ function CollectionGrid() {
   ];
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2">
+    <section className="relative z-20 grid grid-cols-1 md:grid-cols-2 bg-black">
       {collections.map((collection, index) => (
         <Link key={index} href={collection.link}>
           <div className="relative h-[50vh] overflow-hidden group cursor-pointer">
@@ -145,7 +148,7 @@ function CollectionGrid() {
 // Product Grid (Nocta Style)
 function ProductGrid({ products }: { products: any[] }) {
   return (
-    <section className="bg-neutral-900 py-16">
+    <section className="relative z-20 bg-neutral-900 py-16">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -215,7 +218,7 @@ function NewsletterSection() {
   const [email, setEmail] = useState('');
 
   return (
-    <section className="bg-black py-20">
+    <section className="relative z-20 bg-black py-20">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
           NEVER MISS A DROP
@@ -286,7 +289,9 @@ export default function Home() {
   const scrollToSection = (index: number) => {
     const section = sectionRefs.current[index];
     if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
+      // Calculate the scroll position based on section index
+      const scrollPosition = index * window.innerHeight;
+      window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
     }
   };
 
@@ -295,7 +300,7 @@ export default function Home() {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       const viewportHeight = window.innerHeight;
-      const index = Math.round(scrollTop / viewportHeight);
+      const index = Math.floor(scrollTop / viewportHeight);
       if (index >= 0 && index < events.length) {
         setCurrentEventIndex(index);
       }
@@ -304,6 +309,9 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [events.length]);
+
+  // Calculate wrapper height - needs to be tall enough for all sticky sections
+  const wrapperHeight = events.length > 0 ? `${events.length * 100}vh` : '100vh';
 
   return (
     <div className="bg-black">
@@ -316,23 +324,29 @@ export default function Home() {
         />
       )}
 
-      {/* Full-viewport event sections - natural vertical scroll */}
-      {events.length > 0 ? (
-        events.map((event: any, index: number) => (
-          <div 
-            key={event.id} 
-            ref={(el) => { sectionRefs.current[index] = el; }}
-          >
-            <EventSection event={event} index={index} />
-          </div>
-        ))
-      ) : (
-        <section className="h-screen w-full flex items-center justify-center bg-neutral-900">
-          <p className="text-neutral-500">No events available</p>
-        </section>
-      )}
+      {/* Sticky scroll wrapper - tall container for sticky sections */}
+      <div 
+        className="relative"
+        style={{ height: wrapperHeight }}
+      >
+        {/* Full-viewport sticky event sections */}
+        {events.length > 0 ? (
+          events.map((event: any, index: number) => (
+            <div 
+              key={event.id} 
+              ref={(el) => { sectionRefs.current[index] = el; }}
+            >
+              <EventSection event={event} index={index} isFirst={index === 0} />
+            </div>
+          ))
+        ) : (
+          <section className="h-screen w-full flex items-center justify-center bg-neutral-900 sticky top-0">
+            <p className="text-neutral-500">No events available</p>
+          </section>
+        )}
+      </div>
 
-      {/* Collection Grid */}
+      {/* Collection Grid - appears after scrolling through all events */}
       <CollectionGrid />
 
       {/* Product Grid */}
