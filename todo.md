@@ -258,3 +258,10 @@
 - [x] Product grid with size buttons on hover
 - [x] Newsletter section with green SUBSCRIBE button
 - [ ] Test on mobile and desktop (user testing needed)
+
+## Scroll-Snap Full-Screen Events
+- [x] Implement CSS scroll-snap for full-screen event sections
+- [x] Each scroll action should snap to the next complete event
+- [x] Smooth transition between event sections
+- [x] Navigation dots click to jump to specific events
+- [ ] Test scroll-snap behavior on mobile (user testing needed)

@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/_core/hooks/useAuth';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import { Calendar, MapPin, Users, ChevronDown } from 'lucide-react';
 
 // Full-viewport scrollable event section
-function EventSection({ event, index }: { event: any; index: number }) {
+function EventSection({ event, index, isLast, onScrollToNext }: { event: any; index: number; isLast: boolean; onScrollToNext: () => void }) {
   const eventDate = event?.eventDate ? new Date(event.eventDate) : (event?.startDatetime ? new Date(event.startDatetime) : null);
 
   return (
-    <section className="h-screen w-full relative flex-shrink-0 snap-start">
+    <section className="h-screen w-full relative snap-start snap-always">
       {/* Background Image - Full Bleed */}
       <div className="absolute inset-0">
         {event?.coverImageUrl ? (
@@ -80,12 +80,15 @@ function EventSection({ event, index }: { event: any; index: number }) {
         </div>
       </div>
 
-      {/* Scroll indicator on first slide */}
-      {index === 0 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce">
+      {/* Scroll indicator - shows on all event slides */}
+      {!isLast && (
+        <button 
+          onClick={onScrollToNext}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce cursor-pointer hover:opacity-80 transition-opacity"
+        >
           <span className="text-xs text-neutral-500 tracking-wider uppercase">Scroll</span>
-          <div className="w-px h-8 bg-gradient-to-b from-neutral-500 to-transparent" />
-        </div>
+          <ChevronDown className="w-6 h-6 text-neutral-500" />
+        </button>
       )}
     </section>
   );
@@ -121,7 +124,7 @@ function CollectionGrid() {
   ];
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2">
+    <section className="grid grid-cols-1 md:grid-cols-2 snap-start">
       {collections.map((collection, index) => (
         <Link key={index} href={collection.link}>
           <div className="relative h-[50vh] overflow-hidden group cursor-pointer">
@@ -145,7 +148,7 @@ function CollectionGrid() {
 // Product Grid (Nocta Style)
 function ProductGrid({ products }: { products: any[] }) {
   return (
-    <section className="bg-neutral-900 py-16">
+    <section className="bg-neutral-900 py-16 snap-start">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -215,7 +218,7 @@ function NewsletterSection() {
   const [email, setEmail] = useState('');
 
   return (
-    <section className="bg-black py-20">
+    <section className="bg-black py-20 snap-start">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
           NEVER MISS A DROP
@@ -241,15 +244,17 @@ function NewsletterSection() {
 }
 
 // Progress indicator for scroll position
-function ScrollProgress({ currentIndex, total }: { currentIndex: number; total: number }) {
+function ScrollProgress({ currentIndex, total, onDotClick }: { currentIndex: number; total: number; onDotClick: (index: number) => void }) {
   return (
-    <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2">
+    <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3">
       {Array.from({ length: total }).map((_, index) => (
-        <div
+        <button
           key={index}
-          className={`w-2 h-2 rounded-full transition-all duration-300 ${
-            index === currentIndex ? 'bg-[#00ff00] scale-125' : 'bg-neutral-600'
+          onClick={() => onDotClick(index)}
+          className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer hover:scale-125 ${
+            index === currentIndex ? 'bg-[#00ff00] scale-125' : 'bg-neutral-600 hover:bg-neutral-400'
           }`}
+          aria-label={`Go to event ${index + 1}`}
         />
       ))}
     </div>
@@ -263,6 +268,7 @@ export default function Home() {
   const { data: dropsData } = trpc.drop.list.useQuery();
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
   // Filter events for display
   const events = eventsData?.filter((e: any) => {
@@ -280,11 +286,28 @@ export default function Home() {
     isNew: true
   })) || [];
 
+  // Scroll to specific section
+  const scrollToSection = (index: number) => {
+    const section = sectionRefs.current[index];
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Scroll to next section
+  const scrollToNext = () => {
+    if (currentEventIndex < events.length - 1) {
+      scrollToSection(currentEventIndex + 1);
+    }
+  };
+
   // Track scroll position to update current event index
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
     const handleScroll = () => {
-      if (!containerRef.current) return;
-      const scrollTop = window.scrollY;
+      const scrollTop = container.scrollTop;
       const viewportHeight = window.innerHeight;
       const index = Math.round(scrollTop / viewportHeight);
       if (index >= 0 && index < events.length) {
@@ -292,29 +315,45 @@ export default function Home() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
   }, [events.length]);
 
   return (
-    <div ref={containerRef} className="bg-black">
+    <div 
+      ref={containerRef} 
+      className="bg-black h-screen overflow-y-scroll snap-y snap-mandatory"
+      style={{ scrollSnapType: 'y mandatory' }}
+    >
       {/* Scroll Progress Indicator */}
       {events.length > 1 && (
-        <ScrollProgress currentIndex={currentEventIndex} total={events.length} />
+        <ScrollProgress 
+          currentIndex={currentEventIndex} 
+          total={events.length} 
+          onDotClick={scrollToSection}
+        />
       )}
 
       {/* Full-viewport scrollable event sections */}
-      <div className="snap-y snap-mandatory">
-        {events.length > 0 ? (
-          events.map((event: any, index: number) => (
-            <EventSection key={event.id} event={event} index={index} />
-          ))
-        ) : (
-          <section className="h-screen w-full flex items-center justify-center bg-neutral-900">
-            <p className="text-neutral-500">No events available</p>
-          </section>
-        )}
-      </div>
+      {events.length > 0 ? (
+        events.map((event: any, index: number) => (
+          <div 
+            key={event.id} 
+            ref={(el) => { sectionRefs.current[index] = el; }}
+          >
+            <EventSection 
+              event={event} 
+              index={index} 
+              isLast={index === events.length - 1}
+              onScrollToNext={scrollToNext}
+            />
+          </div>
+        ))
+      ) : (
+        <section className="h-screen w-full flex items-center justify-center bg-neutral-900 snap-start">
+          <p className="text-neutral-500">No events available</p>
+        </section>
+      )}
 
       {/* Collection Grid */}
       <CollectionGrid />
