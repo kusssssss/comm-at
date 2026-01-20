@@ -293,3 +293,11 @@
 - [x] Mobile optimization - responsive classes added
 - [x] Add Layers explanation section (Streetlight, Verified, Signal, Inner Room, Black Label)
 - [x] 8 sticky scroll sections total (4 events + Stratified Reality + Collection Grid + Layers + Artifacts)
+
+## Tiffany Blue Color Scheme Update
+- [x] Change primary accent color from green (#00ff00) to Tiffany Blue (#0ABAB5)
+- [x] Update all buttons, badges, and accent elements in Home.tsx
+- [x] Update progress dots and scroll indicators
+- [x] Update global theme colors in index.css (OKLCH format)
+- [x] Update Effects2200.tsx boot sequence colors
+- [x] Review and fix any UI issues - all sections verified working

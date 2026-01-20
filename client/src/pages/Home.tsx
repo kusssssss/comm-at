@@ -30,7 +30,7 @@ function RevealStatus({ status }: { status: 'tease' | 'window' | 'lock' | 'revea
     tease: { icon: EyeOff, color: 'text-neutral-500', label: 'TEASE' },
     window: { icon: Eye, color: 'text-yellow-500', label: 'WINDOW' },
     lock: { icon: Lock, color: 'text-orange-500', label: 'LOCKED' },
-    reveal: { icon: Unlock, color: 'text-[#00ff00]', label: 'REVEALED' }
+    reveal: { icon: Unlock, color: 'text-[#0ABAB5]', label: 'REVEALED' }
   };
   
   const config = statusConfig[status];
@@ -150,7 +150,7 @@ function EventSection({ event, index, isFirst, sectionRef }: { event: any; index
 
             {/* CTA Button - Nocta Green Outlined Style */}
             <Link href={`/gatherings/${event?.id}`}>
-              <button className="px-8 md:px-12 py-3 md:py-4 border-2 border-[#00ff00] text-[#00ff00] font-medium tracking-wider hover:bg-[#00ff00] hover:text-black transition-all duration-300 uppercase text-sm md:text-base">
+              <button className="px-8 md:px-12 py-3 md:py-4 border-2 border-[#0ABAB5] text-[#0ABAB5] font-medium tracking-wider hover:bg-[#0ABAB5] hover:text-black transition-all duration-300 uppercase text-sm md:text-base">
                 Request Access
               </button>
             </Link>
@@ -179,7 +179,7 @@ function StratifiedRealitySection({ index }: { index: number }) {
       {/* Background with subtle pattern */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-900 to-black">
         <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, #00ff00 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 2px 2px, #0ABAB5 1px, transparent 0)`,
           backgroundSize: '40px 40px'
         }} />
       </div>
@@ -189,8 +189,8 @@ function StratifiedRealitySection({ index }: { index: number }) {
         <div className="max-w-4xl mx-auto text-center">
           {/* Icon */}
           <div className="flex justify-center mb-8">
-            <div className="w-20 h-20 rounded-full border-2 border-[#00ff00] flex items-center justify-center">
-              <Layers className="w-10 h-10 text-[#00ff00]" />
+            <div className="w-20 h-20 rounded-full border-2 border-[#0ABAB5] flex items-center justify-center">
+              <Layers className="w-10 h-10 text-[#0ABAB5]" />
             </div>
           </div>
 
@@ -207,7 +207,7 @@ function StratifiedRealitySection({ index }: { index: number }) {
           {/* Description */}
           <p className="text-base md:text-lg text-neutral-500 mb-12 max-w-2xl mx-auto leading-relaxed">
             Unlock layers to reveal time, location, and access. 
-            Events are not posted — they are <span className="text-[#00ff00]">unlocked</span>.
+            Events are not posted — they are <span className="text-[#0ABAB5]">unlocked</span>.
           </p>
 
           {/* Layer badges */}
@@ -221,7 +221,7 @@ function StratifiedRealitySection({ index }: { index: number }) {
 
           {/* CTA */}
           <Link href="/inside">
-            <button className="px-12 py-4 border-2 border-[#00ff00] text-[#00ff00] font-medium tracking-wider hover:bg-[#00ff00] hover:text-black transition-all duration-300 uppercase">
+            <button className="px-12 py-4 border-2 border-[#0ABAB5] text-[#0ABAB5] font-medium tracking-wider hover:bg-[#0ABAB5] hover:text-black transition-all duration-300 uppercase">
               Check Your Layer
             </button>
           </Link>
@@ -308,7 +308,7 @@ function LayersSection({ index }: { index: number }) {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <p className="text-xs tracking-[0.3em] text-[#00ff00] mb-4 uppercase">Stratified Identity</p>
+            <p className="text-xs tracking-[0.3em] text-[#0ABAB5] mb-4 uppercase">Stratified Identity</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight uppercase">
               Your Layer
             </h2>
@@ -340,7 +340,7 @@ function LayersSection({ index }: { index: number }) {
           {/* CTA */}
           <div className="text-center mt-12">
             <Link href="/inside">
-              <button className="px-8 py-3 bg-[#00ff00] text-black font-medium tracking-wider hover:bg-[#00cc00] transition-colors uppercase">
+              <button className="px-8 py-3 bg-[#0ABAB5] text-black font-medium tracking-wider hover:bg-[#0ABAB5] transition-colors uppercase">
                 Upgrade Your Layer
               </button>
             </Link>
@@ -362,7 +362,7 @@ function ProductGridSection({ products, index }: { products: any[]; index: numbe
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <p className="text-xs tracking-[0.3em] text-[#00ff00] mb-2 uppercase">Stratified Commerce</p>
+            <p className="text-xs tracking-[0.3em] text-[#0ABAB5] mb-2 uppercase">Stratified Commerce</p>
             <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight uppercase">Artifacts</h2>
           </div>
           <Link href="/marks">
@@ -446,9 +446,9 @@ function NewsletterSection() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className="flex-1 bg-neutral-900 border border-neutral-700 px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-[#00ff00]"
+            className="flex-1 bg-neutral-900 border border-neutral-700 px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-[#0ABAB5]"
           />
-          <button className="bg-[#00ff00] text-black px-6 py-3 font-medium tracking-wider hover:bg-[#00cc00] transition-colors uppercase">
+          <button className="bg-[#0ABAB5] text-black px-6 py-3 font-medium tracking-wider hover:bg-[#089E99] transition-colors uppercase">
             Subscribe
           </button>
         </div>
@@ -466,7 +466,7 @@ function ScrollProgress({ currentIndex, total, onDotClick }: { currentIndex: num
           key={index}
           onClick={() => onDotClick(index)}
           className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 cursor-pointer hover:scale-125 ${
-            index === currentIndex ? 'bg-[#00ff00] scale-125' : 'bg-neutral-600 hover:bg-neutral-400'
+            index === currentIndex ? 'bg-[#0ABAB5] scale-125' : 'bg-neutral-600 hover:bg-neutral-400'
           }`}
           aria-label={`Go to section ${index + 1}`}
         />

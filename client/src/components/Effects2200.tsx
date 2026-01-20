@@ -356,7 +356,7 @@ export function SystemBoot({
           
           {/* Horizontal scan beam */}
           <motion.div
-            className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#00ff00] to-transparent opacity-50"
+            className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#0ABAB5] to-transparent opacity-50"
             animate={{ top: ['0%', '100%', '0%'] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
           />
@@ -381,7 +381,7 @@ export function SystemBoot({
                   key={i}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="text-[#00ff00]"
+                  className="text-[#0ABAB5]"
                 >
                   {line}
                 </motion.div>
@@ -391,13 +391,13 @@ export function SystemBoot({
             {/* Scan progress bar */}
             {phase === 'scan' && (
               <div className="space-y-2">
-                <div className="flex justify-between text-[#00ff00] text-xs font-mono">
+                <div className="flex justify-between text-[#0ABAB5] text-xs font-mono">
                   <span>SCANNING</span>
                   <span>{scanProgress}%</span>
                 </div>
-                <div className="h-1 bg-[#0a1a0a] overflow-hidden border border-[#00ff00]/30">
+                <div className="h-1 bg-[#0a1a1a] overflow-hidden border border-[#0ABAB5]/30">
                   <motion.div
-                    className="h-full bg-[#00ff00]"
+                    className="h-full bg-[#0ABAB5]"
                     style={{ width: `${scanProgress}%` }}
                   />
                 </div>
@@ -406,7 +406,7 @@ export function SystemBoot({
             
             {/* Blinking cursor */}
             <motion.span
-              className="inline-block w-2 h-4 bg-[#00ff00] mt-4"
+              className="inline-block w-2 h-4 bg-[#0ABAB5] mt-4"
               animate={{ opacity: [1, 0, 1] }}
               transition={{ duration: 0.8, repeat: Infinity }}
             />
