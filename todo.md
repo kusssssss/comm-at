@@ -365,11 +365,17 @@
 - [x] Allow regeneration after successful login
 
 ### Phase 5: Gatherings Reveal System
-- [ ] Implement 4 reveal states (Tease, Window, Locked, Revealed)
+- [x] Implement 4 reveal states (Tease, Window, Locked, Revealed)
 - [ ] Request access flow (pending → approved/denied/waitlisted)
-- [ ] Time reveal countdown based on threshold
-- [ ] Location reveal countdown based on threshold
+- [x] Time reveal countdown based on threshold
+- [x] Location reveal countdown based on threshold
 - [ ] Anti-leak watermark on revealed details
+- [x] Create revealLogic.ts with reveal state calculations
+- [x] Update event.list router to include reveal info
+- [x] Create countdown timer components
+- [x] Update Events.tsx with reveal state badges and countdowns
+- [x] Update EventDetail.tsx with full reveal information
+- [x] Add vitest tests for reveal logic (18 tests passing)
 
 ### Phase 6: Check-in System
 - [ ] Staff check-in portal with code entry
@@ -389,8 +395,9 @@
 - [ ] Merch management (CRUD, gating rules)
 
 ### Phase 9: Seed Content
-- [ ] Create 12 placeholder gatherings across categories
-- [ ] Create 9 placeholder merch items (3 public, 3 layer-gated, 3 attendance-locked)
+- [x] Create 12 placeholder gatherings across categories
+- [x] Create 9 placeholder merch items (3 public, 3 layer-gated, 3 attendance-locked)
+- [x] Run seed script successfully (scripts/seed-data.mjs)
 
 ### Phase 10: Community Section
 - [ ] What comm@ is section
@@ -416,3 +423,14 @@
   - Attendance-locked: MIDNIGHT SESSION TEE, GENESIS CHAIN, FREQUENCY 808 VINYL
 - [x] Seed script location: scripts/seed-data.mjs
 - [x] Run with: node scripts/seed-data.mjs
+
+## Gatherings Reveal System Implementation
+- [ ] Create reveal logic utilities (calculateRevealState, getRevealedInfo)
+- [ ] Update gatherings router with reveal state calculations
+- [ ] Build RevealCountdown component with animated timer
+- [ ] Show 4 reveal states: TEASE → WINDOW → LOCKED → REVEALED
+- [ ] Time reveals based on timeRevealHoursBefore threshold
+- [ ] Location reveals based on locationRevealHoursBefore and user layer
+- [ ] Update Gatherings page with reveal badges and countdowns
+- [ ] Update EventDetail page with full reveal information
+- [ ] Test with different user layers (streetlight, verified, signal, inner_room, black_label)

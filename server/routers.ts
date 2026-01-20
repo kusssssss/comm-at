@@ -9,6 +9,7 @@ import { uploadRouter } from "./uploadRouter";
 import { cipherRouter } from "./cipherRouter";
 import type { User } from "../drizzle/schema";
 import { filterDropForVisibility, filterEventForVisibility, getMarkState, getVisibilityMessage } from "./visibility";
+import { calculateRevealInfo, getRevealStateLabel, formatLayerName, type RevealInfo } from "./revealLogic";
 
 // ============================================================================
 // ROLE GUARDS
@@ -686,12 +687,15 @@ export const appRouter = router({
   // EVENT ROUTER
   // ============================================================================
   event: router({
-    // Public: list published events
+    // Public: list published events with reveal system
     list: markedProcedure.query(async ({ ctx }) => {
       const events = await db.getPublishedEvents();
       const now = new Date();
       
-      // Filter by user role eligibility and add pass info
+      // Get user's mark state for reveal calculations
+      const userMarkState = ctx.user.markState || 'outside';
+      
+      // Filter by user role eligibility and add pass info + reveal info
       const eligible = [];
       for (const event of events) {
         // Check role eligibility
@@ -703,13 +707,48 @@ export const appRouter = router({
           const passCount = await db.getEventPassCount(event.id);
           const userPass = await db.getEventPassByUserAndEvent(ctx.user.id, event.id);
           
-          // Time-gate location
-          const locationRevealed = event.locationRevealAt && event.locationRevealAt <= now;
+          // Calculate reveal info using the new reveal system
+          const revealInfo = calculateRevealInfo({
+            id: event.id,
+            title: event.title,
+            eventDate: event.eventDate,
+            startDatetime: event.startDatetime,
+            endDatetime: event.endDatetime,
+            timeRevealHoursBefore: event.timeRevealHoursBefore,
+            locationRevealHoursBefore: event.locationRevealHoursBefore,
+            markState: (event.eligibilityMinState || 'initiate') as any,
+            venueName: event.venueName,
+            venueAddress: event.venueAddress,
+            area: event.area,
+            city: event.city,
+            coordinates: event.coordinates,
+          }, userMarkState, now);
           
           eligible.push({
             ...event,
-            locationText: locationRevealed ? event.locationText : null,
-            locationRevealed,
+            // Override location fields based on reveal state
+            locationText: revealInfo.locationRevealed ? event.locationText : null,
+            venueName: revealInfo.venueName,
+            venueAddress: revealInfo.venueAddress,
+            area: revealInfo.area,
+            coordinates: revealInfo.coordinates,
+            // Add reveal info
+            revealState: revealInfo.state,
+            revealStateLabel: getRevealStateLabel(revealInfo.state),
+            timeRevealed: revealInfo.timeRevealed,
+            locationRevealed: revealInfo.locationRevealed,
+            revealedStartTime: revealInfo.startTime,
+            revealedEndTime: revealInfo.endTime,
+            timeRevealAt: revealInfo.timeRevealAt,
+            locationRevealAt: revealInfo.locationRevealAt,
+            countdownToTimeReveal: revealInfo.countdownToTimeReveal,
+            countdownToLocationReveal: revealInfo.countdownToLocationReveal,
+            countdownToEvent: revealInfo.countdownToEvent,
+            userLayerSufficient: revealInfo.userLayerSufficient,
+            requiredLayerLabel: formatLayerName(revealInfo.requiredLayer),
+            userLayerLabel: formatLayerName(userMarkState),
+            revealMessage: revealInfo.message,
+            // Pass info
             passCount,
             capacity: event.capacity,
             hasPass: !!userPass,
