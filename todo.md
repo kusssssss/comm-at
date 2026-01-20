@@ -397,3 +397,22 @@
 - [ ] How it works explanation
 - [ ] Code of conduct
 - [ ] FAQ section
+
+## Seed Data Script
+- [ ] Create seed-data.mjs script with 12 gatherings
+- [ ] Add 9 merchandise items (3 public, 3 layer-gated, 3 attendance-locked)
+- [ ] Run seed script and verify data in database
+
+## Seed Data Script (Completed)
+- [x] Created seed script with 12 gatherings (varied categories and reveal states)
+  - Music: THE MIDNIGHT SESSION, CHAPTER INITIATION, FREQUENCY 808
+  - Art: CANVAS COLLECTIVE, STREET MARKS
+  - Community: THE LAUNCH, GENESIS, INNER CIRCLE DINNER
+  - Speed: MIDNIGHT RUN, TOUGE TAKEOVER
+  - Mission: CLEAN THE STREETS, FEED THE CITY
+- [x] Created seed script with 9 merch items (3 public, 3 layer-gated, 3 attendance-locked)
+  - Public: STREETLIGHT TEE, SIGNAL CAP, FREQUENCY TOTE
+  - Layer-gated: VERIFIED HOODIE (initiate), SIGNAL BOMBER (member), INNER ROOM VARSITY (inner_circle)
+  - Attendance-locked: MIDNIGHT SESSION TEE, GENESIS CHAIN, FREQUENCY 808 VINYL
+- [x] Seed script location: scripts/seed-data.mjs
+- [x] Run with: node scripts/seed-data.mjs

@@ -1,0 +1,181 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'events' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'events' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "EVENT_CATALOG"
+    },
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "title"
+    },
+    {
+      "COLUMN_NAME": "EVENT_SCHEMA"
+    },
+    {
+      "COLUMN_NAME": "slug"
+    },
+    {
+      "COLUMN_NAME": "EVENT_NAME"
+    },
+    {
+      "COLUMN_NAME": "chapter"
+    },
+    {
+      "COLUMN_NAME": "DEFINER"
+    },
+    {
+      "COLUMN_NAME": "description"
+    },
+    {
+      "COLUMN_NAME": "TIME_ZONE"
+    },
+    {
+      "COLUMN_NAME": "rules"
+    },
+    {
+      "COLUMN_NAME": "EVENT_BODY"
+    },
+    {
+      "COLUMN_NAME": "capacity"
+    },
+    {
+      "COLUMN_NAME": "EVENT_DEFINITION"
+    },
+    {
+      "COLUMN_NAME": "markState"
+    },
+    {
+      "COLUMN_NAME": "EVENT_TYPE"
+    },
+    {
+      "COLUMN_NAME": "EXECUTE_AT"
+    },
+    {
+      "COLUMN_NAME": "eventVisibility"
+    },
+    {
+      "COLUMN_NAME": "city"
+    },
+    {
+      "COLUMN_NAME": "INTERVAL_VALUE"
+    },
+    {
+      "COLUMN_NAME": "INTERVAL_FIELD"
+    },
+    {
+      "COLUMN_NAME": "locationText"
+    },
+    {
+      "COLUMN_NAME": "locationRevealHoursBefore"
+    },
+    {
+      "COLUMN_NAME": "SQL_MODE"
+    },
+    {
+      "COLUMN_NAME": "locationRevealAt"
+    },
+    {
+      "COLUMN_NAME": "STARTS"
+    },
+    {
+      "COLUMN_NAME": "ENDS"
+    },
+    {
+      "COLUMN_NAME": "eventDate"
+    },
+    {
+      "COLUMN_NAME": "startDatetime"
+    },
+    {
+      "COLUMN_NAME": "STATUS"
+    },
+    {
+      "COLUMN_NAME": "ON_COMPLETION"
+    },
+    {
+      "COLUMN_NAME": "endDatetime"
+    },
+    {
+      "COLUMN_NAME": "CREATED"
+    },
+    {
+      "COLUMN_NAME": "eventStatus"
+    },
+    {
+      "COLUMN_NAME": "publishedAt"
+    },
+    {
+      "COLUMN_NAME": "LAST_ALTERED"
+    },
+    {
+      "COLUMN_NAME": "createdAt"
+    },
+    {
+      "COLUMN_NAME": "LAST_EXECUTED"
+    },
+    {
+      "COLUMN_NAME": "EVENT_COMMENT"
+    },
+    {
+      "COLUMN_NAME": "updatedAt"
+    },
+    {
+      "COLUMN_NAME": "tagline"
+    },
+    {
+      "COLUMN_NAME": "ORIGINATOR"
+    },
+    {
+      "COLUMN_NAME": "eventAccessType"
+    },
+    {
+      "COLUMN_NAME": "CHARACTER_SET_CLIENT"
+    },
+    {
+      "COLUMN_NAME": "eventSecretLevel"
+    },
+    {
+      "COLUMN_NAME": "COLLATION_CONNECTION"
+    },
+    {
+      "COLUMN_NAME": "DATABASE_COLLATION"
+    },
+    {
+      "COLUMN_NAME": "area"
+    },
+    {
+      "COLUMN_NAME": "venueName"
+    },
+    {
+      "COLUMN_NAME": "venueAddress"
+    },
+    {
+      "COLUMN_NAME": "coordinates"
+    },
+    {
+      "COLUMN_NAME": "coverImageUrl"
+    },
+    {
+      "COLUMN_NAME": "tags"
+    },
+    {
+      "COLUMN_NAME": "featuredOrder"
+    },
+    {
+      "COLUMN_NAME": "createdBy"
+    },
+    {
+      "COLUMN_NAME": "timeRevealHoursBefore"
+    },
+    {
+      "COLUMN_NAME": "category"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nEVENT_CATALOG\nid\ntitle\nEVENT_SCHEMA\nslug\nEVENT_NAME\nchapter\nDEFINER\ndescription\nTIME_ZONE\nrules\nEVENT_BODY\ncapacity\nEVENT_DEFINITION\nmarkState\nEVENT_TYPE\nEXECUTE_AT\neventVisibility\ncity\nINTERVAL_VALUE\nINTERVAL_FIELD\nlocationText\nlocationRevealHoursBefore\nSQL_MODE\nlocationRevealAt\nSTARTS\nENDS\neventDate\nstartDatetime\nSTATUS\nON_COMPLETION\nendDatetime\nCREATED\neventStatus\npublishedAt\nLAST_ALTERED\ncreatedAt\nLAST_EXECUTED\nEVENT_COMMENT\nupdatedAt\ntagline\nORIGINATOR\neventAccessType\nCHARACTER_SET_CLIENT\neventSecretLevel\nCOLLATION_CONNECTION\nDATABASE_COLLATION\narea\nvenueName\nvenueAddress\ncoordinates\ncoverImageUrl\ntags\nfeaturedOrder\ncreatedBy\ntimeRevealHoursBefore\ncategory\n",
+  "stderr": "",
+  "execution_time_ms": 1497
+}
