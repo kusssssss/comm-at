@@ -1,27 +1,74 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import Nav from "@/components/Nav";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { 
-  Lock, Eye, EyeOff, Users, Calendar, Shield, ChevronRight, ChevronDown,
-  Zap, Sparkles, MapPin, Clock, ArrowRight, Star, Gift, Trophy,
-  Search, Filter, X, Check, ChevronUp
+  Lock, Users, Calendar, ChevronDown, MapPin
 } from "lucide-react";
-import { 
-  RevealOnScroll,
-  GlowPulse,
-  SystemBoot,
-} from "@/components/Effects2200";
-import { SponsorShowcase } from "@/components/SponsorShowcase";
 import { ImageFallback, getDropImage } from "@/components/ImageFallback";
 
 // ============================================================================
-// NOCTA-STYLE HOME PAGE - STICKY SCROLL SECTIONS
+// NOCTA-STYLE HOME PAGE - SIMPLE VERTICAL SCROLL (NO STICKY)
 // ============================================================================
 
-// Format date with full words (no abbreviations)
+// Placeholder events with Nocta-style imagery
+const PLACEHOLDER_EVENTS = [
+  {
+    id: "placeholder-1",
+    title: "NOCTA X CODE",
+    tagline: "Code began as a precision experiment inside Nike — Tony Spackman's future-tech approach to performance design.",
+    coverImageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1920&q=80",
+    accessType: "open",
+    tags: '["COLLECTION", "TECH", "PERFORMANCE"]',
+    city: "Jakarta",
+    area: "South Jakarta",
+    capacity: 100,
+    passesUsed: 0,
+    startDatetime: new Date("2026-02-15"),
+  },
+  {
+    id: "placeholder-2", 
+    title: "HOLIDAY '25",
+    tagline: "Cardinal Stock — the essential pieces that define the season.",
+    coverImageUrl: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=1920&q=80",
+    accessType: "open",
+    tags: '["CARDINAL STOCK", "HOLIDAY", "ESSENTIAL"]',
+    city: "Jakarta",
+    area: "Central Jakarta",
+    capacity: 50,
+    passesUsed: 0,
+    startDatetime: new Date("2026-01-25"),
+  },
+  {
+    id: "placeholder-3",
+    title: "FALL '25",
+    tagline: "The collection that bridges seasons. Designed for transition.",
+    coverImageUrl: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1920&q=80",
+    accessType: "members_only",
+    tags: '["FALL", "COLLECTION", "NEW"]',
+    city: "Jakarta",
+    area: "West Jakarta",
+    capacity: 30,
+    passesUsed: 0,
+    startDatetime: new Date("2026-03-01"),
+  },
+  {
+    id: "placeholder-4",
+    title: "DIFFUSED BLUE",
+    tagline: "A study in color. Limited edition colorway dropping soon.",
+    coverImageUrl: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=1920&q=80",
+    accessType: "invite_only",
+    tags: '["LIMITED", "COLORWAY", "EXCLUSIVE"]',
+    city: "Jakarta",
+    area: "North Jakarta",
+    capacity: 20,
+    passesUsed: 0,
+    startDatetime: new Date("2026-02-28"),
+  },
+];
+
+// Format date with full words
 const formatEventDate = (date: Date | string | null) => {
   if (!date) return "To Be Announced";
   const d = new Date(date);
@@ -33,21 +80,8 @@ const formatEventDate = (date: Date | string | null) => {
   });
 };
 
-const formatEventTime = (date: Date | string | null) => {
-  if (!date) return "";
-  const d = new Date(date);
-  return d.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-};
-
-// Get CTA button based on access type and status
+// Get CTA button based on access type
 const getEventCTA = (event: any, isVerified: boolean) => {
-  if (event.status === "cancelled") {
-    return { text: "Cancelled", disabled: true, variant: "cancelled" };
-  }
   if (event.soldOut || (event.capacity && event.passesUsed >= event.capacity)) {
     return { text: "Sold Out", disabled: true, variant: "soldout" };
   }
@@ -66,192 +100,100 @@ const getEventCTA = (event: any, isVerified: boolean) => {
   }
 };
 
-// Event tag component
-function EventTag({ tag }: { tag: string }) {
-  return (
-    <span className="px-3 py-1 text-[11px] font-mono uppercase tracking-wider bg-black/50 text-white/80 border border-white/20 backdrop-blur-sm">
-      {tag}
-    </span>
-  );
-}
-
 // ============================================================================
-// SINGLE EVENT SLIDE - Nocta-style sticky section
+// SINGLE EVENT SECTION - Nocta style (NO sticky, just full height)
 // ============================================================================
-function EventSlide({ 
+function EventSection({ 
   event, 
-  isVerified, 
-  index, 
-  total 
+  isVerified,
+  isPlaceholder = false
 }: { 
   event: any; 
-  isVerified: boolean; 
-  index: number;
-  total: number;
+  isVerified: boolean;
+  isPlaceholder?: boolean;
 }) {
   const cta = getEventCTA(event, isVerified);
   const tags = event.tags ? JSON.parse(event.tags || "[]").slice(0, 3) : [];
   
   return (
-    <section 
-      className="sticky top-0 h-screen w-full overflow-hidden"
-      style={{ zIndex: total - index }}
-    >
-      {/* Background image */}
+    <section className="relative h-screen w-full overflow-hidden">
+      {/* Background image - full bleed */}
       <div className="absolute inset-0">
         {event.coverImageUrl ? (
           <img
             src={event.coverImageUrl}
             alt={event.title}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a]" />
         )}
-        {/* Gradient overlays - Nocta style */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+        {/* Gradient overlays - Nocta style: heavy left fade */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
       </div>
       
-      {/* Content */}
+      {/* Content - left aligned like Nocta */}
       <div className="relative z-10 h-full flex items-center">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
-          <div className="max-w-xl">
-            {/* Tags */}
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
-                {tags.map((tag: string) => (
-                  <EventTag key={tag} tag={tag} />
-                ))}
-              </div>
-            )}
-            
-            {/* Collection label - Nocta style */}
-            <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-white/60 mb-4">
+        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+          <div className="max-w-lg">
+            {/* Collection label - small caps */}
+            <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-white/50 mb-4">
               {event.accessType === "invite_only" ? "Invite Only" : 
                event.accessType === "members_only" ? "Members Only" : "Open Event"}
             </p>
             
-            {/* Title - Large Nocta style */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-[0.95] tracking-tight">
+            {/* Title - Large, bold, Nocta style */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-4 leading-[0.9] tracking-tight uppercase">
               {event.title}
             </h1>
             
             {/* Tagline / Description */}
             {event.tagline && (
-              <p className="text-base md:text-lg text-white/70 mb-8 leading-relaxed max-w-md">
+              <p className="text-sm md:text-base text-white/60 mb-8 leading-relaxed max-w-md">
                 {event.tagline}
               </p>
             )}
             
-            {/* Event details - minimal */}
-            <div className="space-y-2 mb-8 text-sm text-white/60">
-              <div className="flex items-center gap-3">
-                <Calendar className="w-4 h-4" />
-                <span>{formatEventDate(event.startDatetime || event.eventDate)}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <MapPin className="w-4 h-4" />
-                <span>
-                  {event.accessType === "invite_only" && !isVerified ? (
-                    "Location revealed upon approval"
-                  ) : (
-                    `${event.city || "Jakarta"}${event.area ? `, ${event.area}` : ""}`
-                  )}
-                </span>
-              </div>
-              {event.capacity && (
+            {/* Event details - minimal, only if not placeholder */}
+            {!isPlaceholder && (
+              <div className="space-y-2 mb-8 text-sm text-white/50">
                 <div className="flex items-center gap-3">
-                  <Users className="w-4 h-4" />
-                  <span>{event.passesUsed || 0} of {event.capacity} spots</span>
+                  <Calendar className="w-4 h-4" />
+                  <span>{formatEventDate(event.startDatetime || event.eventDate)}</span>
                 </div>
-              )}
-            </div>
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-4 h-4" />
+                  <span>
+                    {event.accessType === "invite_only" && !isVerified ? (
+                      "Location revealed upon approval"
+                    ) : (
+                      `${event.city || "Jakarta"}${event.area ? `, ${event.area}` : ""}`
+                    )}
+                  </span>
+                </div>
+                {event.capacity && (
+                  <div className="flex items-center gap-3">
+                    <Users className="w-4 h-4" />
+                    <span>{event.passesUsed || 0} of {event.capacity} spots</span>
+                  </div>
+                )}
+              </div>
+            )}
             
-            {/* CTA Button - Nocta outlined style */}
-            <Link href={`/gatherings/${event.id}`}>
+            {/* CTA Button - Nocta outlined style with green accent */}
+            <Link href={isPlaceholder ? "/gatherings" : `/gatherings/${event.id}`}>
               <button
                 disabled={cta.disabled}
                 className={`group relative px-8 py-4 text-sm font-medium uppercase tracking-[0.2em] transition-all duration-300 ${
                   cta.disabled
                     ? "border border-white/20 text-white/30 cursor-not-allowed"
-                    : "border border-white text-white hover:bg-white hover:text-black"
+                    : "border border-[#00ff00] text-[#00ff00] hover:bg-[#00ff00] hover:text-black"
                 }`}
               >
                 {cta.variant === "locked" && <Lock className="w-4 h-4 inline mr-2" />}
-                {cta.text}
-              </button>
-            </Link>
-          </div>
-        </div>
-      </div>
-      
-      {/* Slide indicator - right side */}
-      <div className="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col items-center gap-3">
-        {Array.from({ length: total }).map((_, i) => (
-          <div
-            key={i}
-            className={`w-1 transition-all duration-300 ${
-              i === index 
-                ? "h-8 bg-white" 
-                : "h-2 bg-white/30"
-            }`}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// COLLECTION SLIDE - For merch collections (Nocta style)
-// ============================================================================
-function CollectionSlide({ 
-  title, 
-  subtitle, 
-  cta, 
-  href, 
-  imageUrl,
-  index,
-  total
-}: { 
-  title: string;
-  subtitle: string;
-  cta: string;
-  href: string;
-  imageUrl: string;
-  index: number;
-  total: number;
-}) {
-  return (
-    <section 
-      className="sticky top-0 h-screen w-full overflow-hidden"
-      style={{ zIndex: total - index }}
-    >
-      {/* Background */}
-      <div className="absolute inset-0">
-        <img
-          src={imageUrl}
-          alt={title}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
-      </div>
-      
-      {/* Content */}
-      <div className="relative z-10 h-full flex items-center">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
-          <div className="max-w-lg">
-            <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-white/60 mb-4">
-              {subtitle}
-            </p>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-8 leading-[0.95]">
-              {title}
-            </h2>
-            <Link href={href}>
-              <button className="px-8 py-4 text-sm font-medium uppercase tracking-[0.2em] border border-white text-white hover:bg-white hover:text-black transition-all duration-300">
-                {cta}
+                {isPlaceholder ? "Shop Collection" : cta.text}
               </button>
             </Link>
           </div>
@@ -283,70 +225,72 @@ function ProductGridSection({ drops }: { drops: any[] }) {
     return null;
   };
 
+  // Use placeholder products if no drops
+  const displayDrops = drops.length > 0 ? drops : [
+    { id: "p1", name: "Component 5 Jacket", price: 14829000, status: "sold_out", heroImageUrl: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600" },
+    { id: "p2", name: "Prestigious Fold Jacket", price: 10293000, status: "active", heroImageUrl: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600" },
+    { id: "p3", name: "Prestigious Flow Jacket", price: 13084000, status: "active", heroImageUrl: "https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=600" },
+    { id: "p4", name: "Prestigious Flow Pant", price: 7676000, status: "sold_out", heroImageUrl: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600" },
+    { id: "p5", name: "Prestigious Fold Pant", price: 7676000, status: "sold_out", heroImageUrl: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600" },
+    { id: "p6", name: "Hyena Top", price: 6804000, status: "active", heroImageUrl: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600" },
+  ];
+
   return (
     <section className="bg-[#0a0a0a] py-20">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        {/* Header */}
+        {/* Header - Nocta style */}
         <div className="flex items-center justify-between mb-12">
           <div>
-            <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-white/40 mb-2">
-              Exclusive Marks
+            <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-[#00ff00] mb-2">
+              CODE
             </p>
-            <h2 className="text-3xl md:text-4xl font-black text-white">
-              The Drop
+            <h2 className="text-2xl md:text-3xl font-black text-white uppercase">
+              Shop Collection
             </h2>
           </div>
-          <Link href="/marks">
-            <button className="px-6 py-3 text-xs font-medium uppercase tracking-[0.2em] border border-white/30 text-white/70 hover:border-white hover:text-white transition-all">
-              View All
-            </button>
-          </Link>
         </div>
         
-        {/* Product grid - Nocta style */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {drops.slice(0, 8).map((drop) => {
+        {/* Product grid - 3 columns like Nocta */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          {displayDrops.slice(0, 6).map((drop) => {
             const status = getStatus(drop);
+            const imageUrl = drop.heroImageUrl || getDropImage(drop.name || "");
+            
             return (
               <Link key={drop.id} href={`/marks/${drop.id}`}>
                 <div className="group cursor-pointer">
-                  {/* Image container */}
-                  <div className="relative aspect-square bg-[#1a1a1a] overflow-hidden mb-3">
+                  {/* Image container - gray bg like Nocta */}
+                  <div className="relative aspect-[3/4] bg-[#1a1a1a] mb-4 overflow-hidden">
                     <img
-                      src={drop.heroImageUrl || getDropImage(drop.id, drop.heroImageUrl, drop.title)}
-                      alt={drop.title}
+                      src={imageUrl}
+                      alt={drop.name}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
                     />
                     
                     {/* Status badge */}
                     {status && (
-                      <div className={`absolute top-3 left-3 text-[10px] font-mono uppercase tracking-wider ${status.class}`}>
+                      <div className={`absolute top-4 left-4 text-[10px] font-mono uppercase tracking-wider ${status.class}`}>
                         {status.text}
                       </div>
                     )}
                     
                     {/* Size buttons on hover - Nocta style */}
-                    <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="flex gap-1 justify-center">
-                        {["S", "M", "L", "XL"].map((size) => (
-                          <button
-                            key={size}
-                            className="w-10 h-8 bg-white/90 text-black text-xs font-medium hover:bg-white transition-colors"
-                          >
-                            {size}
-                          </button>
-                        ))}
-                      </div>
+                    <div className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {["S", "M", "L", "XL"].map((size) => (
+                        <button
+                          key={size}
+                          className="flex-1 py-2 bg-white text-black text-xs font-medium hover:bg-[#00ff00] transition-colors"
+                        >
+                          {size}
+                        </button>
+                      ))}
                     </div>
                   </div>
                   
                   {/* Product info */}
-                  <h3 className="text-sm font-medium text-white mb-1 group-hover:underline">
-                    {drop.title}
-                  </h3>
-                  <p className="text-sm text-white/60">
-                    {formatPrice(drop.priceIdr)}
-                  </p>
+                  <h3 className="text-sm text-white font-medium mb-1">{drop.name}</h3>
+                  <p className="text-sm text-white/60">{formatPrice(drop.price)}</p>
                 </div>
               </Link>
             );
@@ -358,46 +302,31 @@ function ProductGridSection({ drops }: { drops: any[] }) {
 }
 
 // ============================================================================
-// COMMUNITY SECTION - Manifesto, How It Works, Code, FAQ
+// COMMUNITY SECTION
 // ============================================================================
 function CommunitySection() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   
   const faqs = [
-    {
-      q: "How do I join the collective?",
-      a: "Membership is by invitation only. You must be referred by an existing member or apply for clearance through our verification process."
-    },
-    {
-      q: "What is a mark?",
-      a: "A mark is your proof of belonging. It's more than merchandise—it's your key to access events, drops, and the inside feed."
-    },
-    {
-      q: "What happens at gatherings?",
-      a: "Gatherings are intimate events for members only. What happens inside stays inside. Each gathering is unique and curated for the collective."
-    },
-    {
-      q: "How do I advance in rank?",
-      a: "Rank is earned through participation, contribution, and time. Attend gatherings, collect marks, and support the collective."
-    },
-    {
-      q: "Can I lose my membership?",
-      a: "Membership can be revoked for violating the code of conduct. Trust is the foundation of the collective."
-    }
+    { q: "How do I join the collective?", a: "Membership is by invitation only. You must be referred by an existing member and complete the verification process." },
+    { q: "What is a mark?", a: "A mark is both a physical item and a digital key. Each mark grants access to different levels of the collective." },
+    { q: "What happens at gatherings?", a: "Gatherings are private events for members. What happens inside stays inside." },
+    { q: "How do I advance in rank?", a: "Rank advancement is based on participation, contribution, and time within the collective." },
+    { q: "Can I lose my membership?", a: "Membership can be revoked for violating the code of conduct or betraying the trust of the collective." }
   ];
-  
+
   return (
     <section className="bg-black py-24">
       <div className="max-w-4xl mx-auto px-6 md:px-12">
         {/* Manifesto */}
-        <div className="text-center mb-24">
+        <div className="mb-24 text-center">
           <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-white/40 mb-6">
             The Manifesto
           </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-8">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-8">
             What is COMM@?
           </h2>
-          <p className="text-lg text-white/60 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-white/60 leading-relaxed max-w-2xl mx-auto">
             An invitation-only collective protecting underground culture. We are not a brand. 
             We are not a club. We are a network of individuals who value authenticity over exposure, 
             presence over content, and community over clout.
@@ -442,7 +371,7 @@ function CommunitySection() {
               "Protect the identity of members"
             ].map((rule, i) => (
               <div key={i} className="flex items-center gap-3 p-4 border border-white/10">
-                <div className="w-2 h-2 bg-[#3B82F6]" />
+                <div className="w-2 h-2 bg-[#00ff00]" />
                 <span className="text-sm text-white/70">{rule}</span>
               </div>
             ))}
@@ -463,7 +392,7 @@ function CommunitySection() {
                   i === 0 ? "border-white/20 text-white/40" :
                   i === 1 ? "border-white/30 text-white/60" :
                   i === 2 ? "border-white/50 text-white/80" :
-                  "border-[#3B82F6] text-[#3B82F6]"
+                  "border-[#00ff00] text-[#00ff00]"
                 }`}
               >
                 {rank}
@@ -471,7 +400,7 @@ function CommunitySection() {
             ))}
           </div>
           <Link href="/ranks">
-            <button className="mt-8 px-6 py-3 text-xs font-medium uppercase tracking-[0.2em] border border-white/30 text-white/70 hover:border-white hover:text-white transition-all">
+            <button className="mt-8 px-6 py-3 text-xs font-medium uppercase tracking-[0.2em] border border-white/30 text-white/70 hover:border-[#00ff00] hover:text-[#00ff00] transition-all">
               Learn More
             </button>
           </Link>
@@ -519,18 +448,35 @@ function Footer() {
           
           {/* Links */}
           <div className="flex flex-wrap justify-center gap-6 text-xs text-white/50 uppercase tracking-wider">
-            <Link href="/marks" className="hover:text-white transition-colors">Marks</Link>
-            <Link href="/gatherings" className="hover:text-white transition-colors">Gatherings</Link>
-            <Link href="/verify" className="hover:text-white transition-colors">Verify</Link>
-            <Link href="/inside" className="hover:text-white transition-colors">Inside</Link>
-            <Link href="/ranks" className="hover:text-white transition-colors">Ranks</Link>
-            <Link href="/refer" className="hover:text-white transition-colors">Refer</Link>
-            <Link href="/partners" className="hover:text-white transition-colors">Partners</Link>
+            <Link href="/marks" className="hover:text-[#00ff00] transition-colors">Marks</Link>
+            <Link href="/gatherings" className="hover:text-[#00ff00] transition-colors">Gatherings</Link>
+            <Link href="/verify" className="hover:text-[#00ff00] transition-colors">Verify</Link>
+            <Link href="/inside" className="hover:text-[#00ff00] transition-colors">Inside</Link>
+            <Link href="/ranks" className="hover:text-[#00ff00] transition-colors">Ranks</Link>
+            <Link href="/refer" className="hover:text-[#00ff00] transition-colors">Refer</Link>
+            <Link href="/partners" className="hover:text-[#00ff00] transition-colors">Partners</Link>
           </div>
           
           {/* Copyright */}
           <div className="text-xs text-white/30">
             © 2026 COMM@. All rights reserved.
+          </div>
+        </div>
+        
+        {/* Newsletter - Nocta style */}
+        <div className="mt-12 pt-8 border-t border-white/10 text-center">
+          <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-[#00ff00] mb-4">
+            Never Miss A Drop
+          </p>
+          <div className="flex max-w-md mx-auto">
+            <input
+              type="email"
+              placeholder="Enter your email address"
+              className="flex-1 px-4 py-3 bg-transparent border border-white/20 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#00ff00]"
+            />
+            <button className="px-6 py-3 bg-[#00ff00] text-black text-sm font-medium uppercase tracking-wider hover:bg-[#00cc00] transition-colors">
+              Subscribe
+            </button>
           </div>
         </div>
       </div>
@@ -555,8 +501,11 @@ export default function Home() {
   // Check if user is verified member
   const isVerified = !!(user && ["marked_initiate", "marked_member", "marked_inner_circle", "staff", "admin"].includes(user.role || ""));
   
+  // Use real events if available, otherwise use placeholders
+  const displayEvents = events.length > 0 ? events : PLACEHOLDER_EVENTS;
+  
   // Sort events by featured order, then by date
-  const sortedEvents = [...events].sort((a, b) => {
+  const sortedEvents = [...displayEvents].sort((a, b) => {
     if (a.featuredOrder && b.featuredOrder) return a.featuredOrder - b.featuredOrder;
     if (a.featuredOrder) return -1;
     if (b.featuredOrder) return 1;
@@ -565,38 +514,21 @@ export default function Home() {
     if (!dateA) return 1;
     if (!dateB) return -1;
     return new Date(dateA).getTime() - new Date(dateB).getTime();
-  }).slice(0, 6); // Limit to 6 events for performance
-  
-  const totalSlides = sortedEvents.length + 1; // Events + 1 collection slide
+  }).slice(0, 4); // Limit to 4 hero sections like Nocta
   
   return (
     <div className="bg-black">
       <Nav />
       
-      {/* Scroll container with snap */}
-      <div className="scroll-snap-container">
-        {/* Event slides - Nocta sticky scroll */}
-        {sortedEvents.map((event, index) => (
-          <EventSlide
-            key={event.id}
-            event={event}
-            isVerified={isVerified}
-            index={index}
-            total={totalSlides}
-          />
-        ))}
-        
-        {/* Collection slide for Marks */}
-        <CollectionSlide
-          title="The Drop"
-          subtitle="Exclusive Marks Collection"
-          cta="Shop Collection"
-          href="/marks"
-          imageUrl="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920"
-          index={sortedEvents.length}
-          total={totalSlides}
+      {/* Hero sections - simple vertical scroll like Nocta */}
+      {sortedEvents.map((event, index) => (
+        <EventSection
+          key={event.id}
+          event={event}
+          isVerified={isVerified}
+          isPlaceholder={!events.length}
         />
-      </div>
+      ))}
       
       {/* Product grid */}
       <ProductGridSection drops={drops} />

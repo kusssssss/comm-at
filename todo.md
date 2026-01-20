@@ -237,3 +237,11 @@
 - [x] Add event slides with full-viewport hero images
 - [x] Add navigation dots on right side
 - [ ] Test on mobile and desktop (user testing needed)
+
+## Nocta Exact Scroll Replication
+- [x] Deep analysis of Nocta hero scroll mechanics (regular vertical scroll, no sticky)
+- [x] Create placeholder events with proper imagery (Unsplash concert/party images)
+- [x] Implement exact Nocta scroll behavior (100vh sections, vertical scroll)
+- [x] Green accent color for CTAs (#00ff00 Nocta signature)
+- [x] Product grid with size buttons on hover
+- [ ] Test on mobile and desktop (user testing needed)
