@@ -314,3 +314,21 @@
 - [x] Update route from /partners to /sponsors
 - [x] Update SponsorShowcase header to "Our Sponsors"
 - [x] Update Dev.tsx references
+
+
+## FloatScroll-Style UI Effects
+- [x] Add horizontal scrolling marquee of @ symbols to hero section
+- [x] Enhance hero typography with layered Tiffany Blue backdrop (circular glow behind title)
+- [x] Ensure all existing features remain intact (sticky scroll, navigation, sponsors, etc.)
+- [x] CSS keyframe animations for seamless infinite marquee loop
+
+## Personal Cipher MVP (Future Build)
+- [ ] Personal Cipher enrollment and sign-in (TOTP-style rotating codes)
+- [ ] Device binding and recovery codes
+- [ ] Invite code system for enrollment
+- [ ] Gatherings reveal system (Tease → Window → Locked → Revealed)
+- [ ] Request and approval flow for gatherings
+- [ ] Check-in system with reputation updates
+- [ ] Merch gating (layer and attendance-locked)
+- [ ] Administrator panel for members, invites, gatherings, requests, merch
+- [ ] Seed 12 gatherings and 9 merch items

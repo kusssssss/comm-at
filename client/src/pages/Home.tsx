@@ -6,6 +6,43 @@ import { Calendar, MapPin, Users, ChevronDown, Eye, EyeOff, Lock, Unlock, Shield
 import Nav from '@/components/Nav';
 import { SponsorShowcase } from '@/components/SponsorShowcase';
 
+// Horizontal scrolling marquee component - FloatScroll style
+function MarqueeRow({ direction = 'left', speed = 30 }: { direction?: 'left' | 'right'; speed?: number }) {
+  const symbols = Array(20).fill('@');
+  
+  return (
+    <div className="overflow-hidden whitespace-nowrap py-2">
+      <div 
+        className={`inline-flex gap-8 animate-marquee-${direction}`}
+        style={{ 
+          animationDuration: `${speed}s`,
+          animationTimingFunction: 'linear',
+          animationIterationCount: 'infinite'
+        }}
+      >
+        {/* First set */}
+        {symbols.map((symbol, i) => (
+          <span 
+            key={`a-${i}`} 
+            className="text-4xl md:text-5xl font-bold text-[#0ABAB5]/20 hover:text-[#0ABAB5]/40 transition-colors cursor-default"
+          >
+            {symbol}
+          </span>
+        ))}
+        {/* Duplicate for seamless loop */}
+        {symbols.map((symbol, i) => (
+          <span 
+            key={`b-${i}`} 
+            className="text-4xl md:text-5xl font-bold text-[#0ABAB5]/20 hover:text-[#0ABAB5]/40 transition-colors cursor-default"
+          >
+            {symbol}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Layer badge component
 function LayerBadge({ layer }: { layer: string }) {
   const layerConfig: Record<string, { color: string; label: string }> = {
@@ -44,6 +81,24 @@ function RevealStatus({ status }: { status: 'tease' | 'window' | 'lock' | 'revea
     </div>
   );
 }
+
+// Marquee styles - add to global CSS or inline
+const marqueeStyles = `
+  @keyframes marquee-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes marquee-right {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+  .animate-marquee-left {
+    animation: marquee-left 30s linear infinite;
+  }
+  .animate-marquee-right {
+    animation: marquee-right 30s linear infinite;
+  }
+`;
 
 // Full-viewport sticky event section - Nocta style with Stratified Reality
 function EventSection({ event, index, isFirst, sectionRef }: { event: any; index: number; isFirst: boolean; sectionRef?: (el: HTMLElement | null) => void }) {
@@ -86,6 +141,11 @@ function EventSection({ event, index, isFirst, sectionRef }: { event: any; index
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
       </div>
 
+      {/* Horizontal Scrolling Marquee - FloatScroll style */}
+      <div className="absolute top-20 left-0 right-0 z-10 pointer-events-none">
+        <MarqueeRow direction="left" speed={25} />
+      </div>
+
       {/* Content - Left Side */}
       <div className="relative z-10 h-full flex items-center pt-16">
         <div className="container mx-auto px-6 md:px-8 lg:px-16">
@@ -103,10 +163,15 @@ function EventSection({ event, index, isFirst, sectionRef }: { event: any; index
                event?.accessType === 'invite_only' ? 'Invite Only' : 'Gathering'}
             </p>
 
-            {/* Event Title */}
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 md:mb-6 tracking-tight leading-none uppercase">
-              {event?.title || 'UPCOMING GATHERING'}
-            </h1>
+            {/* Event Title with Layered Backdrop - FloatScroll style */}
+            <div className="relative inline-block">
+              {/* Tiffany Blue circular backdrop */}
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-32 h-32 md:w-48 md:h-48 lg:w-64 lg:h-64 rounded-full bg-[#0ABAB5]/20 blur-xl" />
+              <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-24 h-24 md:w-36 md:h-36 lg:w-48 lg:h-48 rounded-full bg-[#0ABAB5]/30" />
+              <h1 className="relative text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 md:mb-6 tracking-tight leading-none uppercase">
+                {event?.title || 'UPCOMING GATHERING'}
+              </h1>
+            </div>
 
             {/* Tagline */}
             {event?.tagline && (
@@ -529,6 +594,8 @@ export default function Home() {
 
   return (
     <div className="bg-black">
+      {/* Inject marquee animation styles */}
+      <style>{marqueeStyles}</style>
       {/* Navigation */}
       <Nav variant="transparent" />
 
