@@ -160,9 +160,15 @@ export default function Events() {
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="text-lg text-foreground font-medium">{event.title}</h3>
                               {event.hasPass && (
-                                <span className="text-xs text-[#00FF00] bg-[#00FF00]/10 px-2 py-0.5 rounded">
-                                  PASS
-                                </span>
+                                event.isWaitlisted ? (
+                                  <span className="text-xs text-[#FFA500] bg-[#FFA500]/10 px-2 py-0.5 rounded">
+                                    WAITLIST #{event.waitlistPosition}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-[#00FF00] bg-[#00FF00]/10 px-2 py-0.5 rounded">
+                                    PASS
+                                  </span>
+                                )
                               )}
                             </div>
                             <p className="text-sm text-muted-foreground">{event.tagline || event.city}</p>
@@ -204,9 +210,19 @@ export default function Events() {
                           
                           {/* Capacity */}
                           <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">
-                              {event.passCount}/{event.capacity}
+                            <Users className="w-4 h-4" style={{ 
+                              color: event.isFull ? '#FF6B6B' : event.spotsRemaining <= 5 ? '#FFA500' : '#888' 
+                            }} />
+                            <span className={`${
+                              event.isFull ? 'text-[#FF6B6B]' : 
+                              event.spotsRemaining <= 5 ? 'text-[#FFA500]' : 
+                              'text-muted-foreground'
+                            }`}>
+                              {event.isFull ? (
+                                event.hasWaitlist ? `Full (${event.waitlistCount} waitlist)` : 'Full'
+                              ) : (
+                                `${event.spotsRemaining} spots left`
+                              )}
                             </span>
                           </div>
                           

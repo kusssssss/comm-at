@@ -785,6 +785,12 @@ export const appRouter = router({
             coordinates: event.coordinates,
           }, userMarkState, now);
           
+          // Get capacity info
+          const confirmedCount = await db.getConfirmedPassCount(event.id);
+          const waitlistCount = await db.getWaitlistCount(event.id);
+          const spotsRemaining = Math.max(0, event.capacity - confirmedCount);
+          const isFull = event.capacity > 0 && spotsRemaining === 0;
+          
           eligible.push({
             ...event,
             // Override location fields based on reveal state
@@ -815,6 +821,14 @@ export const appRouter = router({
             hasPass: !!userPass,
             passStatus: userPass?.passStatus || null,
             qrPayload: userPass?.qrPayload || null,
+            isWaitlisted: userPass?.isWaitlisted || false,
+            waitlistPosition: userPass?.waitlistPosition || null,
+            // Capacity info
+            confirmedCount,
+            waitlistCount,
+            spotsRemaining,
+            isFull,
+            hasWaitlist: waitlistCount > 0,
           });
         }
       }
@@ -822,16 +836,26 @@ export const appRouter = router({
       return eligible;
     }),
     
-    // Marked: claim pass with optional plus-one
+    // Marked: claim pass with optional plus-one (with waitlist support)
     claimPass: markedProcedure
       .input(z.object({ 
         eventId: z.number(),
         plusOneName: z.string().optional(),
+        acceptWaitlist: z.boolean().optional().default(true), // If false, reject if full
       }))
       .mutation(async ({ input, ctx }) => {
         const event = await db.getEventById(input.eventId);
         if (!event || event.status !== "published") {
           throw new TRPCError({ code: "NOT_FOUND", message: "Event not found" });
+        }
+        
+        // Check if user already has a pass
+        const existingPass = await db.getEventPassByUserAndEvent(ctx.user.id, input.eventId);
+        if (existingPass) {
+          if (existingPass.isWaitlisted) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "You are already on the waitlist for this event" });
+          }
+          throw new TRPCError({ code: "BAD_REQUEST", message: "You already have a pass for this event" });
         }
         
         // Check eligibility based on mark_state
@@ -849,13 +873,30 @@ export const appRouter = router({
           throw new TRPCError({ code: "FORBIDDEN", message: "Your mark state does not meet the eligibility requirement" });
         }
         
-        // Generate scannable code
-        const scannableCode = `PASS-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+        // Check capacity and determine if waitlist
+        const confirmedCount = await db.getConfirmedPassCount(input.eventId);
+        const capacity = event.capacity || 0;
+        const isFull = capacity > 0 && confirmedCount >= capacity;
         
-        const qrPayload = await db.createEventPass(input.eventId, ctx.user.id, scannableCode, input.plusOneName);
-        if (!qrPayload) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "Event is at capacity or you already have a pass" });
+        if (isFull && !input.acceptWaitlist) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Event is at capacity" });
         }
+        
+        // Get waitlist position if needed
+        let waitlistPosition: number | undefined;
+        if (isFull) {
+          const waitlistCount = await db.getWaitlistCount(input.eventId);
+          waitlistPosition = waitlistCount + 1;
+        }
+        
+        // Create pass (with waitlist if full)
+        const result = await db.createEventPassWithWaitlist(
+          input.eventId,
+          ctx.user.id,
+          isFull,
+          waitlistPosition,
+          input.plusOneName
+        );
         
         // Create memory log for event pass claim
         await db.createMemoryLog({
@@ -863,10 +904,61 @@ export const appRouter = router({
           memoryType: "event_attended",
           referenceId: input.eventId,
           referenceType: "event",
-          details: `Claimed pass for ${event.title}${input.plusOneName ? ` (+1: ${input.plusOneName})` : ""}`,
+          details: isFull 
+            ? `Joined waitlist for ${event.title} (position ${waitlistPosition})${input.plusOneName ? ` (+1: ${input.plusOneName})` : ""}`
+            : `Claimed pass for ${event.title}${input.plusOneName ? ` (+1: ${input.plusOneName})` : ""}`,
         });
         
-        return { success: true, qrPayload, scannableCode };
+        return { 
+          success: true, 
+          qrPayload: result.qrPayload, 
+          isWaitlisted: result.isWaitlisted,
+          waitlistPosition: result.waitlistPosition,
+        };
+      }),
+    
+    // Get capacity info for an event
+    getCapacityInfo: publicProcedure
+      .input(z.object({ eventId: z.number() }))
+      .query(async ({ input }) => {
+        const event = await db.getEventById(input.eventId);
+        if (!event) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Event not found" });
+        }
+        
+        const confirmedCount = await db.getConfirmedPassCount(input.eventId);
+        const waitlistCount = await db.getWaitlistCount(input.eventId);
+        const capacity = event.capacity || 0;
+        const spotsRemaining = Math.max(0, capacity - confirmedCount);
+        
+        return {
+          capacity,
+          confirmedCount,
+          waitlistCount,
+          spotsRemaining,
+          isFull: capacity > 0 && spotsRemaining === 0,
+          hasWaitlist: waitlistCount > 0,
+        };
+      }),
+    
+    // Get user's waitlist position
+    getMyWaitlistPosition: protectedProcedure
+      .input(z.object({ eventId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const pass = await db.getEventPassByUserAndEvent(ctx.user.id, input.eventId);
+        if (!pass) {
+          return { hasPass: false, isWaitlisted: false, position: null };
+        }
+        
+        if (!pass.isWaitlisted) {
+          return { hasPass: true, isWaitlisted: false, position: null };
+        }
+        
+        // Calculate actual position (count people ahead)
+        const waitlistedPasses = await db.getWaitlistedPasses(input.eventId);
+        const position = waitlistedPasses.findIndex(p => p.id === pass.id) + 1;
+        
+        return { hasPass: true, isWaitlisted: true, position };
       }),
     
     // Admin: list all events
@@ -975,10 +1067,14 @@ export const appRouter = router({
         return enriched;
       }),
     
-    // Admin: revoke pass
+    // Admin: revoke pass (with automatic waitlist promotion)
     revokePass: adminProcedure
       .input(z.object({ passId: z.number(), reason: z.string() }))
       .mutation(async ({ input, ctx }) => {
+        // Get pass info before revoking
+        const passes = await db.getEventPasses(0); // We need to find the pass first
+        const passToRevoke = passes.find(p => p.id === input.passId);
+        
         await db.revokePass(input.passId, input.reason, ctx.user.id);
         
         await db.createAuditLog({
@@ -988,6 +1084,107 @@ export const appRouter = router({
           targetType: "pass",
           targetId: input.passId,
           description: input.reason,
+        });
+        
+        // If the revoked pass was confirmed (not waitlisted), promote from waitlist
+        let promotedUser = null;
+        if (passToRevoke && !passToRevoke.isWaitlisted) {
+          const waitlistedPasses = await db.getWaitlistedPasses(passToRevoke.eventId);
+          if (waitlistedPasses.length > 0) {
+            const nextInLine = waitlistedPasses[0];
+            await db.promoteFromWaitlist(nextInLine.id);
+            promotedUser = nextInLine.userId;
+            
+            // Create memory log for promotion
+            const event = await db.getEventById(passToRevoke.eventId);
+            await db.createMemoryLog({
+              userId: nextInLine.userId,
+              memoryType: "event_attended",
+              referenceId: passToRevoke.eventId,
+              referenceType: "event",
+              details: `Promoted from waitlist for ${event?.title || 'event'}`,
+            });
+          }
+        }
+        
+        return { success: true, promotedUserId: promotedUser };
+      }),
+    
+    // User: cancel own pass (with automatic waitlist promotion)
+    cancelPass: protectedProcedure
+      .input(z.object({ eventId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const pass = await db.getEventPassByUserAndEvent(ctx.user.id, input.eventId);
+        if (!pass) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Pass not found" });
+        }
+        
+        if (pass.passStatus === 'used') {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot cancel a used pass" });
+        }
+        
+        const wasConfirmed = !pass.isWaitlisted;
+        
+        // Revoke the pass
+        await db.revokePass(pass.id, "Cancelled by user", ctx.user.id);
+        
+        // If was confirmed, promote from waitlist
+        let promotedUser = null;
+        if (wasConfirmed) {
+          const waitlistedPasses = await db.getWaitlistedPasses(input.eventId);
+          if (waitlistedPasses.length > 0) {
+            const nextInLine = waitlistedPasses[0];
+            await db.promoteFromWaitlist(nextInLine.id);
+            promotedUser = nextInLine.userId;
+            
+            // Create memory log for promotion
+            const event = await db.getEventById(input.eventId);
+            await db.createMemoryLog({
+              userId: nextInLine.userId,
+              memoryType: "event_attended",
+              referenceId: input.eventId,
+              referenceType: "event",
+              details: `Promoted from waitlist for ${event?.title || 'event'}`,
+            });
+          }
+        }
+        
+        return { success: true, promotedUserId: promotedUser };
+      }),
+    
+    // Admin: manually promote from waitlist
+    promoteFromWaitlist: adminProcedure
+      .input(z.object({ passId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const passes = await db.getEventPasses(0);
+        const pass = passes.find(p => p.id === input.passId);
+        
+        if (!pass) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Pass not found" });
+        }
+        
+        if (!pass.isWaitlisted) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Pass is not on waitlist" });
+        }
+        
+        await db.promoteFromWaitlist(input.passId);
+        
+        const event = await db.getEventById(pass.eventId);
+        await db.createMemoryLog({
+          userId: pass.userId,
+          memoryType: "event_attended",
+          referenceId: pass.eventId,
+          referenceType: "event",
+          details: `Manually promoted from waitlist for ${event?.title || 'event'}`,
+        });
+        
+        await db.createAuditLog({
+          action: "pass_promoted",
+          userId: ctx.user.id,
+          userName: ctx.user.callSign || ctx.user.name || "Admin",
+          targetType: "pass",
+          targetId: input.passId,
+          description: `Promoted user from waitlist`,
         });
         
         return { success: true };

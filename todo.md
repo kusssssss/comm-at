@@ -468,3 +468,19 @@
 - [x] Show attendance requirement with event title
 - [x] Disable Acquire button for locked items
 - [x] Add vitest tests for gating logic (33 tests passing)
+
+
+## Waitlist System Implementation (Completed)
+- [x] Add waitlist fields to event_passes table (isWaitlisted, waitlistPosition, waitlistedAt, promotedFromWaitlistAt)
+- [x] Create waitlistLogic.ts with helper functions (calculateCapacityInfo, shouldWaitlist, getNextToPromote, etc.)
+- [x] Add db functions (createEventPassWithWaitlist, promoteFromWaitlist, getWaitlistedPasses, getConfirmedPassCount, getWaitlistCount)
+- [x] Update claimPass to check capacity and add to waitlist when full
+- [x] Add event.getCapacityInfo and event.getMyWaitlistPosition endpoints
+- [x] Update event.list to include capacity info (confirmedCount, waitlistCount, spotsRemaining, isFull)
+- [x] Update Events.tsx to show capacity status with color-coded urgency (spots left, waitlist count)
+- [x] Show WAITLIST #N badge for waitlisted users
+- [x] Implement automatic promotion when passes are cancelled/revoked
+- [x] Add event.cancelPass for users to cancel their own passes
+- [x] Add event.promoteFromWaitlist for admin manual promotion
+- [x] Add pass_promoted to audit action enum
+- [x] Add vitest tests for waitlist logic (28 tests passing)

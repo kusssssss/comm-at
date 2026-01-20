@@ -587,6 +587,102 @@ export async function hasUserAttendedEvent(userId: number, eventId: number): Pro
   return result.length > 0;
 }
 
+// Waitlist functions
+export async function createEventPassWithWaitlist(
+  eventId: number,
+  userId: number,
+  isWaitlisted: boolean,
+  waitlistPosition?: number,
+  plusOneName?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const qrPayload = `EP-${nanoid(16)}`;
+  const scannableCode = `SC-${nanoid(12)}`;
+  
+  await db.insert(eventPasses).values({
+    eventId,
+    userId,
+    qrPayload,
+    scannableCode,
+    plusOneName: plusOneName || null,
+    isWaitlisted,
+    waitlistPosition: isWaitlisted ? waitlistPosition : null,
+    waitlistedAt: isWaitlisted ? new Date() : null,
+  });
+  
+  return { qrPayload, isWaitlisted, waitlistPosition };
+}
+
+export async function promoteFromWaitlist(passId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.update(eventPasses).set({
+    isWaitlisted: false,
+    waitlistPosition: null,
+    promotedFromWaitlistAt: new Date(),
+  }).where(eq(eventPasses.id, passId));
+  
+  return true;
+}
+
+export async function updateWaitlistPosition(passId: number, newPosition: number) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.update(eventPasses).set({
+    waitlistPosition: newPosition,
+  }).where(eq(eventPasses.id, passId));
+  
+  return true;
+}
+
+export async function getWaitlistedPasses(eventId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(eventPasses)
+    .where(and(
+      eq(eventPasses.eventId, eventId),
+      eq(eventPasses.isWaitlisted, true),
+      sql`${eventPasses.passStatus} != 'revoked'`,
+      sql`${eventPasses.passStatus} != 'expired'`
+    ))
+    .orderBy(eventPasses.waitlistPosition);
+}
+
+export async function getConfirmedPassCount(eventId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db.select({ count: count() }).from(eventPasses)
+    .where(and(
+      eq(eventPasses.eventId, eventId),
+      eq(eventPasses.isWaitlisted, false),
+      sql`${eventPasses.passStatus} != 'revoked'`,
+      sql`${eventPasses.passStatus} != 'expired'`
+    ));
+  
+  return result[0]?.count || 0;
+}
+
+export async function getWaitlistCount(eventId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db.select({ count: count() }).from(eventPasses)
+    .where(and(
+      eq(eventPasses.eventId, eventId),
+      eq(eventPasses.isWaitlisted, true),
+      sql`${eventPasses.passStatus} != 'revoked'`,
+      sql`${eventPasses.passStatus} != 'expired'`
+    ));
+  
+  return result[0]?.count || 0;
+}
+
 export async function markPassUsed(passId: number) {
   const db = await getDb();
   if (!db) return false;

@@ -520,6 +520,12 @@ export const eventPasses = mysqlTable("event_passes", {
   checkedInById: int("checkedInById"), // Staff who checked in
   reputationAwarded: int("reputationAwarded").default(0), // Points given on check-in
   
+  // Waitlist tracking
+  isWaitlisted: boolean("isWaitlisted").default(false).notNull(),
+  waitlistPosition: int("waitlistPosition"), // Position in waitlist (null if not waitlisted)
+  waitlistedAt: timestamp("waitlistedAt"), // When added to waitlist
+  promotedFromWaitlistAt: timestamp("promotedFromWaitlistAt"), // When promoted from waitlist
+  
   revokedAt: timestamp("revokedAt"),
   revokedReason: text("revokedReason"),
   revokedById: int("revokedById"),
@@ -565,6 +571,7 @@ export const auditActionEnum = mysqlEnum("auditAction", [
   "event_published",
   "event_cancelled",
   "pass_revoked",
+  "pass_promoted",
   "user_revoked",
   "user_banned",
   "user_role_changed",
