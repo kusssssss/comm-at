@@ -245,3 +245,16 @@
 - [x] Green accent color for CTAs (#00ff00 Nocta signature)
 - [x] Product grid with size buttons on hover
 - [ ] Test on mobile and desktop (user testing needed)
+
+
+## Nocta EXACT Replication (Redo)
+- [x] Implemented full-viewport (100vh) event sections that scroll vertically
+- [x] Each event has full-bleed background image with gradient overlay
+- [x] Left-aligned text overlay with event title, tagline, date, venue, capacity
+- [x] Green (#00ff00) outlined RESERVE button matching Nocta style
+- [x] Scroll indicator on first slide with animated arrow
+- [x] Progress dots on right side showing current position
+- [x] 2x2 Collection grid after events section
+- [x] Product grid with size buttons on hover
+- [x] Newsletter section with green SUBSCRIBE button
+- [ ] Test on mobile and desktop (user testing needed)

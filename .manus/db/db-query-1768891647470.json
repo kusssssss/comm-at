@@ -1,0 +1,87 @@
+{
+  "query": "SELECT id, title, tagline, coverImageUrl, featuredOrder FROM events ORDER BY featuredOrder DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, title, tagline, coverImageUrl, featuredOrder FROM events ORDER BY featuredOrder DESC;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "THE MIDNIGHT SESSION",
+      "tagline": "When the city sleeps, we gather",
+      "coverImageUrl": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80",
+      "featuredOrder": "8"
+    },
+    {
+      "id": "60006",
+      "title": "ROOFTOP SESSIONS",
+      "tagline": "Above the noise",
+      "coverImageUrl": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=1920&q=80",
+      "featuredOrder": "8"
+    },
+    {
+      "id": "2",
+      "title": "CHAPTER INITIATION",
+      "tagline": "Your first step into the unknown",
+      "coverImageUrl": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1920&q=80",
+      "featuredOrder": "7"
+    },
+    {
+      "id": "60005",
+      "title": "THE ARCHIVE OPENING",
+      "tagline": "History preserved, future revealed",
+      "coverImageUrl": "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1200",
+      "featuredOrder": "7"
+    },
+    {
+      "id": "60004",
+      "title": "STREET CULTURE NIGHT",
+      "tagline": "The pavement is our gallery",
+      "coverImageUrl": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=1200",
+      "featuredOrder": "6"
+    },
+    {
+      "id": "60003",
+      "title": "BALI RETREAT",
+      "tagline": "Three days of transformation",
+      "coverImageUrl": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200",
+      "featuredOrder": "5"
+    },
+    {
+      "id": "60002",
+      "title": "THE COLLECTORS DINNER",
+      "tagline": "Where taste meets culture",
+      "coverImageUrl": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200",
+      "featuredOrder": "4"
+    },
+    {
+      "id": "30002",
+      "title": "the launch",
+      "tagline": "NULL",
+      "coverImageUrl": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80",
+      "featuredOrder": "3"
+    },
+    {
+      "id": "30003",
+      "title": "the launch",
+      "tagline": "NULL",
+      "coverImageUrl": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80",
+      "featuredOrder": "3"
+    },
+    {
+      "id": "60001",
+      "title": "UNDERGROUND FREQUENCIES",
+      "tagline": "Sound that moves through walls",
+      "coverImageUrl": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80",
+      "featuredOrder": "3"
+    },
+    {
+      "id": "30001",
+      "title": "the hanging ",
+      "tagline": "NULL",
+      "coverImageUrl": "NULL",
+      "featuredOrder": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\ttagline\tcoverImageUrl\tfeaturedOrder\n1\tTHE MIDNIGHT SESSION\tWhen the city sleeps, we gather\thttps://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80\t8\n60006\tROOFTOP SESSIONS\tAbove the noise\thttps://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=1920&q=80\t8\n2\tCHAPTER INITIATION\tYour first step into the unknown\thttps://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1920&q=80\t7\n60005\tTHE ARCHIVE OPENING\tHistory preserved, future revealed\thttps://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1200\t7\n60004\tSTREET CULTURE NIGHT\tThe pavement is our gallery\thttps://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=1200\t6\n60003\tBALI RETREAT\tThree days of transformation\thttps://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200\t5\n60002\tTHE COLLECTORS DINNER\tWhere taste meets culture\thttps://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200\t4\n30002\tthe launch\tNULL\thttps://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80\t3\n30003\tthe launch\tNULL\thttps://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80\t3\n60001\tUNDERGROUND FREQUENCIES\tSound that moves through walls\thttps://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80\t3\n30001\tthe hanging \tNULL\tNULL\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1542
+}

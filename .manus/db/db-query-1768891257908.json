@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE events SET featuredOrder = 1 WHERE title = 'THE MIDNIGHT SESSION';\nUPDATE events SET featuredOrder = 2 WHERE title = 'CHAPTER INITIATION';\nUPDATE events SET featuredOrder = 3 WHERE title = 'THE LAUNCH';\nUPDATE events SET eventDate = '2026-02-15 21:00:00' WHERE title = 'THE MIDNIGHT SESSION';\nUPDATE events SET eventDate = '2026-02-20 20:00:00' WHERE title = 'CHAPTER INITIATION';\nUPDATE events SET eventDate = '2026-02-25 19:00:00' WHERE title = 'THE LAUNCH';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute UPDATE events SET featuredOrder = 1 WHERE title = 'THE MIDNIGHT SESSION';\nUPDATE events SET featuredOrder = 2 WHERE title = 'CHAPTER INITIATION';\nUPDATE events SET featuredOrder = 3 WHERE title = 'THE LAUNCH';\nUPDATE events SET eventDate = '2026-02-15 21:00:00' WHERE title = 'THE MIDNIGHT SESSION';\nUPDATE events SET eventDate = '2026-02-20 20:00:00' WHERE title = 'CHAPTER INITIATION';\nUPDATE events SET eventDate = '2026-02-25 19:00:00' WHERE title = 'THE LAUNCH';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2643
+}

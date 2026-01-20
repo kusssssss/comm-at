@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, title, coverImageUrl FROM events WHERE id <= 8 ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, title, coverImageUrl FROM events WHERE id <= 8 ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "THE MIDNIGHT SESSION",
+      "coverImageUrl": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80"
+    },
+    {
+      "id": "2",
+      "title": "CHAPTER INITIATION",
+      "coverImageUrl": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1920&q=80"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tcoverImageUrl\n1\tTHE MIDNIGHT SESSION\thttps://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80\n2\tCHAPTER INITIATION\thttps://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1920&q=80\n",
+  "stderr": "",
+  "execution_time_ms": 1535
+}

@@ -1,0 +1,87 @@
+{
+  "query": "SELECT id, title, coverImageUrl, featuredOrder, eventDate FROM events ORDER BY featuredOrder DESC, id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, title, coverImageUrl, featuredOrder, eventDate FROM events ORDER BY featuredOrder DESC, id;",
+  "rows": [
+    {
+      "id": "60006",
+      "title": "ROOFTOP SESSIONS",
+      "coverImageUrl": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=1920&q=80",
+      "featuredOrder": "8",
+      "eventDate": "2026-04-12 00:00:00"
+    },
+    {
+      "id": "60005",
+      "title": "THE ARCHIVE OPENING",
+      "coverImageUrl": "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1200",
+      "featuredOrder": "7",
+      "eventDate": "2026-04-05 00:00:00"
+    },
+    {
+      "id": "60004",
+      "title": "STREET CULTURE NIGHT",
+      "coverImageUrl": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=1200",
+      "featuredOrder": "6",
+      "eventDate": "2026-03-28 00:00:00"
+    },
+    {
+      "id": "60003",
+      "title": "BALI RETREAT",
+      "coverImageUrl": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200",
+      "featuredOrder": "5",
+      "eventDate": "2026-03-20 00:00:00"
+    },
+    {
+      "id": "60002",
+      "title": "THE COLLECTORS DINNER",
+      "coverImageUrl": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200",
+      "featuredOrder": "4",
+      "eventDate": "2026-03-08 00:00:00"
+    },
+    {
+      "id": "30002",
+      "title": "the launch",
+      "coverImageUrl": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80",
+      "featuredOrder": "3",
+      "eventDate": "2026-02-25 19:00:00"
+    },
+    {
+      "id": "30003",
+      "title": "the launch",
+      "coverImageUrl": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80",
+      "featuredOrder": "3",
+      "eventDate": "2026-02-25 19:00:00"
+    },
+    {
+      "id": "60001",
+      "title": "UNDERGROUND FREQUENCIES",
+      "coverImageUrl": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80",
+      "featuredOrder": "3",
+      "eventDate": "2026-03-01 00:00:00"
+    },
+    {
+      "id": "2",
+      "title": "CHAPTER INITIATION",
+      "coverImageUrl": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1920&q=80",
+      "featuredOrder": "2",
+      "eventDate": "2026-02-20 20:00:00"
+    },
+    {
+      "id": "1",
+      "title": "THE MIDNIGHT SESSION",
+      "coverImageUrl": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1920&q=80",
+      "featuredOrder": "1",
+      "eventDate": "2026-02-15 21:00:00"
+    },
+    {
+      "id": "30001",
+      "title": "the hanging ",
+      "coverImageUrl": "NULL",
+      "featuredOrder": "0",
+      "eventDate": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tcoverImageUrl\tfeaturedOrder\teventDate\n60006\tROOFTOP SESSIONS\thttps://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=1920&q=80\t8\t2026-04-12 00:00:00\n60005\tTHE ARCHIVE OPENING\thttps://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1200\t7\t2026-04-05 00:00:00\n60004\tSTREET CULTURE NIGHT\thttps://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=1200\t6\t2026-03-28 00:00:00\n60003\tBALI RETREAT\thttps://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200\t5\t2026-03-20 00:00:00\n60002\tTHE COLLECTORS DINNER\thttps://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200\t4\t2026-03-08 00:00:00\n30002\tthe launch\thttps://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80\t3\t2026-02-25 19:00:00\n30003\tthe launch\thttps://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80\t3\t2026-02-25 19:00:00\n60001\tUNDERGROUND FREQUENCIES\thttps://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1920&q=80\t3\t2026-03-01 00:00:00\n2\tCHAPTER INITIATION\thttps://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1920&q=80\t2\t2026-02-20 20:00:00\n1\tTHE MIDNIGHT SESSION\thttps://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1920&q=80\t1\t2026-02-15 21:00:00\n30001\tthe hanging \tNULL\t0\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1514
+}
