@@ -40,12 +40,16 @@ import HomeTest from "./pages/HomeTest";
 
 // Auth pages
 import Login from "./pages/Login";
+import Enroll from "./pages/Enroll";
+import Cipher from "./pages/Cipher";
 
 function Router() {
   return (
     <Switch>
       {/* Public routes */}
       <Route path="/" component={Home} />
+      <Route path="/enroll" component={Enroll} />
+      <Route path="/cipher" component={Cipher} />
       <Route path="/test" component={HomeTest} />
       <Route path="/verify" component={Verify} />
       <Route path="/verify/:serial" component={Verify} />

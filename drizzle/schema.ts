@@ -73,6 +73,14 @@ export const users = mysqlTable("users", {
   reputationPoints: int("reputationPoints").default(0).notNull(),
   referralCode: varchar("referralCode", { length: 32 }).unique(),
   
+  // Personal Cipher (TOTP-style authentication)
+  cipherSeed: varchar("cipherSeed", { length: 255 }), // Encrypted TOTP secret
+  cipherEnrolledAt: timestamp("cipherEnrolledAt"), // When cipher was set up
+  deviceFingerprint: varchar("deviceFingerprint", { length: 255 }), // Bound device hash
+  deviceBoundAt: timestamp("deviceBoundAt"), // When device was bound
+  failedCipherAttempts: int("failedCipherAttempts").default(0).notNull(),
+  cipherLockedUntil: timestamp("cipherLockedUntil"), // Temporary lockout
+  
   // Status tracking
   lastActiveAt: timestamp("lastActiveAt"),
   revokedReason: text("revokedReason"),
@@ -86,6 +94,79 @@ export const users = mysqlTable("users", {
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+
+// ============================================================================
+// INVITE CODES TABLE - Single-use enrollment codes for Personal Cipher
+// ============================================================================
+export const inviteCodeStatusEnum = mysqlEnum("inviteCodeStatus", [
+  "active",     // Available for use
+  "used",       // Already redeemed
+  "expired",    // Past expiration date
+  "revoked"     // Manually disabled
+]);
+
+export const inviteCodes = mysqlTable("invite_codes", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 32 }).notNull().unique(),
+  status: inviteCodeStatusEnum.default("active").notNull(),
+  defaultLayer: markStateEnum.default("initiate"), // Layer assigned on enrollment
+  expiresAt: timestamp("expiresAt"), // Optional expiration
+  usedByUserId: int("usedByUserId"), // User who redeemed
+  usedAt: timestamp("usedAt"),
+  createdById: int("createdById").notNull(), // Admin who created
+  notes: text("notes"), // Optional admin notes
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type InviteCode = typeof inviteCodes.$inferSelect;
+export type InsertInviteCode = typeof inviteCodes.$inferInsert;
+
+// ============================================================================
+// RECOVERY CODES TABLE - Single-use backup codes for device recovery
+// ============================================================================
+export const recoveryCodes = mysqlTable("recovery_codes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  codeHash: varchar("codeHash", { length: 255 }).notNull(), // Hashed recovery code
+  usedAt: timestamp("usedAt"), // Null if not used
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type RecoveryCode = typeof recoveryCodes.$inferSelect;
+export type InsertRecoveryCode = typeof recoveryCodes.$inferInsert;
+
+// ============================================================================
+// CIPHER AUDIT LOGS TABLE - Security audit trail for Personal Cipher
+// ============================================================================
+export const cipherAuditActionEnum = mysqlEnum("cipherAuditAction", [
+  "enrollment_started",
+  "enrollment_completed",
+  "login_success",
+  "login_failed",
+  "device_bound",
+  "device_changed",
+  "recovery_code_used",
+  "recovery_codes_regenerated",
+  "account_locked",
+  "account_unlocked",
+  "layer_changed",
+  "reputation_changed"
+]);
+
+export const cipherAuditLogs = mysqlTable("cipher_audit_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  action: cipherAuditActionEnum.notNull(),
+  details: text("details"), // JSON with additional context
+  ipAddress: varchar("ipAddress", { length: 64 }),
+  userAgent: text("userAgent"),
+  deviceFingerprint: varchar("deviceFingerprint", { length: 255 }),
+  success: boolean("success").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CipherAuditLog = typeof cipherAuditLogs.$inferSelect;
+export type InsertCipherAuditLog = typeof cipherAuditLogs.$inferInsert;
 
 // ============================================================================
 // OTP TABLE - Phone verification codes with rate limiting
@@ -192,6 +273,10 @@ export const drops = mysqlTable("drops", {
   clearanceRequired: boolean("clearanceRequired").default(true).notNull(),
   saleWindowStart: timestamp("saleWindowStart"),
   saleWindowEnd: timestamp("saleWindowEnd"),
+  
+  // Gating rules (Stratified Commerce)
+  requiredLayer: markStateEnum.default("outside"), // Minimum layer to view/purchase
+  attendanceLockEventId: int("attendanceLockEventId"), // Must have attended this event to purchase
   
   // Visibility
   visibilityLevel: visibilityLevelEnum.default("full_context").notNull(),
@@ -360,6 +445,9 @@ export const events = mysqlTable("events", {
   accessType: eventAccessTypeEnum.default("members_only").notNull(),
   secretLevel: eventSecretLevelEnum.default("medium"),
   
+  // Time reveal (for Stratified Reality)
+  timeRevealHoursBefore: int("timeRevealHoursBefore").default(48).notNull(), // When exact time is revealed
+  
   // Location (hidden until reveal)
   city: varchar("city", { length: 128 }),
   area: varchar("area", { length: 128 }), // Neighborhood/district
@@ -369,6 +457,9 @@ export const events = mysqlTable("events", {
   locationRevealHoursBefore: int("locationRevealHoursBefore").default(24).notNull(),
   locationRevealAt: timestamp("locationRevealAt"),
   coordinates: varchar("coordinates", { length: 64 }), // lat,lng
+  
+  // Category for filtering
+  category: varchar("category", { length: 64 }).default("community"), // speed, music, art, community, mission, merch
   
   // Media
   coverImageUrl: text("coverImageUrl"),

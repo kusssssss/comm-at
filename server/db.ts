@@ -2193,3 +2193,282 @@ export async function unlockUserAccount(userId: number): Promise<boolean> {
   
   return true;
 }
+
+
+// ============================================================================
+// PERSONAL CIPHER FUNCTIONS
+// ============================================================================
+
+import { inviteCodes, recoveryCodes, cipherAuditLogs, InsertInviteCode, InsertRecoveryCode, InsertCipherAuditLog } from "../drizzle/schema";
+
+/**
+ * Get invite code by code string
+ */
+export async function getInviteCodeByCode(code: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(inviteCodes)
+    .where(eq(inviteCodes.code, code))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Create a new invite code
+ */
+export async function createInviteCode(data: InsertInviteCode) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(inviteCodes).values(data);
+  return { id: result[0].insertId };
+}
+
+/**
+ * Mark invite code as used
+ */
+export async function useInviteCode(id: number, usedById: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(inviteCodes)
+    .set({
+      status: 'used',
+      usedByUserId: usedById,
+      usedAt: new Date(),
+    })
+    .where(eq(inviteCodes.id, id));
+}
+
+/**
+ * Get all invite codes (for admin)
+ */
+export async function getInviteCodes() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(inviteCodes).orderBy(desc(inviteCodes.createdAt));
+}
+
+/**
+ * Revoke an invite code
+ */
+export async function revokeInviteCode(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(inviteCodes)
+    .set({ status: 'revoked' })
+    .where(eq(inviteCodes.id, id));
+}
+
+/**
+ * Enroll user with cipher
+ */
+export async function enrollUserCipher(data: {
+  userId: number;
+  cipherSeed: string;
+  deviceFingerprint: string;
+  callSign: string;
+  layer: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users)
+    .set({
+      cipherSeed: data.cipherSeed,
+      deviceFingerprint: data.deviceFingerprint,
+      callSign: data.callSign,
+      markState: data.layer as any,
+      cipherEnrolledAt: new Date(),
+    })
+    .where(eq(users.id, data.userId));
+}
+
+/**
+ * Complete cipher enrollment
+ */
+export async function completeCipherEnrollment(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users)
+    .set({ cipherEnrolledAt: new Date() })
+    .where(eq(users.id, userId));
+}
+
+// getUserByCallSign already exists above
+
+/**
+ * Create recovery code
+ */
+export async function createRecoveryCode(data: InsertRecoveryCode) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(recoveryCodes).values(data);
+}
+
+/**
+ * Get unused recovery codes for user
+ */
+export async function getUnusedRecoveryCodes(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select()
+    .from(recoveryCodes)
+    .where(and(
+      eq(recoveryCodes.userId, userId),
+      eq(recoveryCodes.usedAt, null as any)
+    ));
+}
+
+/**
+ * Count unused recovery codes
+ */
+export async function countUnusedRecoveryCodes(userId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db.select({ count: count() })
+    .from(recoveryCodes)
+    .where(and(
+      eq(recoveryCodes.userId, userId),
+      eq(recoveryCodes.usedAt, null as any)
+    ));
+  
+  return result[0]?.count || 0;
+}
+
+/**
+ * Mark recovery code as used
+ */
+export async function markRecoveryCodeUsed(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(recoveryCodes)
+    .set({ usedAt: new Date() })
+    .where(eq(recoveryCodes.id, id));
+}
+
+/**
+ * Delete all recovery codes for user
+ */
+export async function deleteRecoveryCodes(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(recoveryCodes).where(eq(recoveryCodes.userId, userId));
+}
+
+/**
+ * Update device fingerprint
+ */
+export async function updateDeviceFingerprint(userId: number, deviceFingerprint: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users)
+    .set({ deviceFingerprint })
+    .where(eq(users.id, userId));
+}
+
+/**
+ * Increment cipher failed attempts
+ */
+export async function incrementCipherFailedAttempts(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const user = await getUserById(userId);
+  const newCount = (user?.failedCipherAttempts || 0) + 1;
+  
+  await db.update(users)
+    .set({ failedCipherAttempts: newCount })
+    .where(eq(users.id, userId));
+  
+  return newCount;
+}
+
+/**
+ * Reset cipher failed attempts
+ */
+export async function resetCipherFailedAttempts(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users)
+    .set({ failedCipherAttempts: 0 })
+    .where(eq(users.id, userId));
+}
+
+/**
+ * Lock cipher account
+ */
+export async function lockCipherAccount(userId: number, lockUntil: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users)
+    .set({ cipherLockedUntil: lockUntil })
+    .where(eq(users.id, userId));
+}
+
+/**
+ * Unlock cipher account
+ */
+export async function unlockCipherAccount(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users)
+    .set({ 
+      cipherLockedUntil: null,
+      failedCipherAttempts: 0,
+    })
+    .where(eq(users.id, userId));
+}
+
+/**
+ * Update user layer
+ */
+export async function updateUserLayer(userId: number, layer: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users)
+    .set({ markState: layer as any })
+    .where(eq(users.id, userId));
+}
+
+/**
+ * Create cipher audit log
+ */
+export async function createCipherAuditLog(data: InsertCipherAuditLog) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(cipherAuditLogs).values(data);
+}
+
+/**
+ * Get cipher audit logs
+ */
+export async function getCipherAuditLogs(userId?: number, limit: number = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  let query = db.select().from(cipherAuditLogs);
+  
+  if (userId) {
+    query = query.where(eq(cipherAuditLogs.userId, userId)) as typeof query;
+  }
+  
+  return query.orderBy(desc(cipherAuditLogs.createdAt)).limit(limit);
+}

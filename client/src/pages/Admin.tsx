@@ -96,6 +96,9 @@ export default function Admin() {
               <TabsTrigger value="credentials" className="data-[state=active]:bg-[#3B82F6]/10">
                 <Key className="w-4 h-4 mr-2" />Credentials
               </TabsTrigger>
+              <TabsTrigger value="invites" className="data-[state=active]:bg-[#3B82F6]/10">
+                <Lock className="w-4 h-4 mr-2" />Invites
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="clearance"><ClearancePanel /></TabsContent>
@@ -107,6 +110,7 @@ export default function Admin() {
             <TabsContent value="logs"><LogsPanel /></TabsContent>
             <TabsContent value="sponsors"><SponsorsPanel /></TabsContent>
             <TabsContent value="credentials"><CredentialsPanel /></TabsContent>
+            <TabsContent value="invites"><InvitesPanel /></TabsContent>
           </Tabs>
         </div>
       </main>
@@ -1760,6 +1764,267 @@ function CredentialsPanel() {
           <li>• Account lockout after 5 failed attempts (30 min)</li>
           <li>• Users must change password on first login</li>
           <li>• Login page: <code className="bg-[#0a0a0a] px-1 rounded">/login</code></li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+
+// ============================================================================
+// INVITES PANEL - Personal Cipher Invite Code Management
+// ============================================================================
+function InvitesPanel() {
+  const [newInviteLayer, setNewInviteLayer] = useState<string>("initiate");
+  const [newInviteExpiry, setNewInviteExpiry] = useState<string>("");
+  const [newInviteNote, setNewInviteNote] = useState<string>("");
+  const [generatedCode, setGeneratedCode] = useState<string>("");
+  
+  const { data: invites, refetch } = trpc.cipher.listInvites.useQuery();
+  
+  const createInviteMutation = trpc.cipher.createInvite.useMutation({
+    onSuccess: (data: { code: string }) => {
+      setGeneratedCode(data.code);
+      toast.success("Invite code created!");
+      refetch();
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+  
+  const revokeInviteMutation = trpc.cipher.revokeInvite.useMutation({
+    onSuccess: () => {
+      toast.success("Invite code revoked");
+      refetch();
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+  
+  const activeInvites = invites?.filter((i: any) => i.status === 'active') || [];
+  const usedInvites = invites?.filter((i: any) => i.status === 'used') || [];
+  const revokedInvites = invites?.filter((i: any) => i.status === 'revoked') || [];
+  
+  const handleCreateInvite = () => {
+    // Calculate days until expiry if set
+    let expiresInDays: number | undefined;
+    if (newInviteExpiry) {
+      const expiryDate = new Date(newInviteExpiry);
+      const now = new Date();
+      expiresInDays = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    }
+    
+    createInviteMutation.mutate({
+      defaultLayer: newInviteLayer as any,
+      expiresInDays,
+      notes: newInviteNote || undefined,
+    });
+  };
+  
+  const copyToClipboard = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast.success("Code copied to clipboard!");
+  };
+  
+  return (
+    <div className="space-y-8">
+      {/* Create New Invite */}
+      <div className="card-noir p-6">
+        <h2 className="text-headline mb-6 flex items-center gap-2">
+          <Plus className="w-5 h-5 text-[#0ABAB5]" />
+          Create Invite Code
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
+              Default Layer
+            </label>
+            <Select value={newInviteLayer} onValueChange={setNewInviteLayer}>
+              <SelectTrigger className="bg-background border-border/50">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="outside">Outside (Layer 0)</SelectItem>
+                <SelectItem value="initiate">Initiate (Layer 1)</SelectItem>
+                <SelectItem value="member">Member (Layer 2)</SelectItem>
+                <SelectItem value="inner_circle">Inner Circle (Layer 3)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <label className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
+              Expires (Optional)
+            </label>
+            <Input
+              type="datetime-local"
+              value={newInviteExpiry}
+              onChange={(e) => setNewInviteExpiry(e.target.value)}
+              className="bg-background border-border/50"
+            />
+          </div>
+          
+          <div>
+            <label className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
+              Note (Optional)
+            </label>
+            <Input
+              placeholder="e.g., For VIP guest"
+              value={newInviteNote}
+              onChange={(e) => setNewInviteNote(e.target.value)}
+              className="bg-background border-border/50"
+            />
+          </div>
+        </div>
+        
+        <Button
+          onClick={handleCreateInvite}
+          disabled={createInviteMutation.isPending}
+          className="bg-[#0ABAB5] hover:bg-[#0ABAB5]/80 text-black"
+        >
+          {createInviteMutation.isPending ? (
+            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+          ) : (
+            <Plus className="w-4 h-4 mr-2" />
+          )}
+          Generate Invite Code
+        </Button>
+        
+        {/* Generated Code Display */}
+        {generatedCode && (
+          <div className="mt-4 p-4 bg-[#0ABAB5]/10 border border-[#0ABAB5]/30 rounded-lg">
+            <p className="text-xs text-muted-foreground mb-2">Generated Code:</p>
+            <div className="flex items-center gap-3">
+              <code className="text-2xl font-mono text-[#0ABAB5] tracking-wider">
+                {generatedCode}
+              </code>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => copyToClipboard(generatedCode)}
+                className="border-[#0ABAB5]/30 text-[#0ABAB5]"
+              >
+                Copy
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Share this code with the invitee. It can only be used once.
+            </p>
+          </div>
+        )}
+      </div>
+      
+      {/* Active Invites */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-headline">Active Invites</h2>
+          <span className="text-xs text-[#0ABAB5] bg-[#0ABAB5]/10 px-2 py-1 rounded">
+            {activeInvites.length} active
+          </span>
+        </div>
+        
+        {activeInvites.length === 0 ? (
+          <div className="card-noir p-8 text-center">
+            <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground">No active invite codes</p>
+          </div>
+        ) : (
+          <div className="grid gap-3">
+            {activeInvites.map((invite: any) => (
+              <div key={invite.id} className="card-noir p-4 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <code className="text-lg font-mono text-[#0ABAB5] bg-[#0ABAB5]/10 px-3 py-1 rounded">
+                    {invite.code}
+                  </code>
+                  <div>
+                    <span className={`
+                      px-2 py-0.5 text-xs rounded uppercase tracking-wider
+                      ${invite.defaultLayer === 'outside' ? 'bg-zinc-800 text-zinc-400' : ''}
+                      ${invite.defaultLayer === 'initiate' ? 'bg-zinc-700 text-zinc-300' : ''}
+                      ${invite.defaultLayer === 'member' ? 'bg-blue-900/50 text-blue-400' : ''}
+                      ${invite.defaultLayer === 'inner_circle' ? 'bg-amber-900/50 text-amber-400' : ''}
+                    `}>
+                      {invite.defaultLayer?.replace('_', ' ')}
+                    </span>
+                    {invite.note && (
+                      <p className="text-xs text-muted-foreground mt-1">{invite.note}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {invite.expiresAt && (
+                    <span className="text-xs text-muted-foreground">
+                      Expires: {new Date(invite.expiresAt).toLocaleDateString()}
+                    </span>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => copyToClipboard(invite.code)}
+                  >
+                    Copy
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-red-400 hover:text-red-300"
+                    onClick={() => revokeInviteMutation.mutate({ id: invite.id })}
+                    disabled={revokeInviteMutation.isPending}
+                  >
+                    Revoke
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Used Invites */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-headline">Used Invites</h2>
+          <span className="text-xs text-green-400 bg-green-500/10 px-2 py-1 rounded">
+            {usedInvites.length} used
+          </span>
+        </div>
+        
+        {usedInvites.length === 0 ? (
+          <div className="card-noir p-6 text-center">
+            <p className="text-muted-foreground text-sm">No invites have been used yet</p>
+          </div>
+        ) : (
+          <div className="grid gap-2">
+            {usedInvites.slice(0, 10).map((invite: any) => (
+              <div key={invite.id} className="card-noir p-3 flex items-center justify-between opacity-60">
+                <div className="flex items-center gap-3">
+                  <code className="text-sm font-mono text-muted-foreground">
+                    {invite.code}
+                  </code>
+                  <span className="text-xs text-green-400">
+                    <CheckCircle2 className="w-3 h-3 inline mr-1" />
+                    Used
+                  </span>
+                  {invite.note && (
+                    <span className="text-xs text-muted-foreground">{invite.note}</span>
+                  )}
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {invite.usedAt && new Date(invite.usedAt).toLocaleDateString()}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Info Box */}
+      <div className="bg-[#0ABAB5]/10 border border-[#0ABAB5]/30 rounded-lg p-4">
+        <h4 className="font-semibold text-[#0ABAB5] mb-2">Personal Cipher Invite System</h4>
+        <ul className="text-sm text-muted-foreground space-y-1">
+          <li>• Each invite code can only be used once</li>
+          <li>• Default layer determines the invitee's starting access level</li>
+          <li>• Expired codes are automatically invalidated</li>
+          <li>• Invitees must complete cipher enrollment at <code className="bg-[#0a0a0a] px-1 rounded">/enroll</code></li>
         </ul>
       </div>
     </div>

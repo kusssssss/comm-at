@@ -6,6 +6,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import * as db from "./db";
 import { uploadRouter } from "./uploadRouter";
+import { cipherRouter } from "./cipherRouter";
 import type { User } from "../drizzle/schema";
 import { filterDropForVisibility, filterEventForVisibility, getMarkState, getVisibilityMessage } from "./visibility";
 
@@ -2084,6 +2085,11 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  // ============================================================================
+  // CIPHER ROUTER - Personal Cipher (TOTP) System
+  // ============================================================================
+  cipher: cipherRouter,
 });
 
 export type AppRouter = typeof appRouter;

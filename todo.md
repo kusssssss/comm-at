@@ -332,3 +332,68 @@
 - [ ] Merch gating (layer and attendance-locked)
 - [ ] Administrator panel for members, invites, gatherings, requests, merch
 - [ ] Seed 12 gatherings and 9 merch items
+
+## Personal Cipher MVP Build
+
+### Phase 1: Database Schema
+- [x] Add cipherSeed field to users table (encrypted TOTP secret)
+- [x] Add deviceFingerprint field to users table
+- [x] Create invite_codes table (code, expiresAt, usedBy, defaultLayer, createdBy)
+- [x] Create recovery_codes table (userId, codeHash, usedAt)
+- [x] Create cipher_audit_logs table (userId, action, details, ip, timestamp)
+- [ ] Create gathering_requests table (userId, gatheringId, status, reviewedBy, reviewedAt)
+- [ ] Create attendance table (userId, gatheringId, checkedInAt, reputationAwarded)
+- [x] Update gatherings table with reveal thresholds (timeRevealHoursBefore)
+
+### Phase 2: Personal Cipher Enrollment
+- [x] Create /enroll page with invite code entry
+- [x] Validate invite code and create member record
+- [x] Generate TOTP secret and show QR code for authenticator apps
+- [x] Generate and display 8 recovery codes (show once)
+- [x] Allow user to set call sign during enrollment
+
+### Phase 3: Personal Cipher Sign-in
+- [x] Create /cipher page with call sign + TOTP code input
+- [x] Implement TOTP validation (current + ±1 step for drift)
+- [x] Device fingerprint binding on first login
+- [x] Require recovery code for new device login
+- [x] Rate limiting and temporary lockout (5 attempts, 15 min)
+
+### Phase 4: Recovery System
+- [x] Store hashed recovery codes
+- [x] Allow recovery code use for device binding
+- [x] Allow regeneration after successful login
+
+### Phase 5: Gatherings Reveal System
+- [ ] Implement 4 reveal states (Tease, Window, Locked, Revealed)
+- [ ] Request access flow (pending → approved/denied/waitlisted)
+- [ ] Time reveal countdown based on threshold
+- [ ] Location reveal countdown based on threshold
+- [ ] Anti-leak watermark on revealed details
+
+### Phase 6: Check-in System
+- [ ] Staff check-in portal with code entry
+- [ ] Mark attendance and award reputation points
+- [ ] Unlock attendance-locked merch
+
+### Phase 7: Merch Gating
+- [ ] Layer-based visibility and purchase gating
+- [ ] Attendance-locked products tied to gatherings
+- [ ] Server and client-side enforcement
+
+### Phase 8: Admin Panel
+- [ ] Members management (list, edit layer/reputation, ban, audit log)
+- [x] Invite codes management (create, set expiration, default layer)
+- [ ] Gatherings management (CRUD, publish, reveal settings)
+- [ ] Requests management (approve/deny/waitlist)
+- [ ] Merch management (CRUD, gating rules)
+
+### Phase 9: Seed Content
+- [ ] Create 12 placeholder gatherings across categories
+- [ ] Create 9 placeholder merch items (3 public, 3 layer-gated, 3 attendance-locked)
+
+### Phase 10: Community Section
+- [ ] What comm@ is section
+- [ ] How it works explanation
+- [ ] Code of conduct
+- [ ] FAQ section
