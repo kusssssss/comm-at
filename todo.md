@@ -265,3 +265,9 @@
 - [x] Smooth transition between event sections
 - [x] Navigation dots click to jump to specific events
 - [ ] Test scroll-snap behavior on mobile (user testing needed)
+
+## Natural Scroll-to-Reveal (Remove Snap)
+- [x] Remove scroll-snap CSS from homepage
+- [x] Implement regular vertical scrolling with 100vh sections
+- [x] Sections reveal naturally as user scrolls (no snapping)
+- [x] Navigation dots kept for position indication and click-to-jump

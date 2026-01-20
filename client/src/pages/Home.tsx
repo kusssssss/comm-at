@@ -4,12 +4,12 @@ import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Calendar, MapPin, Users, ChevronDown } from 'lucide-react';
 
-// Full-viewport scrollable event section
-function EventSection({ event, index, isLast, onScrollToNext }: { event: any; index: number; isLast: boolean; onScrollToNext: () => void }) {
+// Full-viewport event section - natural scroll reveal
+function EventSection({ event, index }: { event: any; index: number }) {
   const eventDate = event?.eventDate ? new Date(event.eventDate) : (event?.startDatetime ? new Date(event.startDatetime) : null);
 
   return (
-    <section className="h-screen w-full relative snap-start snap-always">
+    <section className="h-screen w-full relative">
       {/* Background Image - Full Bleed */}
       <div className="absolute inset-0">
         {event?.coverImageUrl ? (
@@ -80,15 +80,12 @@ function EventSection({ event, index, isLast, onScrollToNext }: { event: any; in
         </div>
       </div>
 
-      {/* Scroll indicator - shows on all event slides */}
-      {!isLast && (
-        <button 
-          onClick={onScrollToNext}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce cursor-pointer hover:opacity-80 transition-opacity"
-        >
+      {/* Scroll indicator on first slide only */}
+      {index === 0 && (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce">
           <span className="text-xs text-neutral-500 tracking-wider uppercase">Scroll</span>
           <ChevronDown className="w-6 h-6 text-neutral-500" />
-        </button>
+        </div>
       )}
     </section>
   );
@@ -124,7 +121,7 @@ function CollectionGrid() {
   ];
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2 snap-start">
+    <section className="grid grid-cols-1 md:grid-cols-2">
       {collections.map((collection, index) => (
         <Link key={index} href={collection.link}>
           <div className="relative h-[50vh] overflow-hidden group cursor-pointer">
@@ -148,7 +145,7 @@ function CollectionGrid() {
 // Product Grid (Nocta Style)
 function ProductGrid({ products }: { products: any[] }) {
   return (
-    <section className="bg-neutral-900 py-16 snap-start">
+    <section className="bg-neutral-900 py-16">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -218,7 +215,7 @@ function NewsletterSection() {
   const [email, setEmail] = useState('');
 
   return (
-    <section className="bg-black py-20 snap-start">
+    <section className="bg-black py-20">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
           NEVER MISS A DROP
@@ -267,7 +264,6 @@ export default function Home() {
   const { data: eventsData } = trpc.event.list.useQuery();
   const { data: dropsData } = trpc.drop.list.useQuery();
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
   // Filter events for display
@@ -294,20 +290,10 @@ export default function Home() {
     }
   };
 
-  // Scroll to next section
-  const scrollToNext = () => {
-    if (currentEventIndex < events.length - 1) {
-      scrollToSection(currentEventIndex + 1);
-    }
-  };
-
   // Track scroll position to update current event index
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
     const handleScroll = () => {
-      const scrollTop = container.scrollTop;
+      const scrollTop = window.scrollY;
       const viewportHeight = window.innerHeight;
       const index = Math.round(scrollTop / viewportHeight);
       if (index >= 0 && index < events.length) {
@@ -315,17 +301,13 @@ export default function Home() {
       }
     };
 
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [events.length]);
 
   return (
-    <div 
-      ref={containerRef} 
-      className="bg-black h-screen overflow-y-scroll snap-y snap-mandatory"
-      style={{ scrollSnapType: 'y mandatory' }}
-    >
-      {/* Scroll Progress Indicator */}
+    <div className="bg-black">
+      {/* Scroll Progress Indicator - only show during events section */}
       {events.length > 1 && (
         <ScrollProgress 
           currentIndex={currentEventIndex} 
@@ -334,23 +316,18 @@ export default function Home() {
         />
       )}
 
-      {/* Full-viewport scrollable event sections */}
+      {/* Full-viewport event sections - natural vertical scroll */}
       {events.length > 0 ? (
         events.map((event: any, index: number) => (
           <div 
             key={event.id} 
             ref={(el) => { sectionRefs.current[index] = el; }}
           >
-            <EventSection 
-              event={event} 
-              index={index} 
-              isLast={index === events.length - 1}
-              onScrollToNext={scrollToNext}
-            />
+            <EventSection event={event} index={index} />
           </div>
         ))
       ) : (
-        <section className="h-screen w-full flex items-center justify-center bg-neutral-900 snap-start">
+        <section className="h-screen w-full flex items-center justify-center bg-neutral-900">
           <p className="text-neutral-500">No events available</p>
         </section>
       )}
