@@ -230,3 +230,10 @@
   - [x] FAQ accordion
 - [x] Update events data model with new fields (tagline, coverImageUrl, tags, area, featuredOrder)
 - [x] Add seed data (8 events with cover images, tags, locations)
+
+## Nocta Scroll Replication
+- [x] Analyze Nocta's exact scroll mechanics (sticky sections, z-index stacking)
+- [x] Implement sticky scroll sections that stack on top of each other
+- [x] Add event slides with full-viewport hero images
+- [x] Add navigation dots on right side
+- [ ] Test on mobile and desktop (user testing needed)

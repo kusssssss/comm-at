@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, title, featuredOrder, coverImageUrl FROM events LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, title, featuredOrder, coverImageUrl FROM events LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "THE MIDNIGHT SESSION",
+      "featuredOrder": "1",
+      "coverImageUrl": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200"
+    },
+    {
+      "id": "2",
+      "title": "CHAPTER INITIATION",
+      "featuredOrder": "2",
+      "coverImageUrl": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200"
+    },
+    {
+      "id": "30001",
+      "title": "the hanging ",
+      "featuredOrder": "0",
+      "coverImageUrl": "NULL"
+    },
+    {
+      "id": "30002",
+      "title": "the launch",
+      "featuredOrder": "0",
+      "coverImageUrl": "NULL"
+    },
+    {
+      "id": "30003",
+      "title": "the launch",
+      "featuredOrder": "0",
+      "coverImageUrl": "NULL"
+    },
+    {
+      "id": "60001",
+      "title": "UNDERGROUND FREQUENCIES",
+      "featuredOrder": "3",
+      "coverImageUrl": "https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=1200"
+    },
+    {
+      "id": "60002",
+      "title": "THE COLLECTORS DINNER",
+      "featuredOrder": "4",
+      "coverImageUrl": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200"
+    },
+    {
+      "id": "60003",
+      "title": "BALI RETREAT",
+      "featuredOrder": "5",
+      "coverImageUrl": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200"
+    },
+    {
+      "id": "60004",
+      "title": "STREET CULTURE NIGHT",
+      "featuredOrder": "6",
+      "coverImageUrl": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=1200"
+    },
+    {
+      "id": "60005",
+      "title": "THE ARCHIVE OPENING",
+      "featuredOrder": "7",
+      "coverImageUrl": "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1200"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tfeaturedOrder\tcoverImageUrl\n1\tTHE MIDNIGHT SESSION\t1\thttps://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200\n2\tCHAPTER INITIATION\t2\thttps://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200\n30001\tthe hanging \t0\tNULL\n30002\tthe launch\t0\tNULL\n30003\tthe launch\t0\tNULL\n60001\tUNDERGROUND FREQUENCIES\t3\thttps://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=1200\n60002\tTHE COLLECTORS DINNER\t4\thttps://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200\n60003\tBALI RETREAT\t5\thttps://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200\n60004\tSTREET CULTURE NIGHT\t6\thttps://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=1200\n60005\tTHE ARCHIVE OPENING\t7\thttps://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1200\n",
+  "stderr": "",
+  "execution_time_ms": 1520
+}

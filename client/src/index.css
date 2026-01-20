@@ -175,3 +175,26 @@
     }
   }
 }
+/* Nocta-style sticky scroll container */
+.scroll-snap-container {
+  /* Container for sticky sections - each section stacks on top of previous */
+}
+
+.scroll-snap-container > section {
+  /* Each section is sticky and covers the full viewport */
+  /* z-index is set inline to create stacking order */
+}
+
+/* Smooth scroll behavior for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
