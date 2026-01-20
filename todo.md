@@ -517,3 +517,22 @@
 - [x] Send notification when added to waitlist (claimPass)
 - [x] Send notification when request is approved/denied/waitlisted (access request flow)
 - [x] Include event title and waitlist position in notifications
+
+
+## Admin Access Request Panel (Completed)
+- [x] Add bulk approve API endpoint (event.bulkApproveRequests)
+- [x] Add bulk deny API endpoint (event.bulkDenyRequests)
+- [x] Add getAllAccessRequests endpoint with filtering and pagination
+- [x] Add getAccessRequestStats endpoint for dashboard stats
+- [x] Create AdminAccessRequests page (/admin/access-requests)
+- [x] Add filtering by event, status
+- [x] Add search by user name/call sign
+- [x] Implement checkbox selection for bulk actions
+- [x] Add bulk approve button with confirmation dialog
+- [x] Add bulk deny button with reason input
+- [x] Show request details (user info, message, event, date)
+- [x] Add individual approve/deny/waitlist actions
+- [x] Add pagination for large request lists
+- [x] Add stats cards (pending, approved, denied, waitlisted)
+- [x] Add route to App.tsx
+- [x] Add vitest tests for bulk actions (9 tests passing)

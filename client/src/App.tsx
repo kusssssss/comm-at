@@ -35,6 +35,7 @@ import StaffCheckIn from "./pages/StaffCheckIn";
 
 // Admin pages
 import Admin from "./pages/Admin";
+import AdminAccessRequests from "./pages/AdminAccessRequests";
 
 // Dev tools
 import Dev from "./pages/Dev";
@@ -86,6 +87,7 @@ function Router() {
       
       {/* Admin routes */}
       <Route path="/admin" component={Admin} />
+      <Route path="/admin/access-requests" component={AdminAccessRequests} />
       <Route path="/admin/:section" component={Admin} />
       
       {/* Dev tools */}

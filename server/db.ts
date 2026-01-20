@@ -1,4 +1,4 @@
-import { eq, and, desc, gte, lt, sql, count, gt, inArray, like, isNotNull } from "drizzle-orm";
+import { eq, and, or, desc, gte, lt, sql, count, gt, inArray, like, isNotNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import * as crypto from "crypto";
 import { nanoid } from "nanoid";
@@ -2902,4 +2902,108 @@ export async function getUserAccessRequests(userId: number) {
     .innerJoin(events, eq(eventRsvps.eventId, events.id))
     .where(eq(eventRsvps.userId, userId))
     .orderBy(desc(eventRsvps.createdAt));
+}
+
+
+// ============================================================================
+// ADMIN ACCESS REQUEST FUNCTIONS
+// ============================================================================
+
+export async function getAllAccessRequests(options: {
+  eventId?: number;
+  status?: 'pending' | 'approved' | 'denied' | 'waitlisted';
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return { requests: [], total: 0 };
+  
+  const conditions = [];
+  
+  if (options.eventId) {
+    conditions.push(eq(eventRsvps.eventId, options.eventId));
+  }
+  
+  if (options.status) {
+    conditions.push(eq(eventRsvps.status, options.status));
+  }
+  
+  if (options.search) {
+    conditions.push(
+      or(
+        like(users.name, `%${options.search}%`),
+        like(users.callSign, `%${options.search}%`)
+      )
+    );
+  }
+  
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+  
+  // Get total count
+  const countResult = await db.select({ count: count() })
+    .from(eventRsvps)
+    .innerJoin(users, eq(eventRsvps.userId, users.id))
+    .innerJoin(events, eq(eventRsvps.eventId, events.id))
+    .where(whereClause);
+  
+  const total = countResult[0]?.count || 0;
+  
+  // Get paginated results
+  const requests = await db.select({
+    id: eventRsvps.id,
+    eventId: eventRsvps.eventId,
+    userId: eventRsvps.userId,
+    status: eventRsvps.status,
+    requestMessage: eventRsvps.requestMessage,
+    adminResponse: eventRsvps.adminResponse,
+    respondedById: eventRsvps.respondedById,
+    respondedAt: eventRsvps.respondedAt,
+    createdAt: eventRsvps.createdAt,
+    userName: users.name,
+    userCallSign: users.callSign,
+    userRole: users.role,
+    userChapter: users.chapter,
+    userEmail: users.email,
+    eventTitle: events.title,
+    eventDate: events.eventDate,
+    eventVenue: events.venueName,
+  })
+    .from(eventRsvps)
+    .innerJoin(users, eq(eventRsvps.userId, users.id))
+    .innerJoin(events, eq(eventRsvps.eventId, events.id))
+    .where(whereClause)
+    .orderBy(desc(eventRsvps.createdAt))
+    .limit(options.limit || 50)
+    .offset(options.offset || 0);
+  
+  return { requests, total };
+}
+
+export async function getAccessRequestStats(eventId?: number) {
+  const db = await getDb();
+  if (!db) return { pending: 0, approved: 0, denied: 0, waitlisted: 0, total: 0 };
+  
+  const conditions = eventId ? [eq(eventRsvps.eventId, eventId)] : [];
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+  
+  const result = await db.select({
+    status: eventRsvps.status,
+    count: count(),
+  })
+    .from(eventRsvps)
+    .where(whereClause)
+    .groupBy(eventRsvps.status);
+  
+  const stats = { pending: 0, approved: 0, denied: 0, waitlisted: 0, total: 0 };
+  
+  for (const row of result) {
+    if (row.status === 'pending') stats.pending = row.count;
+    else if (row.status === 'approved') stats.approved = row.count;
+    else if (row.status === 'denied') stats.denied = row.count;
+    else if (row.status === 'waitlisted') stats.waitlisted = row.count;
+    stats.total += row.count;
+  }
+  
+  return stats;
 }

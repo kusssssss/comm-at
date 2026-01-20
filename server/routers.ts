@@ -1153,6 +1153,138 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    // Admin: bulk approve access requests
+    bulkApproveRequests: adminProcedure
+      .input(z.object({
+        requestIds: z.array(z.number()),
+        response: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const results = { approved: 0, failed: 0, errors: [] as string[] };
+        
+        for (const requestId of input.requestIds) {
+          try {
+            const request = await db.getAccessRequestById(requestId);
+            if (!request) {
+              results.failed++;
+              results.errors.push(`Request ${requestId} not found`);
+              continue;
+            }
+            
+            if (request.status !== 'pending') {
+              results.failed++;
+              results.errors.push(`Request ${requestId} is not pending`);
+              continue;
+            }
+            
+            // Approve the request
+            await db.approveAccessRequest(requestId, ctx.user.id, input.response);
+            
+            // Create pass for user
+            const event = await db.getEventById(request.eventId);
+            const confirmedCount = await db.getConfirmedPassCount(request.eventId);
+            const capacity = event?.capacity || 0;
+            const isFull = capacity > 0 && confirmedCount >= capacity;
+            
+            let waitlistPosition: number | undefined;
+            if (isFull) {
+              const waitlistCount = await db.getWaitlistCount(request.eventId);
+              waitlistPosition = waitlistCount + 1;
+            }
+            
+            await db.createEventPassWithWaitlist(
+              request.eventId,
+              request.userId,
+              isFull,
+              waitlistPosition
+            );
+            
+            // Send notification
+            await db.createNotification({
+              userId: request.userId,
+              type: 'system_announcement',
+              title: 'Access Request Approved',
+              body: `Your request to access "${event?.title || 'the event'}" has been approved.${input.response ? ` Note: ${input.response}` : ''}`,
+            });
+            
+            results.approved++;
+          } catch (error) {
+            results.failed++;
+            results.errors.push(`Request ${requestId}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+        }
+        
+        return results;
+      }),
+    
+    // Admin: bulk deny access requests
+    bulkDenyRequests: adminProcedure
+      .input(z.object({
+        requestIds: z.array(z.number()),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const results = { denied: 0, failed: 0, errors: [] as string[] };
+        
+        for (const requestId of input.requestIds) {
+          try {
+            const request = await db.getAccessRequestById(requestId);
+            if (!request) {
+              results.failed++;
+              results.errors.push(`Request ${requestId} not found`);
+              continue;
+            }
+            
+            if (request.status !== 'pending') {
+              results.failed++;
+              results.errors.push(`Request ${requestId} is not pending`);
+              continue;
+            }
+            
+            // Deny the request
+            await db.denyAccessRequest(requestId, ctx.user.id, input.reason);
+            
+            // Get event for notification
+            const event = await db.getEventById(request.eventId);
+            
+            // Send notification
+            await db.createNotification({
+              userId: request.userId,
+              type: 'system_announcement',
+              title: 'Access Request Denied',
+              body: `Your request to access "${event?.title || 'the event'}" has been denied.${input.reason ? ` Reason: ${input.reason}` : ''}`,
+            });
+            
+            results.denied++;
+          } catch (error) {
+            results.failed++;
+            results.errors.push(`Request ${requestId}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+        }
+        
+        return results;
+      }),
+    
+    // Admin: get all access requests with filtering
+    getAllAccessRequests: adminProcedure
+      .input(z.object({
+        eventId: z.number().optional(),
+        status: z.enum(['pending', 'approved', 'denied', 'waitlisted']).optional(),
+        search: z.string().optional(),
+        limit: z.number().default(50),
+        offset: z.number().default(0),
+      }))
+      .query(async ({ input }) => {
+        return db.getAllAccessRequests(input);
+      }),
+    
+    // Admin: get access request stats
+    getAccessRequestStats: adminProcedure
+      .input(z.object({ eventId: z.number().optional() }))
+      .query(async ({ input }) => {
+        return db.getAccessRequestStats(input.eventId);
+      }),
+    
     // Admin: list all events
     listAll: adminProcedure.query(async () => {
       return db.getAllEvents();
