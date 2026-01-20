@@ -1,0 +1,61 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'event_passes' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'event_passes' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "eventId"
+    },
+    {
+      "COLUMN_NAME": "userId"
+    },
+    {
+      "COLUMN_NAME": "markId"
+    },
+    {
+      "COLUMN_NAME": "passStatus"
+    },
+    {
+      "COLUMN_NAME": "qrPayload"
+    },
+    {
+      "COLUMN_NAME": "claimedAt"
+    },
+    {
+      "COLUMN_NAME": "usedAt"
+    },
+    {
+      "COLUMN_NAME": "revokedAt"
+    },
+    {
+      "COLUMN_NAME": "revokedReason"
+    },
+    {
+      "COLUMN_NAME": "revokedById"
+    },
+    {
+      "COLUMN_NAME": "scannableCode"
+    },
+    {
+      "COLUMN_NAME": "plusOneName"
+    },
+    {
+      "COLUMN_NAME": "rulesAcceptedAt"
+    },
+    {
+      "COLUMN_NAME": "checkedInAt"
+    },
+    {
+      "COLUMN_NAME": "checkedInById"
+    },
+    {
+      "COLUMN_NAME": "reputationAwarded"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nid\neventId\nuserId\nmarkId\npassStatus\nqrPayload\nclaimedAt\nusedAt\nrevokedAt\nrevokedReason\nrevokedById\nscannableCode\nplusOneName\nrulesAcceptedAt\ncheckedInAt\ncheckedInById\nreputationAwarded\n",
+  "stderr": "",
+  "execution_time_ms": 1545
+}

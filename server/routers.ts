@@ -1038,6 +1038,72 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return db.getCheckInLogs(input.eventId);
       }),
+    
+    // Check in by scannable code (manual entry or QR scan)
+    checkInByCode: staffProcedure
+      .input(z.object({ 
+        code: z.string(),
+        eventId: z.number(),
+        reputationPoints: z.number().default(10)
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Find pass by scannable code or QR payload
+        let pass = await db.getEventPassByScannableCode(input.code);
+        if (!pass) {
+          pass = await db.getEventPassByQr(input.code);
+        }
+        
+        if (!pass) {
+          await db.createCheckInLog({
+            eventId: input.eventId,
+            scannedByUserId: ctx.user.id,
+            result: "rejected",
+            reason: "Pass not found",
+          });
+          return { success: false, error: "Pass not found" };
+        }
+        
+        if (pass.eventId !== input.eventId) {
+          await db.createCheckInLog({
+            eventId: input.eventId,
+            eventPassId: pass.id,
+            scannedByUserId: ctx.user.id,
+            result: "rejected",
+            reason: "Pass is for different event",
+          });
+          return { success: false, error: "Pass is for a different event" };
+        }
+        
+        // Perform check-in
+        const result = await db.checkInPass(pass.id, ctx.user.id, input.reputationPoints);
+        
+        if (result.success) {
+          const user = await db.getUserById(pass.userId);
+          return { 
+            success: true, 
+            userCallSign: user?.callSign || "Unknown",
+            userName: user?.name || "Unknown",
+            reputationAwarded: input.reputationPoints,
+            plusOneName: pass.plusOneName,
+          };
+        }
+        
+        return result;
+      }),
+    
+    // Get event attendance list
+    getAttendance: staffProcedure
+      .input(z.object({ eventId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getEventAttendance(input.eventId);
+      }),
+    
+    // Get check-in stats for event
+    getCheckInStats: staffProcedure
+      .input(z.object({ eventId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getEventCheckInStats(input.eventId);
+      }),
   }),
 
   // ============================================================================

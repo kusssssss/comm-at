@@ -30,6 +30,7 @@ import Referral from "./pages/Referral";
 
 // Staff pages
 import Staff from "./pages/Staff";
+import StaffCheckIn from "./pages/StaffCheckIn";
 
 // Admin pages
 import Admin from "./pages/Admin";
@@ -79,6 +80,7 @@ function Router() {
       
       {/* Staff routes */}
       <Route path="/staff" component={Staff} />
+      <Route path="/staff/checkin" component={StaffCheckIn} />
       
       {/* Admin routes */}
       <Route path="/admin" component={Admin} />

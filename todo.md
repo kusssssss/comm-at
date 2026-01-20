@@ -434,3 +434,20 @@
 - [ ] Update Gatherings page with reveal badges and countdowns
 - [ ] Update EventDetail page with full reveal information
 - [ ] Test with different user layers (streetlight, verified, signal, inner_room, black_label)
+
+
+## Check-in System (Completed)
+- [x] Update event_passes table to track check-in status (checkedInAt, checkedInById, reputationAwarded)
+- [x] Create getEventPassByScannableCode function in db.ts
+- [x] Create checkInPass function with reputation awarding
+- [x] Create getEventAttendance and getEventCheckInStats functions
+- [x] Add staff.checkInByCode endpoint in routers.ts
+- [x] Add staff.getAttendance and staff.getCheckInStats endpoints
+- [x] Build staff check-in portal page (/staff/checkin)
+- [x] Implement QR code scanning with html5-qrcode library
+- [x] Implement manual pass code entry with auto-uppercase
+- [x] Award configurable reputation points on check-in (default 10)
+- [x] Show attendance list with check-in status for staff
+- [x] Show real-time stats (total passes, checked in, pending)
+- [x] Create QRScanner component with camera toggle
+- [x] Add vitest tests for check-in logic (12 tests passing)

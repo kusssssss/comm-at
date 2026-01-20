@@ -514,6 +514,12 @@ export const eventPasses = mysqlTable("event_passes", {
   
   claimedAt: timestamp("claimedAt").defaultNow().notNull(),
   usedAt: timestamp("usedAt"),
+  
+  // Check-in tracking
+  checkedInAt: timestamp("checkedInAt"),
+  checkedInById: int("checkedInById"), // Staff who checked in
+  reputationAwarded: int("reputationAwarded").default(0), // Points given on check-in
+  
   revokedAt: timestamp("revokedAt"),
   revokedReason: text("revokedReason"),
   revokedById: int("revokedById"),

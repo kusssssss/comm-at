@@ -609,6 +609,115 @@ export async function getCheckInLogs(eventId?: number, limit = 100) {
 }
 
 // ============================================================================
+// CHECK-IN FUNCTIONS
+// ============================================================================
+
+export async function getEventPassByScannableCode(code: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(eventPasses)
+    .where(eq(eventPasses.scannableCode, code))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function checkInPass(
+  passId: number, 
+  staffUserId: number, 
+  reputationPoints: number = 10
+): Promise<{ success: boolean; error?: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, error: 'Database not available' };
+  
+  // Get the pass
+  const passResult = await db.select().from(eventPasses).where(eq(eventPasses.id, passId)).limit(1);
+  if (passResult.length === 0) {
+    return { success: false, error: 'Pass not found' };
+  }
+  
+  const pass = passResult[0];
+  
+  // Check if already checked in
+  if (pass.checkedInAt) {
+    return { success: false, error: 'Already checked in' };
+  }
+  
+  // Check if pass is valid
+  if (pass.passStatus === 'revoked') {
+    return { success: false, error: 'Pass has been revoked' };
+  }
+  
+  if (pass.passStatus === 'expired') {
+    return { success: false, error: 'Pass has expired' };
+  }
+  
+  // Update pass with check-in info
+  await db.update(eventPasses).set({
+    checkedInAt: new Date(),
+    checkedInById: staffUserId,
+    reputationAwarded: reputationPoints,
+    passStatus: 'used',
+    usedAt: new Date(),
+  }).where(eq(eventPasses.id, passId));
+  
+  // Award reputation points to user
+  await db.update(users).set({
+    reputationPoints: sql`${users.reputationPoints} + ${reputationPoints}`,
+  }).where(eq(users.id, pass.userId));
+  
+  // Create check-in log
+  await db.insert(checkInLogs).values({
+    eventId: pass.eventId,
+    eventPassId: passId,
+    scannedByUserId: staffUserId,
+    result: 'accepted',
+    reason: `Checked in, awarded ${reputationPoints} reputation points`,
+  });
+  
+  return { success: true };
+}
+
+export async function getEventAttendance(eventId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    passId: eventPasses.id,
+    userId: eventPasses.userId,
+    userName: users.name,
+    callSign: users.callSign,
+    plusOneName: eventPasses.plusOneName,
+    claimedAt: eventPasses.claimedAt,
+    checkedInAt: eventPasses.checkedInAt,
+    checkedInById: eventPasses.checkedInById,
+    reputationAwarded: eventPasses.reputationAwarded,
+    passStatus: eventPasses.passStatus,
+  })
+    .from(eventPasses)
+    .innerJoin(users, eq(eventPasses.userId, users.id))
+    .where(eq(eventPasses.eventId, eventId))
+    .orderBy(desc(eventPasses.checkedInAt));
+  
+  return result;
+}
+
+export async function getEventCheckInStats(eventId: number) {
+  const db = await getDb();
+  if (!db) return { total: 0, checkedIn: 0, pending: 0 };
+  
+  const passes = await db.select({
+    checkedInAt: eventPasses.checkedInAt,
+    passStatus: eventPasses.passStatus,
+  }).from(eventPasses).where(eq(eventPasses.eventId, eventId));
+  
+  const total = passes.length;
+  const checkedIn = passes.filter(p => p.checkedInAt !== null).length;
+  const pending = passes.filter(p => p.checkedInAt === null && p.passStatus === 'claimed').length;
+  
+  return { total, checkedIn, pending };
+}
+
+// ============================================================================
 // AUDIT LOG FUNCTIONS
 // ============================================================================
 
