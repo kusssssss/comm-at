@@ -92,6 +92,13 @@
       "when": 1768549767454,
       "tag": "0012_stale_mantis",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1768887508303,
+      "tag": "0013_friendly_sauron",
+      "breakpoints": true
     }
   ]
 }

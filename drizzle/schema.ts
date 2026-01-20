@@ -332,32 +332,61 @@ export const eventVisibilityEnum = mysqlEnum("eventVisibility", [
   "inner_circle"  // Inner circle only
 ]);
 
+export const eventAccessTypeEnum = mysqlEnum("eventAccessType", [
+  "invite_only",   // Requires invitation
+  "members_only",  // Open to verified members
+  "open"           // Open to all
+]);
+
+export const eventSecretLevelEnum = mysqlEnum("eventSecretLevel", [
+  "low",
+  "medium",
+  "high"
+]);
+
 export const events = mysqlTable("events", {
   id: int("id").autoincrement().primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }).unique(),
   chapter: varchar("chapter", { length: 128 }).default("South Jakarta").notNull(),
   description: text("description"),
+  tagline: varchar("tagline", { length: 255 }), // One-liner "what it is"
   rules: text("rules"), // Event code of conduct
   capacity: int("capacity").notNull(),
   
   // Eligibility
   eligibilityMinState: markStateEnum.default("member").notNull(),
   contentVisibility: eventVisibilityEnum.default("member").notNull(),
+  accessType: eventAccessTypeEnum.default("members_only").notNull(),
+  secretLevel: eventSecretLevelEnum.default("medium"),
   
   // Location (hidden until reveal)
   city: varchar("city", { length: 128 }),
+  area: varchar("area", { length: 128 }), // Neighborhood/district
+  venueName: varchar("venueName", { length: 255 }),
+  venueAddress: text("venueAddress"),
   locationText: text("locationText"),
   locationRevealHoursBefore: int("locationRevealHoursBefore").default(24).notNull(),
   locationRevealAt: timestamp("locationRevealAt"),
+  coordinates: varchar("coordinates", { length: 64 }), // lat,lng
+  
+  // Media
+  coverImageUrl: text("coverImageUrl"),
+  
+  // Tags for filtering
+  tags: text("tags"), // JSON array: ["music", "fashion", "secret"]
   
   // Timing (legacy eventDate kept for compatibility)
   eventDate: timestamp("eventDate"),
   startDatetime: timestamp("startDatetime"),
   endDatetime: timestamp("endDatetime"),
   
+  // Hero ordering
+  featuredOrder: int("featuredOrder").default(0), // 0 = not featured, 1+ = order in hero
+  
   status: eventStatusEnum.default("draft").notNull(),
   publishedAt: timestamp("publishedAt"),
+  createdBy: int("createdBy"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

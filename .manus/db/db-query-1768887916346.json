@@ -1,0 +1,103 @@
+{
+  "query": "SELECT column_name FROM information_schema.columns WHERE table_name = 'events' AND table_schema = DATABASE();",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT column_name FROM information_schema.columns WHERE table_name = 'events' AND table_schema = DATABASE();",
+  "rows": [
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "title"
+    },
+    {
+      "column_name": "slug"
+    },
+    {
+      "column_name": "chapter"
+    },
+    {
+      "column_name": "description"
+    },
+    {
+      "column_name": "rules"
+    },
+    {
+      "column_name": "capacity"
+    },
+    {
+      "column_name": "markState"
+    },
+    {
+      "column_name": "eventVisibility"
+    },
+    {
+      "column_name": "city"
+    },
+    {
+      "column_name": "locationText"
+    },
+    {
+      "column_name": "locationRevealHoursBefore"
+    },
+    {
+      "column_name": "locationRevealAt"
+    },
+    {
+      "column_name": "eventDate"
+    },
+    {
+      "column_name": "startDatetime"
+    },
+    {
+      "column_name": "endDatetime"
+    },
+    {
+      "column_name": "eventStatus"
+    },
+    {
+      "column_name": "publishedAt"
+    },
+    {
+      "column_name": "createdAt"
+    },
+    {
+      "column_name": "updatedAt"
+    },
+    {
+      "column_name": "tagline"
+    },
+    {
+      "column_name": "eventAccessType"
+    },
+    {
+      "column_name": "eventSecretLevel"
+    },
+    {
+      "column_name": "area"
+    },
+    {
+      "column_name": "venueName"
+    },
+    {
+      "column_name": "venueAddress"
+    },
+    {
+      "column_name": "coordinates"
+    },
+    {
+      "column_name": "coverImageUrl"
+    },
+    {
+      "column_name": "tags"
+    },
+    {
+      "column_name": "featuredOrder"
+    },
+    {
+      "column_name": "createdBy"
+    }
+  ],
+  "messages": [],
+  "stdout": "column_name\nid\ntitle\nslug\nchapter\ndescription\nrules\ncapacity\nmarkState\neventVisibility\ncity\nlocationText\nlocationRevealHoursBefore\nlocationRevealAt\neventDate\nstartDatetime\nendDatetime\neventStatus\npublishedAt\ncreatedAt\nupdatedAt\ntagline\neventAccessType\neventSecretLevel\narea\nvenueName\nvenueAddress\ncoordinates\ncoverImageUrl\ntags\nfeaturedOrder\ncreatedBy\n",
+  "stderr": "",
+  "execution_time_ms": 1505
+}

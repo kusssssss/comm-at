@@ -1,0 +1,8 @@
+{
+  "query": "UPDATE drops SET \n  price = 4500000,\n  imageUrl = 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800'\nWHERE id = 1;\n\nUPDATE drops SET \n  price = 2800000,\n  imageUrl = 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800'\nWHERE id = 2;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute UPDATE drops SET \n  price = 4500000,\n  imageUrl = 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800'\nWHERE id = 1;\n\nUPDATE drops SET \n  price = 2800000,\n  imageUrl = 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800'\nWHERE id = 2;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'price' in 'field list'"
+  ]
+}

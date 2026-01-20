@@ -213,3 +213,20 @@
 
 ## Hero Section - TAKEOVER Text
 - [x] Change TAKEOVER text gradient from purple/magenta to blue (updated 200+ purple hex codes across 20 files)
+
+
+## Homepage Redesign (Nocta-Style)
+- [x] Events Hero Section (full viewport, editorial scroll)
+  - [x] Full-viewport event cards with large imagery
+  - [x] Event info overlay (title, tagline, date, location, CTA)
+  - [x] Navigation dots for scrolling between events
+  - [x] Filters (Now/Upcoming/This Week, Location, Search)
+- [x] Merchandise Section (drop-style grid with "The Drop" header)
+- [x] Community Section
+  - [x] Manifesto section
+  - [x] How it works steps
+  - [x] Code of conduct
+  - [x] Chapters/ranks teaser
+  - [x] FAQ accordion
+- [x] Update events data model with new fields (tagline, coverImageUrl, tags, area, featuredOrder)
+- [x] Add seed data (8 events with cover images, tags, locations)

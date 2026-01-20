@@ -1,0 +1,13 @@
+{
+  "query": "SELECT GROUP_CONCAT(column_name) FROM information_schema.columns WHERE table_name = 'events' AND table_schema = DATABASE();",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT GROUP_CONCAT(column_name) FROM information_schema.columns WHERE table_name = 'events' AND table_schema = DATABASE();",
+  "rows": [
+    {
+      "GROUP_CONCAT(column_name)": "id,title,slug,chapter,description,rules,capacity,markState,eventVisibility,city,locationText,locationRevealHoursBefore,locationRevealAt,eventDate,startDatetime,endDatetime,eventStatus,publishedAt,createdAt,updatedAt,tagline,eventAccessType,eventSecretLevel,area,venueName,venueAddress,coordinates,coverImageUrl,tags,featuredOrder,createdBy"
+    }
+  ],
+  "messages": [],
+  "stdout": "GROUP_CONCAT(column_name)\nid,title,slug,chapter,description,rules,capacity,markState,eventVisibility,city,locationText,locationRevealHoursBefore,locationRevealAt,eventDate,startDatetime,endDatetime,eventStatus,publishedAt,createdAt,updatedAt,tagline,eventAccessType,eventSecretLevel,area,venueName,venueAddress,coordinates,coverImageUrl,tags,featuredOrder,createdBy\n",
+  "stderr": "",
+  "execution_time_ms": 1571
+}

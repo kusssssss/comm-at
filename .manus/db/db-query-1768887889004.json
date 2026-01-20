@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE events SET \n  tagline = 'Your first step into the unknown',\n  coverImageUrl = 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200',\n  tags = '[\"initiation\", \"ritual\", \"new members\"]',\n  featuredOrder = 1,\n  city = 'Jakarta',\n  area = 'South Jakarta',\n  venueName = 'The Vault',\n  venueAddress = 'Jl. Senopati No. 88'\nWHERE id = 1;\n\nUPDATE events SET \n  tagline = 'When the city sleeps, we gather',\n  coverImageUrl = 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200',\n  tags = '[\"late night\", \"inner circle\", \"exclusive\"]',\n  featuredOrder = 2,\n  city = 'Jakarta',\n  area = 'Central Jakarta'\nWHERE id = 2;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute UPDATE events SET \n  tagline = 'Your first step into the unknown',\n  coverImageUrl = 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200',\n  tags = '[\"initiation\", \"ritual\", \"new members\"]',\n  featuredOrder = 1,\n  city = 'Jakarta',\n  area = 'South Jakarta',\n  venueName = 'The Vault',\n  venueAddress = 'Jl. Senopati No. 88'\nWHERE id = 1;\n\nUPDATE events SET \n  tagline = 'When the city sleeps, we gather',\n  coverImageUrl = 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200',\n  tags = '[\"late night\", \"inner circle\", \"exclusive\"]',\n  featuredOrder = 2,\n  city = 'Jakarta',\n  area = 'Central Jakarta'\nWHERE id = 2;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1942
+}

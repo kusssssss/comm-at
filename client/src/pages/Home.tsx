@@ -1,1210 +1,1036 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import Nav from "@/components/Nav";
 import { trpc } from "@/lib/trpc";
-import { Countdown, InlineCountdown } from "@/components/Countdown";
-import { AccessLock, MembersOnlyBadge, VisibilityIndicator, AccessBadge } from "@/components/AccessLock";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Lock, Eye, EyeOff, Users, Calendar, Shield, ChevronRight, Zap, Sparkles, MapPin, Clock, ArrowRight, Star, Gift, Trophy } from "lucide-react";
 import { 
-  ChromaticText, 
-  DecryptText, 
-  CycleNumber,
-  GlitchHover,
-  SystemBoot,
-  GlowPulse,
-  FlickerText,
+  Lock, Eye, EyeOff, Users, Calendar, Shield, ChevronRight, ChevronDown,
+  Zap, Sparkles, MapPin, Clock, ArrowRight, Star, Gift, Trophy,
+  Search, Filter, X, Check, ChevronUp, Play, Pause
+} from "lucide-react";
+import { 
   RevealOnScroll,
-  Hologram,
+  GlowPulse,
+  SystemBoot,
 } from "@/components/Effects2200";
 import { SponsorShowcase } from "@/components/SponsorShowcase";
-import { ClearanceTest } from "@/components/ClearanceTest";
-import { CardHoverAnimation, ButtonHoverAnimation } from "@/components/CardHoverAnimation";
 import { ImageFallback, getDropImage } from "@/components/ImageFallback";
 
 // ============================================================================
-// YEAR 2200 HOME PAGE - SECRET SOCIETY / AFFILIATION THEME
+// NOCTA-STYLE HOME PAGE - EVENTS HERO + MERCH + COMMUNITY
 // ============================================================================
 
-const MANIFESTO = [
-  { text: "The mark is the key.", emphasis: "mark" },
-  { text: "The Mark is the lock.", emphasis: "Mark" },
-  { text: "The collective is the room.", emphasis: "collective" },
-  { text: "Dilution leads to being unmarked.", emphasis: "unmarked" },
+// Time filter options
+const TIME_FILTERS = [
+  { id: "now", label: "Now" },
+  { id: "upcoming", label: "Upcoming" },
+  { id: "this_week", label: "This Week" },
 ];
 
-const MEMBER_TIERS = [
-  { 
-    name: "OUTSIDE", 
-    description: "Unverified. No access.", 
-    color: "#444444",
-    icon: EyeOff,
-    howToAdvance: "Get a mark from a drop or existing member",
-    access: ["Public drops viewing", "Mark verification"]
-  },
-  { 
-    name: "INITIATE", 
-    description: "First mark. Proving ground.", 
-    color: "#666666",
-    icon: Eye,
-    howToAdvance: "Attend 2 events + own 3 marks",
-    access: ["Inside feed access", "Event eligibility", "Member directory"]
-  },
-  { 
-    name: "MEMBER", 
-    description: "Trusted. Inner access.", 
-    color: "#888888",
-    icon: Users,
-    howToAdvance: "Refer 5 members + attend 5 events",
-    access: ["Priority event access", "Exclusive drops", "Full archive"]
-  },
-  { 
-    name: "INNER CIRCLE", 
-    description: "The core. Full clearance.", 
-    color: "#3B82F6",
-    icon: Shield,
-    howToAdvance: null,
-    access: ["All events", "Early drops", "Governance rights", "Secret channels"]
-  },
+// Location filter options (editable)
+const LOCATION_FILTERS = [
+  { id: "all", label: "All Locations" },
+  { id: "south_jakarta", label: "South Jakarta" },
+  { id: "central_jakarta", label: "Central Jakarta" },
+  { id: "north_jakarta", label: "North Jakarta" },
+  { id: "bandung", label: "Bandung" },
+  { id: "bali", label: "Bali" },
 ];
 
-const CRYPTIC_TESTIMONIALS = [
-  { quote: "The first event changed everything. I finally understood.", author: "Member #0047" },
-  { quote: "What happens inside stays inside. That's the code.", author: "Member #0012" },
-  { quote: "I thought it was just merch. I was wrong.", author: "Initiate #0234" },
-  { quote: "Three marks deep. No turning back now.", author: "Inner Circle" },
-];
-
-// Format time ago
-const timeAgo = (date: Date | string | null) => {
-  if (!date) return '';
+// Format date with full words (no abbreviations)
+const formatEventDate = (date: Date | string | null) => {
+  if (!date) return "To Be Announced";
   const d = new Date(date);
-  const now = new Date();
-  const diff = now.getTime() - d.getTime();
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return `${days}d ago`;
+  return d.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 };
 
-// Blurred/Classified content component
-function ClassifiedContent({ children, label = "CLASSIFIED" }: { children: React.ReactNode, label?: string }) {
+const formatEventTime = (date: Date | string | null) => {
+  if (!date) return "";
+  const d = new Date(date);
+  return d.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
+// Get CTA button based on access type and status
+const getEventCTA = (event: any, isVerified: boolean) => {
+  if (event.status === "cancelled") {
+    return { text: "Cancelled", disabled: true, variant: "cancelled" };
+  }
+  if (event.soldOut || (event.capacity && event.passesUsed >= event.capacity)) {
+    return { text: "Sold Out", disabled: true, variant: "soldout" };
+  }
+  
+  switch (event.accessType) {
+    case "invite_only":
+      return { text: "Request Access", disabled: false, variant: "invite" };
+    case "members_only":
+      if (!isVerified) {
+        return { text: "Members Only", disabled: true, variant: "locked" };
+      }
+      return { text: "Reserve", disabled: false, variant: "reserve" };
+    case "open":
+    default:
+      return { text: "Reserve", disabled: false, variant: "reserve" };
+  }
+};
+
+// Secret level indicator
+function SecretLevelIndicator({ level }: { level: string | null }) {
+  if (!level) return null;
+  
+  const levels = {
+    low: { bars: 1, color: "bg-green-500" },
+    medium: { bars: 2, color: "bg-yellow-500" },
+    high: { bars: 3, color: "bg-red-500" },
+  };
+  
+  const config = levels[level as keyof typeof levels] || levels.medium;
+  
   return (
-    <div className="relative group">
-      <div className="blur-sm group-hover:blur-md transition-all duration-300">
-        {children}
-      </div>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="px-4 py-2 bg-black/80 border border-[#3B82F6]/50">
-          <span className="text-[#3B82F6] text-xs font-mono tracking-widest flex items-center gap-2">
-            <Lock className="w-3 h-3" />
-            {label}
-          </span>
-        </div>
+    <div className="flex items-center gap-1">
+      <span className="text-[10px] text-[#666666] font-mono uppercase mr-1">Secret</span>
+      <div className="flex gap-0.5">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className={`w-1 h-3 rounded-sm ${
+              i <= config.bars ? config.color : "bg-[#333333]"
+            }`}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-// Live pulse indicator
-function LivePulse() {
+// Event tag badge
+function EventTag({ tag }: { tag: string }) {
   return (
-    <span className="relative flex h-2 w-2">
-      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3B82F6] opacity-75"></span>
-      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3B82F6]"></span>
+    <span className="px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider bg-[#1a1a1a] text-[#888888] border border-[#333333]">
+      {tag}
     </span>
   );
 }
 
-// Event card component for previews
-function EventPreviewCard({ event, isBlurred = false }: { event: any, isBlurred?: boolean }) {
-  const eventDate = event.eventDate ? new Date(event.eventDate) : null;
-  const isUpcoming = eventDate && eventDate > new Date();
+// ============================================================================
+// EVENTS HERO SECTION - Nocta-style pinned scroll
+// ============================================================================
+function EventsHeroSection({ events, isVerified }: { events: any[], isVerified: boolean }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [timeFilter, setTimeFilter] = useState("upcoming");
+  const [locationFilter, setLocationFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
   
-  return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      className={`relative p-6 border border-[#222222] bg-[#0a0a0a] rounded-lg overflow-hidden group ${
-        isBlurred ? 'cursor-pointer' : ''
-      }`}
-    >
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      
-      {/* Status badge */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          {isUpcoming ? (
-            <>
-              <LivePulse />
-              <span className="text-[10px] text-[#3B82F6] font-mono tracking-widest">UPCOMING</span>
-            </>
-          ) : (
-            <span className="text-[10px] text-[#666666] font-mono tracking-widest">PAST</span>
-          )}
-        </div>
-        {event.chapter && (
-          <span className="text-[10px] text-[#444444] font-mono">{event.chapter}</span>
-        )}
-      </div>
-      
-      {/* Event title */}
-      <h3 className={`text-lg font-bold text-white mb-2 ${isBlurred ? 'blur-[3px]' : ''}`}>
-        {isBlurred ? '████████ NIGHT' : event.title}
-      </h3>
-      
-      {/* Event details */}
-      <div className="space-y-2 mb-4">
-        <div className="flex items-center gap-2 text-sm text-[#666666]">
-          <Calendar className="w-3.5 h-3.5" />
-          <span className={isBlurred ? 'blur-[2px]' : ''}>
-            {eventDate ? eventDate.toLocaleDateString('en-US', { 
-              weekday: 'short', 
-              month: 'short', 
-              day: 'numeric' 
-            }) : 'TBA'}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-[#666666]">
-          <MapPin className="w-3.5 h-3.5" />
-          <span className={isBlurred ? 'blur-[2px]' : ''}>
-            {isBlurred ? 'Location Hidden' : (event.location || 'South Jakarta')}
-          </span>
-        </div>
-        {event.capacity && (
-          <div className="flex items-center gap-2 text-sm text-[#666666]">
-            <Users className="w-3.5 h-3.5" />
-            <span>{event.passesUsed || 0} / {event.capacity} spots</span>
-          </div>
-        )}
-      </div>
-      
-      {/* CTA */}
-      {isBlurred ? (
-        <div className="flex items-center gap-2 text-[#3B82F6] text-xs font-mono">
-          <Lock className="w-3 h-3" />
-          <span>MEMBERS ONLY</span>
-        </div>
-      ) : (
-        <Link href={`/events`}>
-          <span className="flex items-center gap-2 text-[#3B82F6] text-xs font-mono group-hover:gap-3 transition-all">
-            VIEW DETAILS
-            <ArrowRight className="w-3 h-3" />
-          </span>
-        </Link>
-      )}
-    </motion.div>
-  );
-}
-
-// Helper to map drops to specific images based on ID or title
-function getProductImage(dropId: number, title?: string): string {
-  // Map by ID first
-  const idMap: Record<number, string> = {
-    30043: '/images/product-sukajan.jpg',
-    30044: '/images/product-longsleeve.jpg',
-    30045: '/images/product-bomber.jpg',
-    30046: '/images/product-hoodie.jpg',
-    30047: '/images/product-varsity.jpg',
-    30048: '/images/product-chain.jpg',
-  };
+  // Filter events
+  const filteredEvents = events.filter((event) => {
+    // Time filter
+    const now = new Date();
+    const eventDate = event.startDatetime ? new Date(event.startDatetime) : 
+                      event.eventDate ? new Date(event.eventDate) : null;
+    
+    if (timeFilter === "now" && eventDate) {
+      const endDate = event.endDatetime ? new Date(event.endDatetime) : 
+                      new Date(eventDate.getTime() + 4 * 60 * 60 * 1000);
+      if (!(now >= eventDate && now <= endDate)) return false;
+    }
+    if (timeFilter === "upcoming" && eventDate && eventDate < now) return false;
+    if (timeFilter === "this_week" && eventDate) {
+      const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      if (eventDate > weekFromNow) return false;
+    }
+    
+    // Location filter
+    if (locationFilter !== "all") {
+      const cityMatch = event.city?.toLowerCase().replace(/\s+/g, "_") === locationFilter;
+      const areaMatch = event.area?.toLowerCase().replace(/\s+/g, "_") === locationFilter;
+      if (!cityMatch && !areaMatch) return false;
+    }
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const titleMatch = event.title?.toLowerCase().includes(query);
+      const venueMatch = event.venueName?.toLowerCase().includes(query);
+      const tagsMatch = event.tags?.toLowerCase().includes(query);
+      if (!titleMatch && !venueMatch && !tagsMatch) return false;
+    }
+    
+    return true;
+  });
   
-  if (idMap[dropId]) return idMap[dropId];
-  
-  // Fallback to title matching
-  if (title) {
-    const titleLower = title.toLowerCase();
-    if (titleLower.includes('noodle bowl') || titleLower.includes('chain')) return '/images/product-chain.jpg';
-    if (titleLower.includes('bombae') || titleLower.includes('varsity')) return '/images/product-varsity.jpg';
-    if (titleLower.includes('good girl') || titleLower.includes('hoodie')) return '/images/product-hoodie.jpg';
-    if (titleLower.includes('tomodachi') || titleLower.includes('bomber')) return '/images/product-bomber.jpg';
-  }
-  
-  return '/images/product-sukajan.jpg';
-}
-
-// Drop preview card
-function DropPreviewCard({ drop, isBlurred = false }: { drop: any, isBlurred?: boolean }) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      className="relative border border-[#222222] bg-[#0a0a0a] rounded-lg overflow-hidden group"
-    >
-      {/* Image */}
-      <div className="aspect-square bg-[#111111] relative overflow-hidden">
-        <img
-          src={getProductImage(drop.id, drop.title)}
-          alt={drop.title}
-          className={`w-full h-full object-cover ${isBlurred ? 'blur-md' : ''}`}
-          loading="lazy"
-          onError={(e: any) => {
-            e.target.src = '/images/product-sukajan.jpg';
-          }}
-        />
-        {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-        
-        {/* Status badge */}
-        <div className="absolute top-3 left-3">
-          <span className={`px-2 py-1 text-[10px] font-mono tracking-wider ${
-            drop.status === 'active' 
-              ? 'bg-[#3B82F6] text-white' 
-              : 'bg-[#222222] text-[#666666]'
-          }`}>
-            {drop.status === 'active' ? 'AVAILABLE' : drop.status?.toUpperCase()}
-          </span>
-        </div>
-      </div>
-      
-      {/* Content */}
-      <div className="p-4">
-        <h3 className={`text-sm font-bold text-white mb-1 ${isBlurred ? 'blur-[2px]' : ''}`}>
-          {isBlurred ? '██████████' : drop.title}
-        </h3>
-        <p className="text-xs text-[#666666] mb-3 line-clamp-2">
-          {isBlurred ? 'Details hidden' : (drop.tagline || drop.description?.slice(0, 60))}
-        </p>
-        
-        {/* Price and edition */}
-        <div className="flex items-center justify-between">
-          <span className={`text-sm font-mono ${isBlurred ? 'blur-[2px] text-[#666666]' : 'text-[#3B82F6]'}`}>
-            {isBlurred ? '███' : (drop.priceIdr && drop.priceIdr > 0 ? `IDR ${drop.priceIdr.toLocaleString()}` : 'INQUIRE')}
-          </span>
-          <span className="text-[10px] text-[#444444] font-mono">
-            {drop.totalArtifacts || '??'} editions
-          </span>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// Inside feed preview
-function InsideFeedPreview({ activity }: { activity: any[] }) {
-  return (
-    <div className="space-y-3">
-      {activity.slice(0, 4).map((item: any, i: number) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.1 }}
-          className="flex items-center gap-3 p-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg"
-        >
-          <div className="w-8 h-8 rounded-full bg-[#222222] flex items-center justify-center">
-            <span className="text-[10px] text-[#3B82F6] font-mono">
-              {item.callSign?.[0] || '?'}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <span className="text-white text-sm font-medium">{item.callSign || 'Anonymous'}</span>
-            <span className="text-[#666666] text-sm mx-2">
-              {item.type === 'marking' ? 'joined' : 
-               item.type === 'event' ? 'attended event' : 'was active'}
-            </span>
-          </div>
-          <span className="text-[#444444] text-[10px] font-mono flex-shrink-0">
-            {timeAgo(item.timestamp)}
-          </span>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-export default function Home() {
-  const [, setLocation] = useLocation();
-  const [showContent, setShowContent] = useState(false);
-  const [serialInput, setSerialInput] = useState('');
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const { user } = useAuth();
-  
-  // Determine user's access tier
-  const userTier = user?.markState || 'outside';
-  
-  // Fetch data
-  const { data: stats } = trpc.community.getStats.useQuery();
-  const { data: activity } = trpc.community.getActivityFeed.useQuery();
-  const { data: drops } = trpc.drop.list.useQuery();
-  const { data: events } = trpc.event.list.useQuery();
-  
-  // Find next upcoming event and drop
-  const upcomingEvents = events?.filter((e: any) => e.eventDate && new Date(e.eventDate) > new Date()).sort((a: any, b: any) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()) || [];
-  const nextEvent = upcomingEvents[0];
-  const activeDrops = drops?.filter((d: any) => d.status === 'active' && d.saleWindowEnd && new Date(d.saleWindowEnd) > new Date()) || [];
-  const nextDropEnd = activeDrops[0];
-  
-  // Rotate testimonials
+  // Auto-play through events
   useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % CRYPTIC_TESTIMONIALS.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+    if (isAutoPlaying && filteredEvents.length > 1) {
+      autoPlayRef.current = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % filteredEvents.length);
+      }, 5000);
+    }
+    return () => {
+      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    };
+  }, [isAutoPlaying, filteredEvents.length]);
   
-  // Get recent drops (limit to 4)
-  const recentDrops = drops?.slice(0, 4) || [];
+  // Handle scroll/swipe
+  const handleScroll = useCallback((direction: "up" | "down") => {
+    setIsAutoPlaying(false);
+    if (direction === "down") {
+      setCurrentIndex((prev) => Math.min(prev + 1, filteredEvents.length - 1));
+    } else {
+      setCurrentIndex((prev) => Math.max(prev - 1, 0));
+    }
+  }, [filteredEvents.length]);
+  
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+        handleScroll("down");
+      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+        handleScroll("up");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleScroll]);
+  
+  const currentEvent = filteredEvents[currentIndex];
   
   return (
-    <SystemBoot onComplete={() => setShowContent(true)}>
-      <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
-        {/* Navigation */}
-        <Nav variant="transparent" />
-        
-        {/* ================================================================ */}
-        {/* HERO SECTION - Full viewport dramatic intro */}
-        {/* ================================================================ */}
-        <section className="relative min-h-screen flex items-center justify-center px-4 pt-20 pb-16">
-          {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0a0a] to-[#1a1a1a]" />
-          
-          {/* Animated grid lines */}
-          <div 
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: `
-                linear-gradient(rgba(147, 51, 234, 0.5) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(147, 51, 234, 0.5) 1px, transparent 1px)
-              `,
-              backgroundSize: '50px 50px',
-            }}
-          />
-          
-          {/* Radial glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(59,130,246,0.1)_0%,_transparent_70%)]" />
-          
-          <div className="relative z-10 text-center max-w-4xl mx-auto">
-            {/* Live indicator */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={showContent ? { opacity: 1 } : {}}
-              transition={{ delay: 0.1, duration: 0.6 }}
-              className="flex items-center justify-center gap-2 mb-6"
-            >
-              <LivePulse />
-              <span className="text-[#666666] text-xs font-mono tracking-widest">
-                {stats?.totalMarked || 0} MEMBERS ACTIVE
-              </span>
-            </motion.div>
-            
-            {/* Chapter announcement */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={showContent ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="mb-8"
-            >
-              <GlowPulse color="#3B82F6">
-                <span className="inline-block px-4 py-2 border border-[#3B82F6]/50 text-[#3B82F6] text-xs font-mono tracking-[0.3em] uppercase">
-                  <FlickerText intensity="light">INVITATION ONLY</FlickerText>
-                </span>
-              </GlowPulse>
-            </motion.div>
-            
-            {/* Chapter label */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={showContent ? { opacity: 1 } : {}}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-[#666666] text-sm font-mono tracking-[0.5em] uppercase mb-4"
-            >
-              <DecryptText text="CHAPTER ONE" delay={500} speed={40} />
-            </motion.p>
-            
-            {/* Main title - SEO H1 */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={showContent ? { opacity: 1, scale: 1 } : {}}
-              transition={{ delay: 0.6, duration: 0.8 }}
-              className="mb-4"
-            >
-              <h1 className="text-[15vw] md:text-[12vw] lg:text-[10rem] font-black leading-[0.85] tracking-tighter">
-                <ChromaticText intensity={3}>
-                  <DecryptText text="JXL" delay={700} speed={50} />
-                </ChromaticText>
-                <span className="sr-only">COMM@ - Exclusive Secret Society Jakarta</span>
-              </h1>
-            </motion.div>
-            
-            {/* Subtitle */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={showContent ? { opacity: 1 } : {}}
-              transition={{ delay: 0.8, duration: 0.6 }}
-              className="mb-8"
-            >
-              <span className="text-[8vw] md:text-[6vw] lg:text-[5rem] font-black text-[#3B82F6] tracking-tight block">
-                <DecryptText text="TAKEOVER" delay={900} speed={40} />
-              </span>
-            </motion.div>
-            
-            {/* Location */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={showContent ? { opacity: 1 } : {}}
-              transition={{ delay: 1, duration: 0.6 }}
-              className="text-[#666666] text-sm font-mono tracking-widest uppercase mb-12"
-            >
-              South Jakarta, Indonesia
-            </motion.p>
-            
-            {/* Stats row */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={showContent ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 1.2, duration: 0.6 }}
-              className="flex justify-center gap-8 md:gap-16 mb-12"
-            >
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white">
-                  <CycleNumber value={stats?.totalMarked || 0} delay={1300} duration={1000} />
-                </div>
-                <div className="text-xs text-[#666666] font-mono tracking-widest uppercase mt-1">Marked</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white">
-                  <CycleNumber value={stats?.totalArtifacts || 0} delay={1400} duration={1000} />
-                </div>
-                <div className="text-xs text-[#666666] font-mono tracking-widest uppercase mt-1">Marks</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white">
-                  <CycleNumber value={stats?.totalEvents || 0} delay={1500} duration={1000} />
-                </div>
-                <div className="text-xs text-[#666666] font-mono tracking-widest uppercase mt-1">Gatherings</div>
-              </div>
-            </motion.div>
-            
-            {/* COUNTDOWN SECTION - Next Event or Drop */}
-            {(nextEvent || nextDropEnd) && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={showContent ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 1.3, duration: 0.6 }}
-                className="mb-12"
-              >
-                <div className="inline-block p-6 border border-[#3B82F6]/30 bg-[#3B82F6]/5 rounded-lg backdrop-blur-sm">
-                  {nextEvent?.eventDate ? (
-                    <>
-                      <div className="flex items-center justify-center gap-2 mb-3">
-                        <Calendar className="w-4 h-4 text-[#3B82F6]" />
-                        <span className="text-[#3B82F6] text-xs font-mono tracking-widest uppercase">NEXT SECRET EVENT</span>
-                      </div>
-                      <Countdown 
-                        targetDate={new Date(nextEvent.eventDate)} 
-                        size="md"
-                        variant="default"
-                      />
-                      <div className="mt-3 flex items-center justify-center gap-2">
-                        <MembersOnlyBadge pulse={false} />
-                      </div>
-                    </>
-                  ) : nextDropEnd?.saleWindowEnd ? (
-                    <>
-                      <div className="flex items-center justify-center gap-2 mb-3">
-                        <Sparkles className="w-4 h-4 text-[#3B82F6]" />
-                        <span className="text-[#3B82F6] text-xs font-mono tracking-widest uppercase">DROP ENDS IN</span>
-                      </div>
-                      <Countdown 
-                        targetDate={new Date(nextDropEnd.saleWindowEnd)} 
-                        size="md"
-                        variant="urgent"
-                      />
-                      <div className="mt-3 text-center">
-                        <span className="text-white text-sm font-medium">{nextDropEnd.title}</span>
-                      </div>
-                    </>
-                  ) : null}
-                </div>
-              </motion.div>
+    <section 
+      ref={containerRef}
+      className="relative min-h-screen bg-black overflow-hidden"
+    >
+      {/* Background image with parallax */}
+      <AnimatePresence mode="wait">
+        {currentEvent && (
+          <motion.div
+            key={currentEvent.id}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0"
+          >
+            {currentEvent.coverImageUrl ? (
+              <img
+                src={currentEvent.coverImageUrl}
+                alt={currentEvent.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a]" />
             )}
+            {/* Gradient overlays */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/50" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Filters bar */}
+      <div className="absolute top-20 left-0 right-0 z-20 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Time filters */}
+            <div className="flex bg-[#111111]/80 backdrop-blur-sm border border-[#333333] rounded-lg p-1">
+              {TIME_FILTERS.map((filter) => (
+                <button
+                  key={filter.id}
+                  onClick={() => { setTimeFilter(filter.id); setCurrentIndex(0); }}
+                  className={`px-4 py-2 text-xs font-mono uppercase tracking-wider transition-all ${
+                    timeFilter === filter.id
+                      ? "bg-[#3B82F6] text-white"
+                      : "text-[#888888] hover:text-white"
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
             
-            {/* Access Level Indicator */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={showContent ? { opacity: 1 } : {}}
-              transition={{ delay: 1.35, duration: 0.6 }}
-              className="mb-8"
-            >
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-[#444444] text-xs font-mono">YOUR ACCESS:</span>
-                <AccessBadge tier={userTier as any} size="sm" />
-              </div>
-            </motion.div>
-            
-            {/* CTA buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={showContent ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 1.4, duration: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-0"
-            >
-              <GlitchHover>
-                <Link href="/marks">
-                  <GlowPulse color="#3B82F6">
-                    <button className="w-full sm:w-auto px-8 py-4 bg-[#3B82F6] text-white font-bold text-sm tracking-widest uppercase btn-gradient-hover min-h-[48px] transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]">
-                      <span>BROWSE MARKS</span>
-                    </button>
-                  </GlowPulse>
-                </Link>
-              </GlitchHover>
-              
-              <GlitchHover>
-                <Link href="/gatherings">
-                  <button className="w-full sm:w-auto px-8 py-4 border border-[#333333] text-white font-bold text-sm tracking-widest uppercase min-h-[48px] transition-all duration-300 hover:border-[#3B82F6] hover:text-[#3B82F6] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] shimmer-hover">
-                    VIEW GATHERINGS
-                  </button>
-                </Link>
-              </GlitchHover>
-            </motion.div>
-            
-            {/* Scroll indicator */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={showContent ? { opacity: 1 } : {}}
-              transition={{ delay: 2, duration: 0.6 }}
-              className="absolute bottom-8 left-1/2 -translate-x-1/2"
-            >
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="text-[#333333] text-xs font-mono tracking-widest"
+            {/* Location filter */}
+            <div className="relative">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 px-4 py-2 bg-[#111111]/80 backdrop-blur-sm border border-[#333333] text-[#888888] text-xs font-mono uppercase tracking-wider hover:text-white transition-all"
               >
-                SCROLL
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-        
-        {/* ================================================================ */}
-        {/* RECENT MARKS PREVIEW */}
-        {/* ================================================================ */}
-        <section className="relative py-20 md:py-28 px-4 bg-[#050505]">
-          <div className="max-w-6xl mx-auto">
-            <RevealOnScroll>
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <Sparkles className="w-4 h-4 text-[#3B82F6]" />
-                  <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase">
-                    LATEST MARKS
-                  </p>
+                <MapPin className="w-3 h-3" />
+                {LOCATION_FILTERS.find(l => l.id === locationFilter)?.label}
+                <ChevronDown className="w-3 h-3" />
+              </button>
+              
+              {showFilters && (
+                <div className="absolute top-full mt-2 left-0 bg-[#111111] border border-[#333333] rounded-lg overflow-hidden z-30">
+                  {LOCATION_FILTERS.map((loc) => (
+                    <button
+                      key={loc.id}
+                      onClick={() => { setLocationFilter(loc.id); setShowFilters(false); setCurrentIndex(0); }}
+                      className={`block w-full px-4 py-2 text-left text-xs font-mono uppercase tracking-wider transition-all ${
+                        locationFilter === loc.id
+                          ? "bg-[#3B82F6] text-white"
+                          : "text-[#888888] hover:bg-[#1a1a1a] hover:text-white"
+                      }`}
+                    >
+                      {loc.label}
+                    </button>
+                  ))}
                 </div>
-                <Link href="/marks">
-                  <span className="text-[#3B82F6] text-xs font-mono tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
-                    VIEW ALL <ArrowRight className="w-3 h-3" />
-                  </span>
-                </Link>
-              </div>
-            </RevealOnScroll>
+              )}
+            </div>
             
-            <RevealOnScroll delay={100}>
-              <h2 className="text-2xl md:text-4xl font-bold mb-8">
-                Exclusive marks for the collective
-              </h2>
-            </RevealOnScroll>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {recentDrops.length > 0 ? (
-                recentDrops.map((drop: any, i: number) => (
-                  <RevealOnScroll key={drop.id} delay={200 + i * 100}>
-                    <Link href={`/drop/${drop.id}`}>
-                      <DropPreviewCard drop={drop} />
-                    </Link>
-                  </RevealOnScroll>
-                ))
-              ) : (
-                // Placeholder cards when no drops
-                [1, 2, 3, 4].map((i) => (
-                  <RevealOnScroll key={i} delay={200 + i * 100}>
-                    <DropPreviewCard drop={{ title: 'Coming Soon', status: 'upcoming' }} isBlurred />
-                  </RevealOnScroll>
-                ))
+            {/* Search */}
+            <div className="relative flex-1 max-w-xs">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#666666]" />
+              <input
+                type="text"
+                placeholder="Search events..."
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentIndex(0); }}
+                className="w-full pl-8 pr-4 py-2 bg-[#111111]/80 backdrop-blur-sm border border-[#333333] text-white text-xs font-mono placeholder-[#666666] focus:outline-none focus:border-[#3B82F6]"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] hover:text-white"
+                >
+                  <X className="w-3 h-3" />
+                </button>
               )}
             </div>
           </div>
-        </section>
-        
-        {/* ================================================================ */}
-        {/* UPCOMING GATHERINGS PREVIEW */}
-        {/* ================================================================ */}
-        <section className="relative py-20 md:py-28 px-4">
-          <div className="max-w-6xl mx-auto">
-            <RevealOnScroll>
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-[#3B82F6]" />
-                  <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase">
-                    SECRET GATHERINGS
-                  </p>
-                </div>
-                <Link href="/gatherings">
-                  <span className="text-[#3B82F6] text-xs font-mono tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
-                    VIEW ALL <ArrowRight className="w-3 h-3" />
-                  </span>
-                </Link>
-              </div>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={100}>
-              <h2 className="text-2xl md:text-4xl font-bold mb-4">
-                What happens inside
-              </h2>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={200}>
-              <p className="text-[#666666] mb-8 max-w-2xl">
-                Members-only gatherings. Locations revealed 24 hours before. No phones. No photos.
-                Get a mark to unlock access.
-              </p>
-            </RevealOnScroll>
-            
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Blurred event previews to create mystery */}
-              <RevealOnScroll delay={300}>
-                <EventPreviewCard 
-                  event={{ 
-                    title: 'MARKED NIGHT', 
-                    eventDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                    chapter: 'JXL',
-                    capacity: 100,
-                    passesUsed: 47
-                  }} 
-                  isBlurred 
-                />
-              </RevealOnScroll>
-              
-              <RevealOnScroll delay={400}>
-                <EventPreviewCard 
-                  event={{ 
-                    title: 'THE GATHERING', 
-                    eventDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-                    chapter: 'JXL',
-                    capacity: 50,
-                    passesUsed: 23
-                  }} 
-                  isBlurred 
-                />
-              </RevealOnScroll>
-              
-              <RevealOnScroll delay={500}>
-                <EventPreviewCard 
-                  event={{ 
-                    title: 'CHAPTER LAUNCH', 
-                    eventDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                    chapter: 'NEW',
-                    capacity: 200,
-                    passesUsed: 0
-                  }} 
-                  isBlurred 
-                />
-              </RevealOnScroll>
-            </div>
-            
-            {/* CTA to get access */}
-            <RevealOnScroll delay={600}>
-              <div className="mt-8 text-center">
-                <Link href="/marks">
-                  <GlowPulse color="#3B82F6">
-                    <button className="px-8 py-4 bg-[#3B82F6] text-white font-bold text-sm tracking-widest uppercase hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-all">
-                      GET A MARK TO UNLOCK
-                    </button>
-                  </GlowPulse>
-                </Link>
-              </div>
-            </RevealOnScroll>
-          </div>
-        </section>
-        
-        {/* ================================================================ */}
-        {/* INSIDE THE COLLECTIVE - Sneak Peek */}
-        {/* ================================================================ */}
-        <section className="relative py-20 md:py-28 px-4 bg-[#050505]">
-          <div className="max-w-6xl mx-auto">
-            <RevealOnScroll>
-              <div className="flex items-center gap-3 mb-8">
-                <Zap className="w-4 h-4 text-[#3B82F6]" />
-                <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase">
-                  INSIDE THE COLLECTIVE
-                </p>
-              </div>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={100}>
-              <h2 className="text-2xl md:text-4xl font-bold mb-4">
-                A glimpse of what awaits
-              </h2>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={200}>
-              <p className="text-[#666666] mb-12 max-w-2xl">
-                Members get access to exclusive content, real-time updates, and a community 
-                that protects what matters.
-              </p>
-            </RevealOnScroll>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Live Feed Preview */}
-              <RevealOnScroll delay={300}>
-                <div className="p-6 border border-[#222222] bg-[#0a0a0a] rounded-lg h-full">
-                  <div className="flex items-center gap-2 mb-4">
-                    <LivePulse />
-                    <h3 className="text-white font-bold">Live Feed</h3>
+        </div>
+      </div>
+      
+      {/* Event content */}
+      <div className="relative z-10 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-32 w-full">
+          <AnimatePresence mode="wait">
+            {currentEvent ? (
+              <motion.div
+                key={currentEvent.id}
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 50 }}
+                transition={{ duration: 0.5 }}
+                className="max-w-2xl"
+              >
+                {/* Tags */}
+                {currentEvent.tags && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {JSON.parse(currentEvent.tags || "[]").slice(0, 4).map((tag: string) => (
+                      <EventTag key={tag} tag={tag} />
+                    ))}
                   </div>
-                  <p className="text-[#666666] text-sm mb-4">
-                    Real-time updates from the collective
+                )}
+                
+                {/* Secret level */}
+                <div className="mb-4">
+                  <SecretLevelIndicator level={currentEvent.secretLevel} />
+                </div>
+                
+                {/* Title */}
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-4 leading-tight">
+                  {currentEvent.title}
+                </h1>
+                
+                {/* Tagline */}
+                {currentEvent.tagline && (
+                  <p className="text-lg md:text-xl text-[#cccccc] mb-6 font-light">
+                    {currentEvent.tagline}
                   </p>
+                )}
+                
+                {/* Event details */}
+                <div className="space-y-3 mb-8">
+                  {/* Date & Time */}
+                  <div className="flex items-center gap-3 text-[#888888]">
+                    <Calendar className="w-4 h-4 text-[#3B82F6]" />
+                    <span className="text-sm">
+                      {formatEventDate(currentEvent.startDatetime || currentEvent.eventDate)}
+                      {currentEvent.startDatetime && (
+                        <span className="text-[#666666]"> at {formatEventTime(currentEvent.startDatetime)}</span>
+                      )}
+                    </span>
+                  </div>
                   
-                  {activity && activity.length > 0 ? (
-                    <InsideFeedPreview activity={activity} />
-                  ) : (
-                    <ClassifiedContent label="MEMBERS ONLY">
-                      <div className="space-y-3">
-                        {[1, 2, 3].map((i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 bg-[#111111] rounded">
-                            <div className="w-8 h-8 rounded-full bg-[#222222]" />
-                            <div className="flex-1 h-4 bg-[#222222] rounded" />
-                          </div>
-                        ))}
-                      </div>
-                    </ClassifiedContent>
+                  {/* Location */}
+                  <div className="flex items-center gap-3 text-[#888888]">
+                    <MapPin className="w-4 h-4 text-[#3B82F6]" />
+                    <span className="text-sm">
+                      {currentEvent.accessType === "invite_only" && !isVerified ? (
+                        <span className="text-[#666666]">Location revealed upon approval</span>
+                      ) : currentEvent.accessType === "members_only" && !isVerified ? (
+                        <span>
+                          {currentEvent.city || "Jakarta"}
+                          {currentEvent.area && `, ${currentEvent.area}`}
+                          <span className="text-[#666666]"> • Venue revealed to members</span>
+                        </span>
+                      ) : (
+                        <span>
+                          {currentEvent.venueName && `${currentEvent.venueName}, `}
+                          {currentEvent.city || "Jakarta"}
+                          {currentEvent.area && `, ${currentEvent.area}`}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  
+                  {/* Capacity */}
+                  {currentEvent.capacity && (
+                    <div className="flex items-center gap-3 text-[#888888]">
+                      <Users className="w-4 h-4 text-[#3B82F6]" />
+                      <span className="text-sm">
+                        {currentEvent.passesUsed || 0} of {currentEvent.capacity} spots claimed
+                      </span>
+                    </div>
                   )}
                 </div>
-              </RevealOnScroll>
-              
-              {/* Leaderboard Preview */}
-              <RevealOnScroll delay={400}>
-                <div className="p-6 border border-[#222222] bg-[#0a0a0a] rounded-lg h-full">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Trophy className="w-4 h-4 text-[#3B82F6]" />
-                    <h3 className="text-white font-bold">Leaderboard</h3>
-                  </div>
-                  <p className="text-[#666666] text-sm mb-4">
-                    Top collectors and event attendees
-                  </p>
-                  
-                  <ClassifiedContent label="MEMBERS ONLY">
-                    <div className="space-y-3">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="flex items-center gap-3 p-2">
-                          <span className="text-[#3B82F6] font-mono text-sm w-6">#{i}</span>
-                          <div className="w-6 h-6 rounded-full bg-[#222222]" />
-                          <div className="flex-1 h-3 bg-[#222222] rounded" />
-                          <span className="text-[#666666] text-xs">??? pts</span>
-                        </div>
-                      ))}
-                    </div>
-                  </ClassifiedContent>
-                </div>
-              </RevealOnScroll>
-              
-              {/* Referral Preview */}
-              <RevealOnScroll delay={500}>
-                <div className="p-6 border border-[#222222] bg-[#0a0a0a] rounded-lg h-full">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Gift className="w-4 h-4 text-[#3B82F6]" />
-                    <h3 className="text-white font-bold">Referrals</h3>
-                  </div>
-                  <p className="text-[#666666] text-sm mb-4">
-                    Invite friends, earn rewards
-                  </p>
-                  
-                  <ClassifiedContent label="MEMBERS ONLY">
-                    <div className="text-center py-6">
-                      <div className="text-4xl font-bold text-white mb-2">???</div>
-                      <div className="text-xs text-[#666666]">Your referral code</div>
-                      <div className="mt-4 grid grid-cols-3 gap-4 text-center">
-                        <div>
-                          <div className="text-xl font-bold text-white">?</div>
-                          <div className="text-[10px] text-[#666666]">Invited</div>
-                        </div>
-                        <div>
-                          <div className="text-xl font-bold text-white">?</div>
-                          <div className="text-[10px] text-[#666666]">Joined</div>
-                        </div>
-                        <div>
-                          <div className="text-xl font-bold text-[#3B82F6]">?</div>
-                          <div className="text-[10px] text-[#666666]">Points</div>
-                        </div>
-                      </div>
-                    </div>
-                  </ClassifiedContent>
-                </div>
-              </RevealOnScroll>
-            </div>
-          </div>
-        </section>
-        
-        {/* ================================================================ */}
-        {/* CRYPTIC TESTIMONIAL BANNER */}
-        {/* ================================================================ */}
-        <section className="relative py-12 px-4 border-y border-[#1a1a1a] overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTestimonial}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className="max-w-4xl mx-auto text-center"
-            >
-              <p className="text-[#888888] text-lg md:text-xl italic mb-2">
-                "{CRYPTIC_TESTIMONIALS[activeTestimonial].quote}"
-              </p>
-              <p className="text-[#3B82F6] text-xs font-mono tracking-widest">
-                — {CRYPTIC_TESTIMONIALS[activeTestimonial].author}
-              </p>
-            </motion.div>
+                
+                {/* CTA Button */}
+                {(() => {
+                  const cta = getEventCTA(currentEvent, isVerified);
+                  return (
+                    <Link href={`/gatherings/${currentEvent.id}`}>
+                      <button
+                        disabled={cta.disabled}
+                        className={`px-8 py-4 text-sm font-bold uppercase tracking-widest transition-all ${
+                          cta.variant === "reserve"
+                            ? "bg-[#3B82F6] text-white hover:bg-[#2563EB] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]"
+                            : cta.variant === "invite"
+                            ? "bg-transparent border-2 border-[#3B82F6] text-[#3B82F6] hover:bg-[#3B82F6] hover:text-white"
+                            : cta.variant === "locked"
+                            ? "bg-[#222222] text-[#666666] cursor-not-allowed"
+                            : cta.variant === "soldout"
+                            ? "bg-[#1a1a1a] text-[#666666] cursor-not-allowed line-through"
+                            : "bg-[#333333] text-[#666666] cursor-not-allowed"
+                        }`}
+                      >
+                        {cta.variant === "locked" && <Lock className="w-4 h-4 inline mr-2" />}
+                        {cta.text}
+                      </button>
+                    </Link>
+                  );
+                })()}
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-20"
+              >
+                <p className="text-[#666666] text-lg">No events match your filters</p>
+                <button
+                  onClick={() => { setTimeFilter("upcoming"); setLocationFilter("all"); setSearchQuery(""); }}
+                  className="mt-4 text-[#3B82F6] text-sm font-mono uppercase tracking-wider hover:underline"
+                >
+                  Clear filters
+                </button>
+              </motion.div>
+            )}
           </AnimatePresence>
+        </div>
+      </div>
+      
+      {/* Progress indicator */}
+      {filteredEvents.length > 1 && (
+        <div className="absolute right-8 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col items-center gap-4">
+          {/* Current / Total */}
+          <div className="text-[#666666] text-xs font-mono">
+            <span className="text-white">{currentIndex + 1}</span>
+            <span className="mx-1">/</span>
+            <span>{filteredEvents.length}</span>
+          </div>
           
           {/* Progress dots */}
-          <div className="flex justify-center gap-2 mt-4">
-            {CRYPTIC_TESTIMONIALS.map((_, i) => (
+          <div className="flex flex-col gap-2">
+            {filteredEvents.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setActiveTestimonial(i)}
-                className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                  i === activeTestimonial ? 'bg-[#3B82F6]' : 'bg-[#333333]'
+                onClick={() => { setCurrentIndex(i); setIsAutoPlaying(false); }}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  i === currentIndex
+                    ? "bg-[#3B82F6] scale-125"
+                    : "bg-[#333333] hover:bg-[#666666]"
                 }`}
               />
             ))}
           </div>
-        </section>
-        
-        {/* ================================================================ */}
-        {/* MEMBERSHIP TIERS SECTION */}
-        {/* ================================================================ */}
-        <section className="relative py-20 md:py-28 px-4">
-          <div className="max-w-5xl mx-auto">
-            <RevealOnScroll>
-              <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase mb-6 text-center">
-                THE HIERARCHY
-              </p>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={100}>
-              <h2 className="text-2xl md:text-4xl font-bold text-center mb-4">
-                Earn your place
-              </h2>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={200}>
-              <p className="text-[#666666] text-center mb-6 max-w-2xl mx-auto">
-                Access is earned, not given. Each mark brings you deeper into the collective.
-              </p>
-            </RevealOnScroll>
-            
-            {/* Journey explanation */}
-            <RevealOnScroll delay={250}>
-              <div className="bg-[#0a0a0a] border border-[#222222] rounded-lg p-6 mb-12 max-w-3xl mx-auto">
-                <p className="text-[#3B82F6] text-xs font-mono tracking-widest mb-4 text-center">HOW TO RISE</p>
-                <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-2 text-center">
-                  <div className="flex flex-col items-center">
-                    <span className="text-[#444444] text-xs font-mono">OUTSIDE</span>
-                    <span className="text-[#666666] text-[10px] mt-1">Get a mark</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#333333] rotate-90 md:rotate-0" />
-                  <div className="flex flex-col items-center">
-                    <span className="text-[#666666] text-xs font-mono">INITIATE</span>
-                    <span className="text-[#666666] text-[10px] mt-1">2 events + 3 marks</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#333333] rotate-90 md:rotate-0" />
-                  <div className="flex flex-col items-center">
-                    <span className="text-[#888888] text-xs font-mono">MEMBER</span>
-                    <span className="text-[#666666] text-[10px] mt-1">5 referrals + 5 events</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#333333] rotate-90 md:rotate-0" />
-                  <div className="flex flex-col items-center">
-                    <span className="text-[#3B82F6] text-xs font-mono">INNER CIRCLE</span>
-                    <span className="text-[#666666] text-[10px] mt-1">By invitation</span>
-                  </div>
-                </div>
-              </div>
-            </RevealOnScroll>
-            
-            <div className="grid md:grid-cols-4 gap-4">
-              {MEMBER_TIERS.map((tier, i) => (
-                <RevealOnScroll key={tier.name} delay={300 + i * 100}>
-                  <div 
-                    className={`relative p-6 border bg-[#0a0a0a] h-full transition-all duration-300 hover:scale-[1.02] rounded-lg card-gradient-hover ${
-                      tier.name === 'INNER CIRCLE' 
-                        ? 'border-[#3B82F6]/50 hover:border-[#3B82F6]' 
-                        : 'border-[#222222] hover:border-[#333333]'
-                    }`}
-                  >
-                    {/* Tier indicator */}
-                    <div className="flex items-center gap-3 mb-4">
-                      <tier.icon className="w-5 h-5" style={{ color: tier.color }} />
-                      <span 
-                        className="text-xs font-mono tracking-widest"
-                        style={{ color: tier.color }}
-                      >
-                        {tier.name}
-                      </span>
-                    </div>
-                    
-                    <p className="text-white text-sm font-medium mb-3">{tier.description}</p>
-                    
-                    {/* Access list */}
-                    <ul className="space-y-1 mb-4">
-                      {tier.access.map((item, j) => (
-                        <li key={j} className="text-[#666666] text-xs flex items-start gap-2">
-                          <ChevronRight className="w-3 h-3 mt-0.5 flex-shrink-0" style={{ color: tier.color }} />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    {/* How to advance */}
-                    {tier.howToAdvance && (
-                      <div className="pt-3 border-t border-[#222222]">
-                        <p className="text-[10px] text-[#444444] uppercase tracking-wider mb-1">Next level:</p>
-                        <p className="text-xs text-[#3B82F6]">{tier.howToAdvance}</p>
-                      </div>
-                    )}
-                    
-                    {/* Glow effect for Inner Circle */}
-                    {tier.name === 'INNER CIRCLE' && (
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#3B82F6]/5 to-transparent pointer-events-none rounded-lg" />
-                    )}
-                  </div>
-                </RevealOnScroll>
-              ))}
-            </div>
-          </div>
-        </section>
-        
-        {/* ================================================================ */}
-        {/* THE CODE SECTION */}
-        {/* ================================================================ */}
-        <section className="relative py-20 md:py-28 px-4 bg-[#050505]">
-          {/* Diagonal lines background */}
-          <div 
-            className="absolute inset-0 opacity-[0.02]"
-            style={{
-              backgroundImage: `repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(147, 51, 234, 0.5) 10px,
-                rgba(147, 51, 234, 0.5) 11px
-              )`,
-            }}
-          />
           
-          <div className="relative max-w-4xl mx-auto text-center">
-            <RevealOnScroll>
-              <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase mb-12">
-                THE CODE
-              </p>
-            </RevealOnScroll>
-            
-            <div className="space-y-6 md:space-y-8">
-              {MANIFESTO.map((line, i) => (
-                <RevealOnScroll key={i} delay={i * 150}>
-                  <p className="text-xl md:text-2xl lg:text-3xl font-light text-[#888888]">
-                    {line.text.split(line.emphasis).map((part, j) => (
-                      <span key={j}>
-                        {part}
-                        {j === 0 && <span className="text-[#3B82F6] font-medium">{line.emphasis}</span>}
-                      </span>
-                    ))}
-                  </p>
-                </RevealOnScroll>
-              ))}
-            </div>
-          </div>
-        </section>
-        
-        {/* ================================================================ */}
-        {/* VERIFY CTA SECTION */}
-        {/* ================================================================ */}
-        <section className="relative py-20 md:py-28 px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <RevealOnScroll>
-              <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase mb-6">
-                GET STARTED
-              </p>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={100}>
-              <h2 className="text-2xl md:text-4xl font-bold mb-4">
-                Have a mark?
-              </h2>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={200}>
-              <p className="text-[#888888] mb-8">
-                Enter your serial number to verify authenticity and begin the marking process.
-              </p>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={300}>
-              <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                <input
-                  type="text"
-                  value={serialInput}
-                  onChange={(e) => setSerialInput(e.target.value.toUpperCase())}
-                  placeholder="GN001-001"
-                  className="flex-1 px-4 py-3 bg-[#0a0a0a] border border-[#333333] text-white font-mono text-center tracking-widest placeholder:text-[#444444] focus:border-[#3B82F6] focus:outline-none transition-colors rounded-lg"
-                />
-                <GlitchHover>
-                  <GlowPulse color="#3B82F6">
-                    <button 
-                      onClick={() => serialInput && setLocation(`/verify/${serialInput}`)}
-                      className="px-6 py-3 bg-[#3B82F6] text-white font-bold text-sm tracking-widest uppercase hover:bg-[#60A5FA] transition-colors rounded-lg"
-                    >
-                      VERIFY
-                    </button>
-                  </GlowPulse>
-                </GlitchHover>
-              </div>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={400}>
-              <p className="text-[#444444] text-xs font-mono mt-4">
-                Look for a tag or label on your mark. Format: GN001-001
-              </p>
-            </RevealOnScroll>
-            
-            {/* Don't have a mark? */}
-            <RevealOnScroll delay={500}>
-              <div className="mt-12 pt-8 border-t border-[#1a1a1a]">
-                <p className="text-[#666666] text-sm mb-4">Don't have a mark yet?</p>
-                <Link href="/marks">
-                  <button className="text-[#3B82F6] text-sm font-mono tracking-widest hover:underline">
-                    BROWSE AVAILABLE MARKS →
-                  </button>
-                </Link>
-              </div>
-            </RevealOnScroll>
-          </div>
-        </section>
-        
-        {/* ================================================================ */}
-        {/* SPONSORS */}
-        {/* ================================================================ */}
-        <ClearanceTest />
-        
-        {/* Featured Partner Section */}
-        <section className="py-20 px-6 bg-gradient-to-b from-black via-yellow-950/10 to-black border-y border-yellow-500/20">
-          <div className="max-w-6xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
-              <p className="text-xs text-yellow-400 tracking-[0.3em] uppercase mb-4 font-bold">Platinum Partner</p>
-              <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-400 mb-4">FEELBERT GROUP</h2>
-              <p className="text-gray-300 text-lg max-w-2xl mx-auto">BUAT YANG TAU TAU AJA</p>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="bg-gradient-to-br from-yellow-500/20 to-amber-600/15 border-2 border-yellow-400/50 rounded-2xl p-12 hover:border-yellow-400/80 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/20"
-            >
-              <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                <div className="flex-1">
-                  <div className="text-6xl font-black text-yellow-300 mb-4">FEEL?</div>
-                  <h3 className="text-2xl font-bold text-yellow-300 mb-3">TRULY GABUT</h3>
-                  <p className="text-gray-300 mb-6 leading-relaxed">
-                    Sponsored by Feelbert Group — supporting intimate culture events, spontaneous missions, and nights worth remembering.
-                  </p>
-                  <a 
-                    href="#"
-                    className="inline-block px-8 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold rounded-lg hover:from-yellow-300 hover:to-amber-400 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/50"
-                  >
-                    Explore Partnership
-                  </a>
-                </div>
-                <div className="flex-1 text-center">
-                  <div className="inline-block bg-gradient-to-br from-yellow-400/30 to-amber-600/20 border border-yellow-400/50 rounded-xl p-4 overflow-hidden">
-                    <img src="/sponsors/feelbert-octopus.png" alt="FEELBERT Group Octopus NFT" className="w-48 h-48 object-contain" />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-        
-        <SponsorShowcase />
-        
-        {/* ================================================================ */}
-        {/* FOOTER */}
-        {/* ================================================================ */}
-        <footer className="py-12 px-4 border-t border-[#1a1a1a] bg-[#050505]">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-4 gap-8 mb-8">
-              {/* Brand */}
-              <div>
-                <div className="text-[#3B82F6] text-3xl font-black mb-2">@</div>
-                <div className="text-[#444444] text-xs font-mono tracking-widest mb-4">
-                  CHAPTER ONE — JXL TAKEOVER
-                </div>
-                <p className="text-[#666666] text-sm">
-                  An invitation-only collective protecting underground culture.
+          {/* Auto-play toggle */}
+          <button
+            onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+            className="p-2 text-[#666666] hover:text-white transition-colors"
+          >
+            {isAutoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+          </button>
+        </div>
+      )}
+      
+      {/* Navigation arrows */}
+      {filteredEvents.length > 1 && (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
+          <button
+            onClick={() => handleScroll("up")}
+            disabled={currentIndex === 0}
+            className={`p-3 border border-[#333333] transition-all ${
+              currentIndex === 0
+                ? "text-[#333333] cursor-not-allowed"
+                : "text-white hover:border-[#3B82F6] hover:text-[#3B82F6]"
+            }`}
+          >
+            <ChevronUp className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => handleScroll("down")}
+            disabled={currentIndex === filteredEvents.length - 1}
+            className={`p-3 border border-[#333333] transition-all ${
+              currentIndex === filteredEvents.length - 1
+                ? "text-[#333333] cursor-not-allowed"
+                : "text-white hover:border-[#3B82F6] hover:text-[#3B82F6]"
+            }`}
+          >
+            <ChevronDown className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+      
+      {/* Scroll hint */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2 }}
+        className="absolute bottom-8 right-8 z-20 hidden md:block"
+      >
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="text-[#333333] text-xs font-mono tracking-widest flex items-center gap-2"
+        >
+          <span>SCROLL</span>
+          <ChevronDown className="w-4 h-4" />
+        </motion.div>
+      </motion.div>
+    </section>
+  );
+}
+
+// ============================================================================
+// MERCH SECTION - Drop-style grid
+// ============================================================================
+function MerchSection({ drops }: { drops: any[] }) {
+  // Separate featured and regular drops
+  const featuredDrops = drops.filter(d => d.featuredOrder && d.featuredOrder > 0).slice(0, 3);
+  const regularDrops = drops.filter(d => !d.featuredOrder || d.featuredOrder === 0);
+  
+  // Get availability status
+  const getAvailability = (drop: any) => {
+    if (drop.status === "sold_out" || (drop.totalEditions && drop.soldCount >= drop.totalEditions)) {
+      return { text: "Sold Out", variant: "soldout" };
+    }
+    if (drop.totalEditions && drop.soldCount >= drop.totalEditions * 0.8) {
+      return { text: "Limited", variant: "limited" };
+    }
+    return { text: "In Stock", variant: "instock" };
+  };
+  
+  // Format price
+  const formatPrice = (price: number | string | null) => {
+    if (!price) return "Inquire";
+    const num = typeof price === "string" ? parseFloat(price) : price;
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(num);
+  };
+  
+  return (
+    <section className="relative py-20 md:py-32 px-4 bg-[#050505]">
+      <div className="max-w-7xl mx-auto">
+        {/* Section header */}
+        <RevealOnScroll>
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <Sparkles className="w-4 h-4 text-[#3B82F6]" />
+                <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase">
+                  EXCLUSIVE MARKS
                 </p>
               </div>
-              
-              {/* Explore */}
-              <div>
-                <h4 className="text-white text-sm font-bold mb-4">EXPLORE</h4>
-                <div className="space-y-2">
-                  <Link href="/marks" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
-                    Marks
-                  </Link>
-                  <Link href="/gatherings" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
-                    Gatherings
-                  </Link>
-                  <Link href="/verify" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
-                    Verify Mark
-                  </Link>
-                </div>
-              </div>
-              
-              {/* Members */}
-              <div>
-                <h4 className="text-white text-sm font-bold mb-4">MEMBERS</h4>
-                <div className="space-y-2">
-                  <Link href="/inside" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
-                    Inside Feed
-                  </Link>
-                  <Link href="/ranks" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
-                    Leaderboard
-                  </Link>
-                  <Link href="/refer" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
-                    Referrals
-                  </Link>
-                </div>
-              </div>
-              
-              {/* Partners */}
-              <div>
-                <h4 className="text-white text-sm font-bold mb-4">PARTNERS</h4>
-                <div className="space-y-2">
-                  <Link href="/partners" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
-                    Become a Partner
-                  </Link>
-                  <Link href="/apply" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
-                    Apply for Clearance
-                  </Link>
-                </div>
-              </div>
+              <h2 className="text-3xl md:text-5xl font-black text-white">
+                The Drop
+              </h2>
             </div>
-            
-            <div className="pt-8 border-t border-[#1a1a1a] text-center">
-              <p className="text-[#333333] text-xs font-mono">
+            <Link href="/marks">
+              <span className="text-[#3B82F6] text-sm font-mono uppercase tracking-wider flex items-center gap-2 hover:gap-3 transition-all">
+                View All <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+          </div>
+        </RevealOnScroll>
+        
+        {/* Why this matters */}
+        <RevealOnScroll delay={100}>
+          <p className="text-[#888888] text-lg mb-12 max-w-2xl">
+            Each mark is more than merchandise. It is your key to the collective, 
+            your proof of belonging, your entry to what happens inside.
+          </p>
+        </RevealOnScroll>
+        
+        {/* Featured row */}
+        {featuredDrops.length > 0 && (
+          <div className="mb-12">
+            <RevealOnScroll delay={150}>
+              <p className="text-[#666666] text-xs font-mono tracking-widest uppercase mb-6">Featured</p>
+            </RevealOnScroll>
+            <div className="grid md:grid-cols-3 gap-6">
+              {featuredDrops.map((drop, i) => (
+                <RevealOnScroll key={drop.id} delay={200 + i * 100}>
+                  <Link href={`/marks/${drop.id}`}>
+                    <div className="group relative bg-[#0a0a0a] border border-[#222222] overflow-hidden hover:border-[#3B82F6] transition-all">
+                      {/* Image */}
+                      <div className="aspect-square bg-[#111111] relative overflow-hidden">
+                        <img
+                          src={drop.heroImageUrl || getDropImage(drop.id, drop.heroImageUrl, drop.title)}
+                          alt={drop.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                        {/* Badges */}
+                        <div className="absolute top-3 left-3 flex gap-2">
+                          <span className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider bg-[#3B82F6] text-white">
+                            Featured
+                          </span>
+                          {drop.status === "active" && (
+                            <span className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider bg-green-500 text-white">
+                              New
+                            </span>
+                          )}
+                        </div>
+                        {/* Availability badge */}
+                        {(() => {
+                          const avail = getAvailability(drop);
+                          return (
+                            <div className={`absolute top-3 right-3 px-2 py-1 text-[10px] font-mono uppercase tracking-wider ${
+                              avail.variant === "soldout" ? "bg-red-500/80 text-white" :
+                              avail.variant === "limited" ? "bg-yellow-500/80 text-black" :
+                              "bg-green-500/80 text-white"
+                            }`}>
+                              {avail.text}
+                            </div>
+                          );
+                        })()}
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="px-6 py-3 bg-[#3B82F6] text-white text-sm font-bold uppercase tracking-wider">
+                            Enter Drop
+                          </span>
+                        </div>
+                      </div>
+                      {/* Content */}
+                      <div className="p-4">
+                        <h3 className="text-white font-bold mb-1">{drop.title}</h3>
+                        <p className="text-[#3B82F6] font-mono text-sm">{formatPrice(drop.price)}</p>
+                      </div>
+                    </div>
+                  </Link>
+                </RevealOnScroll>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Regular grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          {(regularDrops.length > 0 ? regularDrops : drops).slice(0, 8).map((drop, i) => (
+            <RevealOnScroll key={drop.id} delay={300 + i * 50}>
+              <Link href={`/marks/${drop.id}`}>
+                <div className="group relative bg-[#0a0a0a] border border-[#222222] overflow-hidden hover:border-[#3B82F6] transition-all">
+                  {/* Image */}
+                  <div className="aspect-square bg-[#111111] relative overflow-hidden">
+                    <img
+                      src={drop.heroImageUrl || getDropImage(drop.id, drop.heroImageUrl, drop.title)}
+                      alt={drop.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    {/* Availability badge */}
+                    {(() => {
+                      const avail = getAvailability(drop);
+                      return avail.variant !== "instock" && (
+                        <div className={`absolute top-2 right-2 px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider ${
+                          avail.variant === "soldout" ? "bg-red-500/80 text-white" :
+                          "bg-yellow-500/80 text-black"
+                        }`}>
+                          {avail.text}
+                        </div>
+                      );
+                    })()}
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="px-4 py-2 bg-[#3B82F6] text-white text-xs font-bold uppercase tracking-wider">
+                        {getAvailability(drop).variant === "soldout" ? "View" : "Buy"}
+                      </span>
+                    </div>
+                  </div>
+                  {/* Content */}
+                  <div className="p-3">
+                    <h3 className="text-white text-sm font-medium mb-1 truncate">{drop.title}</h3>
+                    <p className="text-[#3B82F6] font-mono text-xs">{formatPrice(drop.price)}</p>
+                  </div>
+                </div>
+              </Link>
+            </RevealOnScroll>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// COMMUNITY SECTION - Manifesto, How it works, Code, FAQ
+// ============================================================================
+function CommunitySection() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  
+  const faqs = [
+    {
+      q: "How do I join the collective?",
+      a: "Membership is by invitation only. You must be referred by an existing member or apply through our clearance process. Once approved, you will receive your first mark."
+    },
+    {
+      q: "What is a mark?",
+      a: "A mark is your proof of membership. It can be a physical item from our drops or a digital credential. Each mark grants you access to events, content, and the community."
+    },
+    {
+      q: "What happens at gatherings?",
+      a: "Gatherings are members-only events. What happens inside stays inside. Locations are revealed 24 hours before. No phones. No photos. Just presence."
+    },
+    {
+      q: "How do I advance in rank?",
+      a: "Ranks are earned through participation. Attend events, collect marks, refer new members, and contribute to the collective. Each tier unlocks new access."
+    },
+    {
+      q: "Can I lose my membership?",
+      a: "Yes. Violating the code of conduct, sharing restricted content, or extended inactivity can result in being unmarked. The collective protects itself."
+    },
+  ];
+  
+  const codeOfConduct = [
+    "What happens inside stays inside",
+    "Respect the space and those in it",
+    "No recording without explicit consent",
+    "Support the collective over the individual",
+    "Protect the identity of members",
+    "Show up when you commit",
+  ];
+  
+  const howItWorks = [
+    { step: "01", title: "Get Invited", desc: "Receive an invitation from an existing member or apply for clearance" },
+    { step: "02", title: "Verify", desc: "Complete verification and receive your first mark" },
+    { step: "03", title: "Access", desc: "Unlock events, drops, and the inside feed" },
+    { step: "04", title: "Advance", desc: "Earn rank through participation and contribution" },
+  ];
+  
+  return (
+    <section className="relative py-20 md:py-32 px-4 bg-black">
+      <div className="max-w-6xl mx-auto">
+        {/* Manifesto */}
+        <RevealOnScroll>
+          <div className="mb-24 text-center">
+            <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase mb-8">
+              THE MANIFESTO
+            </p>
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-8 leading-tight">
+              What is <span className="text-[#3B82F6]">COMM@</span>?
+            </h2>
+            <div className="max-w-3xl mx-auto space-y-6 text-lg md:text-xl text-[#888888]">
+              <p>
+                An invitation-only collective protecting underground culture.
+              </p>
+              <p>
+                We are not a brand. We are not a club. We are a network of individuals 
+                who value authenticity over exposure, presence over content, 
+                and community over clout.
+              </p>
+              <p className="text-white font-medium">
                 The mark is the key. The Mark is the lock. The collective is the room.
               </p>
             </div>
           </div>
-        </footer>
+        </RevealOnScroll>
+        
+        {/* How it works */}
+        <RevealOnScroll delay={100}>
+          <div className="mb-24">
+            <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase mb-8 text-center">
+              HOW IT WORKS
+            </p>
+            <div className="grid md:grid-cols-4 gap-8">
+              {howItWorks.map((item, i) => (
+                <RevealOnScroll key={i} delay={150 + i * 100}>
+                  <div className="text-center md:text-left">
+                    <div className="text-[#3B82F6] text-4xl font-black mb-4 font-mono">{item.step}</div>
+                    <h3 className="text-white text-xl font-bold mb-2">{item.title}</h3>
+                    <p className="text-[#666666] text-sm">{item.desc}</p>
+                  </div>
+                </RevealOnScroll>
+              ))}
+            </div>
+          </div>
+        </RevealOnScroll>
+        
+        {/* Code of conduct */}
+        <RevealOnScroll delay={200}>
+          <div className="mb-24">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase mb-4">
+                  THE CODE
+                </p>
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-6">
+                  Code of Conduct
+                </h3>
+                <p className="text-[#888888] mb-8">
+                  These are not suggestions. They are the foundation of trust 
+                  that makes the collective possible.
+                </p>
+              </div>
+              <div className="space-y-4">
+                {codeOfConduct.map((rule, i) => (
+                  <RevealOnScroll key={i} delay={250 + i * 50}>
+                    <div className="flex items-center gap-4 p-4 border border-[#222222] bg-[#0a0a0a]">
+                      <div className="w-8 h-8 flex items-center justify-center bg-[#3B82F6]/10 text-[#3B82F6]">
+                        <Check className="w-4 h-4" />
+                      </div>
+                      <span className="text-white text-sm">{rule}</span>
+                    </div>
+                  </RevealOnScroll>
+                ))}
+              </div>
+            </div>
+          </div>
+        </RevealOnScroll>
+        
+        {/* Chapters and ranks teaser */}
+        <RevealOnScroll delay={300}>
+          <div className="mb-24 p-8 md:p-12 border border-[#222222] bg-[#0a0a0a]">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div>
+                <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase mb-4">
+                  CHAPTERS & RANKS
+                </p>
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-4">
+                  Earn Your Place
+                </h3>
+                <p className="text-[#888888] mb-6">
+                  The collective operates in chapters. Each chapter has its own identity, 
+                  events, and culture. Your rank determines your access and influence.
+                </p>
+                <Link href="/ranks">
+                  <button className="px-6 py-3 border border-[#3B82F6] text-[#3B82F6] text-sm font-bold uppercase tracking-wider hover:bg-[#3B82F6] hover:text-white transition-all">
+                    Learn More
+                  </button>
+                </Link>
+              </div>
+              <div className="flex justify-center">
+                <div className="relative">
+                  {/* Rank visualization */}
+                  <div className="w-48 h-48 rounded-full border-4 border-[#222222] flex items-center justify-center">
+                    <div className="w-36 h-36 rounded-full border-4 border-[#333333] flex items-center justify-center">
+                      <div className="w-24 h-24 rounded-full border-4 border-[#444444] flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-[#3B82F6] flex items-center justify-center">
+                          <Shield className="w-6 h-6 text-white" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Labels */}
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-[10px] font-mono text-[#666666]">OUTSIDE</div>
+                  <div className="absolute top-8 -right-8 text-[10px] font-mono text-[#666666]">INITIATE</div>
+                  <div className="absolute top-20 -right-8 text-[10px] font-mono text-[#888888]">MEMBER</div>
+                  <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-[10px] font-mono text-[#3B82F6]">INNER CIRCLE</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </RevealOnScroll>
+        
+        {/* FAQ */}
+        <RevealOnScroll delay={400}>
+          <div>
+            <p className="text-[#666666] text-xs font-mono tracking-[0.5em] uppercase mb-8 text-center">
+              FREQUENTLY ASKED
+            </p>
+            <h3 className="text-2xl md:text-3xl font-black text-white mb-8 text-center">
+              Questions
+            </h3>
+            <div className="max-w-3xl mx-auto space-y-4">
+              {faqs.map((faq, i) => (
+                <RevealOnScroll key={i} delay={450 + i * 50}>
+                  <div className="border border-[#222222] bg-[#0a0a0a]">
+                    <button
+                      onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                      className="w-full flex items-center justify-between p-4 text-left"
+                    >
+                      <span className="text-white font-medium">{faq.q}</span>
+                      <ChevronDown className={`w-5 h-5 text-[#666666] transition-transform ${
+                        openFaq === i ? "rotate-180" : ""
+                      }`} />
+                    </button>
+                    <AnimatePresence>
+                      {openFaq === i && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="overflow-hidden"
+                        >
+                          <p className="px-4 pb-4 text-[#888888] text-sm">
+                            {faq.a}
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </RevealOnScroll>
+              ))}
+            </div>
+          </div>
+        </RevealOnScroll>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
+// FOOTER
+// ============================================================================
+function Footer() {
+  return (
+    <footer className="py-12 px-4 border-t border-[#1a1a1a] bg-[#050505]">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-4 gap-8 mb-8">
+          {/* Brand */}
+          <div>
+            <div className="text-[#3B82F6] text-3xl font-black mb-2">@</div>
+            <div className="text-[#444444] text-xs font-mono tracking-widest mb-4">
+              CHAPTER ONE — JXL TAKEOVER
+            </div>
+            <p className="text-[#666666] text-sm">
+              An invitation-only collective protecting underground culture.
+            </p>
+          </div>
+          
+          {/* Explore */}
+          <div>
+            <h4 className="text-white text-sm font-bold mb-4">EXPLORE</h4>
+            <div className="space-y-2">
+              <Link href="/marks" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
+                Marks
+              </Link>
+              <Link href="/gatherings" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
+                Gatherings
+              </Link>
+              <Link href="/verify" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
+                Verify Mark
+              </Link>
+            </div>
+          </div>
+          
+          {/* Members */}
+          <div>
+            <h4 className="text-white text-sm font-bold mb-4">MEMBERS</h4>
+            <div className="space-y-2">
+              <Link href="/inside" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
+                Inside Feed
+              </Link>
+              <Link href="/ranks" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
+                Leaderboard
+              </Link>
+              <Link href="/refer" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
+                Referrals
+              </Link>
+            </div>
+          </div>
+          
+          {/* Partners */}
+          <div>
+            <h4 className="text-white text-sm font-bold mb-4">PARTNERS</h4>
+            <div className="space-y-2">
+              <Link href="/partners" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
+                Become a Partner
+              </Link>
+              <Link href="/apply" className="block text-[#666666] hover:text-[#3B82F6] text-sm transition-colors">
+                Apply for Clearance
+              </Link>
+            </div>
+          </div>
+        </div>
+        
+        <div className="pt-8 border-t border-[#1a1a1a] text-center">
+          <p className="text-[#333333] text-xs font-mono">
+            The mark is the key. The Mark is the lock. The collective is the room.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ============================================================================
+// MAIN HOME PAGE COMPONENT
+// ============================================================================
+export default function Home() {
+  const { user } = useAuth();
+  const [, setLocation] = useLocation();
+  
+  // Fetch events
+  const { data: eventsData } = trpc.event.list.useQuery();
+  const events = eventsData || [];
+  
+  // Fetch drops
+  const { data: dropsData } = trpc.drop.list.useQuery();
+  const drops = dropsData || [];
+  
+  // Check if user is verified member
+  const isVerified = user && ["marked_initiate", "marked_member", "marked_inner_circle", "staff", "admin"].includes(user.role || "");
+  
+  return (
+    <SystemBoot>
+      <div className="min-h-screen bg-black text-white">
+        <Nav />
+        
+        {/* Events Hero Section */}
+        <EventsHeroSection events={events} isVerified={!!isVerified} />
+        
+        {/* Merch Section */}
+        <MerchSection drops={drops} />
+        
+        {/* Community Section */}
+        <CommunitySection />
+        
+        {/* Sponsor Showcase */}
+        <SponsorShowcase />
+        
+        {/* Footer */}
+        <Footer />
       </div>
     </SystemBoot>
   );

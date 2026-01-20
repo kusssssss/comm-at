@@ -1,0 +1,175 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'events' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'events' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "EVENT_CATALOG"
+    },
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "EVENT_SCHEMA"
+    },
+    {
+      "COLUMN_NAME": "title"
+    },
+    {
+      "COLUMN_NAME": "slug"
+    },
+    {
+      "COLUMN_NAME": "EVENT_NAME"
+    },
+    {
+      "COLUMN_NAME": "chapter"
+    },
+    {
+      "COLUMN_NAME": "DEFINER"
+    },
+    {
+      "COLUMN_NAME": "description"
+    },
+    {
+      "COLUMN_NAME": "TIME_ZONE"
+    },
+    {
+      "COLUMN_NAME": "EVENT_BODY"
+    },
+    {
+      "COLUMN_NAME": "rules"
+    },
+    {
+      "COLUMN_NAME": "capacity"
+    },
+    {
+      "COLUMN_NAME": "EVENT_DEFINITION"
+    },
+    {
+      "COLUMN_NAME": "markState"
+    },
+    {
+      "COLUMN_NAME": "EVENT_TYPE"
+    },
+    {
+      "COLUMN_NAME": "EXECUTE_AT"
+    },
+    {
+      "COLUMN_NAME": "eventVisibility"
+    },
+    {
+      "COLUMN_NAME": "INTERVAL_VALUE"
+    },
+    {
+      "COLUMN_NAME": "city"
+    },
+    {
+      "COLUMN_NAME": "INTERVAL_FIELD"
+    },
+    {
+      "COLUMN_NAME": "locationText"
+    },
+    {
+      "COLUMN_NAME": "SQL_MODE"
+    },
+    {
+      "COLUMN_NAME": "locationRevealHoursBefore"
+    },
+    {
+      "COLUMN_NAME": "STARTS"
+    },
+    {
+      "COLUMN_NAME": "locationRevealAt"
+    },
+    {
+      "COLUMN_NAME": "eventDate"
+    },
+    {
+      "COLUMN_NAME": "ENDS"
+    },
+    {
+      "COLUMN_NAME": "STATUS"
+    },
+    {
+      "COLUMN_NAME": "startDatetime"
+    },
+    {
+      "COLUMN_NAME": "ON_COMPLETION"
+    },
+    {
+      "COLUMN_NAME": "endDatetime"
+    },
+    {
+      "COLUMN_NAME": "eventStatus"
+    },
+    {
+      "COLUMN_NAME": "CREATED"
+    },
+    {
+      "COLUMN_NAME": "LAST_ALTERED"
+    },
+    {
+      "COLUMN_NAME": "publishedAt"
+    },
+    {
+      "COLUMN_NAME": "createdAt"
+    },
+    {
+      "COLUMN_NAME": "LAST_EXECUTED"
+    },
+    {
+      "COLUMN_NAME": "EVENT_COMMENT"
+    },
+    {
+      "COLUMN_NAME": "updatedAt"
+    },
+    {
+      "COLUMN_NAME": "tagline"
+    },
+    {
+      "COLUMN_NAME": "ORIGINATOR"
+    },
+    {
+      "COLUMN_NAME": "eventAccessType"
+    },
+    {
+      "COLUMN_NAME": "CHARACTER_SET_CLIENT"
+    },
+    {
+      "COLUMN_NAME": "COLLATION_CONNECTION"
+    },
+    {
+      "COLUMN_NAME": "eventSecretLevel"
+    },
+    {
+      "COLUMN_NAME": "area"
+    },
+    {
+      "COLUMN_NAME": "DATABASE_COLLATION"
+    },
+    {
+      "COLUMN_NAME": "venueName"
+    },
+    {
+      "COLUMN_NAME": "venueAddress"
+    },
+    {
+      "COLUMN_NAME": "coordinates"
+    },
+    {
+      "COLUMN_NAME": "coverImageUrl"
+    },
+    {
+      "COLUMN_NAME": "tags"
+    },
+    {
+      "COLUMN_NAME": "featuredOrder"
+    },
+    {
+      "COLUMN_NAME": "createdBy"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nEVENT_CATALOG\nid\nEVENT_SCHEMA\ntitle\nslug\nEVENT_NAME\nchapter\nDEFINER\ndescription\nTIME_ZONE\nEVENT_BODY\nrules\ncapacity\nEVENT_DEFINITION\nmarkState\nEVENT_TYPE\nEXECUTE_AT\neventVisibility\nINTERVAL_VALUE\ncity\nINTERVAL_FIELD\nlocationText\nSQL_MODE\nlocationRevealHoursBefore\nSTARTS\nlocationRevealAt\neventDate\nENDS\nSTATUS\nstartDatetime\nON_COMPLETION\nendDatetime\neventStatus\nCREATED\nLAST_ALTERED\npublishedAt\ncreatedAt\nLAST_EXECUTED\nEVENT_COMMENT\nupdatedAt\ntagline\nORIGINATOR\neventAccessType\nCHARACTER_SET_CLIENT\nCOLLATION_CONNECTION\neventSecretLevel\narea\nDATABASE_COLLATION\nvenueName\nvenueAddress\ncoordinates\ncoverImageUrl\ntags\nfeaturedOrder\ncreatedBy\n",
+  "stderr": "",
+  "execution_time_ms": 1539
+}
