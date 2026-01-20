@@ -187,7 +187,7 @@ export function SponsorShowcase() {
           className="text-center mb-12"
         >
           <p className="text-xs text-gray-500 tracking-[0.3em] uppercase mb-2">Powered By</p>
-          <h2 className="text-2xl font-bold text-white">Our Partners</h2>
+          <h2 className="text-2xl font-bold text-white">Our Sponsors</h2>
         </motion.div>
         
         {/* Platinum sponsors - large, prominent */}
@@ -241,10 +241,10 @@ export function SponsorShowcase() {
           className="text-center mt-12"
         >
           <a 
-            href="/partners" 
+            href="/sponsors" 
             className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
           >
-            Become a Partner →
+            Become a Sponsor →
           </a>
         </motion.div>
       </div>

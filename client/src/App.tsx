@@ -55,7 +55,6 @@ function Router() {
       <Route path="/marks" component={Drops} />
       <Route path="/drop/:id" component={DropDetail} />
       <Route path="/sponsors" component={Sponsors} />
-      <Route path="/partners" component={Sponsors} />
       <Route path="/admin/sponsor/:sponsorId/analytics" component={SponsorAnalytics} />
       <Route path="/apply" component={Apply} />
       <Route path="/acquire/:dropId" component={Acquire} />

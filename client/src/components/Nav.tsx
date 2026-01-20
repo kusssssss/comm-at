@@ -39,7 +39,7 @@ export default function Nav({
     { href: "/marks", label: "MARKS", icon: Sparkles },
     { href: "/verify", label: "VERIFY", icon: Shield },
     { href: "/gatherings", label: "GATHERINGS", icon: Calendar },
-    { href: "/partners", label: "PARTNERS", icon: Handshake },
+    { href: "/sponsors", label: "SPONSORS", icon: Handshake },
   ];
 
   // Member-only links (shown when logged in)

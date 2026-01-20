@@ -307,3 +307,10 @@
 - [x] Place after Artifacts section and before Newsletter
 - [x] Use SponsorShowcase component
 - [x] Add 6 sample sponsors (FEELBERT GROUP, NEON DISTRICT, MIDNIGHT LABS, URBAN COLLECTIVE, SOUND SYSTEM, STREET KINGS)
+
+## Rename Partners to Sponsors
+- [x] Update navigation link from PARTNERS to SPONSORS
+- [x] Update "Become a Partner" CTA to "Become a Sponsor"
+- [x] Update route from /partners to /sponsors
+- [x] Update SponsorShowcase header to "Our Sponsors"
+- [x] Update Dev.tsx references

@@ -248,8 +248,8 @@ export default function Dev() {
       description: "Sponsor integration and partnership features",
       features: [
         { 
-          path: "/partners", 
-          label: "Partners Page", 
+          path: "/sponsors", 
+          label: "Sponsors Page", 
           description: "Sponsor showcase with tier-based visibility",
           demoPoints: ["Platinum/Gold/Silver tiers", "Banner display", "Analytics tracking", "Inquiry form"]
         },
