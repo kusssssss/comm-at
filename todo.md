@@ -279,3 +279,17 @@
 - [x] Each section sticks to top and gets covered by next section as user scrolls
 - [x] Later sections have higher z-index to cover earlier ones
 - [x] Test the sticky scroll-to-reveal behavior - working!
+
+
+## Restore Missing Elements & Stratified Reality Integration
+- [x] Restore navigation header with COMM@ logo
+- [x] Apply sticky scroll effect to collection grid section (same as hero events)
+- [x] Integrate Stratified Reality narrative into homepage
+- [x] Add "STRATIFIED REALITY" hero section with layer explanation
+- [x] Update events feed to show reveal status (Tease, Window, Locked, Revealed)
+- [x] Add layer badges and requirements to event cards
+- [x] Restore product grid section (renamed to "Artifacts" with Stratified Commerce messaging)
+- [x] Restore newsletter section
+- [x] Mobile optimization - responsive classes added
+- [x] Add Layers explanation section (Streetlight, Verified, Signal, Inner Room, Black Label)
+- [x] 8 sticky scroll sections total (4 events + Stratified Reality + Collection Grid + Layers + Artifacts)
