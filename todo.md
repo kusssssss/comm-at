@@ -451,3 +451,20 @@
 - [x] Show real-time stats (total passes, checked in, pending)
 - [x] Create QRScanner component with camera toggle
 - [x] Add vitest tests for check-in logic (12 tests passing)
+
+
+## Merchandise Gating Implementation (Completed)
+- [x] Review drops schema for existing gating fields (requiredLayer, attendanceLockEventId)
+- [x] Create gatingLogic.ts with helper functions (getUserLayer, checkLayerAccess, checkDropGating)
+- [x] Create getDropGatingInfo for display purposes
+- [x] Add getEventPassesByUser and hasUserAttendedEvent to db.ts
+- [x] Update mark.acquire to enforce layer-based restrictions
+- [x] Update mark.acquire to enforce attendance-locked restrictions
+- [x] Update drop.getById to include gating info
+- [x] Update drop.list to include gating info for all drops
+- [x] Update Drops.tsx UI to show gating requirements banner
+- [x] Show "Access Granted" (green) or "Restricted Access" (amber) badges
+- [x] Show layer requirement with STREETLIGHT/VERIFIED/INNER ROOM labels
+- [x] Show attendance requirement with event title
+- [x] Disable Acquire button for locked items
+- [x] Add vitest tests for gating logic (33 tests passing)

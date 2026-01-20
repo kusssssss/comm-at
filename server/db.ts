@@ -1,4 +1,4 @@
-import { eq, and, desc, gte, lt, sql, count, gt, inArray, like } from "drizzle-orm";
+import { eq, and, desc, gte, lt, sql, count, gt, inArray, like, isNotNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import * as crypto from "crypto";
 import { nanoid } from "nanoid";
@@ -564,6 +564,27 @@ export async function getEventPasses(eventId: number) {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(eventPasses).where(eq(eventPasses.eventId, eventId));
+}
+
+export async function getEventPassesByUser(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(eventPasses).where(eq(eventPasses.userId, userId));
+}
+
+export async function hasUserAttendedEvent(userId: number, eventId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const result = await db.select().from(eventPasses)
+    .where(and(
+      eq(eventPasses.userId, userId),
+      eq(eventPasses.eventId, eventId),
+      isNotNull(eventPasses.checkedInAt)
+    ))
+    .limit(1);
+  
+  return result.length > 0;
 }
 
 export async function markPassUsed(passId: number) {

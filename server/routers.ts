@@ -10,6 +10,7 @@ import { cipherRouter } from "./cipherRouter";
 import type { User } from "../drizzle/schema";
 import { filterDropForVisibility, filterEventForVisibility, getMarkState, getVisibilityMessage } from "./visibility";
 import { calculateRevealInfo, getRevealStateLabel, formatLayerName, type RevealInfo } from "./revealLogic";
+import { checkDropGating, getDropGatingInfo, getUserLayer, getLayerLabel } from "./gatingLogic";
 
 // ============================================================================
 // ROLE GUARDS
@@ -584,12 +585,40 @@ export const appRouter = router({
     // Public: get drop by ID for product page
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
+      .query(async ({ input, ctx }) => {
         const drop = await db.getDropById(input.id);
         if (!drop || drop.status !== 'published') {
           return null;
         }
-        return drop;
+        
+        // Get gating info
+        const gatingInfo = getDropGatingInfo(drop);
+        
+        // Check if user can purchase
+        const gatingResult = await checkDropGating(
+          ctx.user as User | null,
+          drop,
+          db.getEventPassesByUser,
+          db.getEventById
+        );
+        
+        // Get event title if attendance-locked
+        let attendanceLockEventTitle: string | undefined;
+        if (gatingInfo.attendanceLockEventId) {
+          const event = await db.getEventById(gatingInfo.attendanceLockEventId);
+          attendanceLockEventTitle = event?.title;
+        }
+        
+        return {
+          ...drop,
+          gating: {
+            ...gatingInfo,
+            attendanceLockEventTitle,
+            canPurchase: gatingResult.canPurchase,
+            reason: gatingResult.reason,
+            requirements: gatingResult.requirements,
+          },
+        };
       }),
     
     list: publicProcedure.query(async ({ ctx }) => {
@@ -597,8 +626,40 @@ export const appRouter = router({
       const allDrops = await db.getAllDrops();
       const publishedDrops = allDrops.filter(d => d.status === 'published');
       
-      // Apply stratified reality filtering
-      return publishedDrops.map(drop => filterDropForVisibility(drop, ctx.user as User | null));
+      // Apply stratified reality filtering and add gating info
+      const dropsWithGating = await Promise.all(
+        publishedDrops.map(async (drop) => {
+          const filtered = filterDropForVisibility(drop, ctx.user as User | null);
+          const gatingInfo = getDropGatingInfo(drop);
+          
+          // Check if user can purchase
+          const gatingResult = await checkDropGating(
+            ctx.user as User | null,
+            drop,
+            db.getEventPassesByUser,
+            db.getEventById
+          );
+          
+          // Get event title if attendance-locked
+          let attendanceLockEventTitle: string | undefined;
+          if (gatingInfo.attendanceLockEventId) {
+            const event = await db.getEventById(gatingInfo.attendanceLockEventId);
+            attendanceLockEventTitle = event?.title;
+          }
+          
+          return {
+            ...filtered,
+            gating: {
+              ...gatingInfo,
+              attendanceLockEventTitle,
+              canPurchase: gatingResult.canPurchase,
+              reason: gatingResult.reason,
+            },
+          };
+        })
+      );
+      
+      return dropsWithGating;
     }),
     
     // Admin list shows all drops including drafts
@@ -1373,6 +1434,21 @@ export const appRouter = router({
           if (now < new Date(drop.saleWindowStart) || now > new Date(drop.saleWindowEnd)) {
             throw new TRPCError({ code: "BAD_REQUEST", message: "Sale window is not open" });
           }
+        }
+        
+        // Check gating restrictions (layer-based and attendance-locked)
+        const gatingResult = await checkDropGating(
+          ctx.user,
+          drop,
+          db.getEventPassesByUser,
+          db.getEventById
+        );
+        
+        if (!gatingResult.canPurchase) {
+          throw new TRPCError({ 
+            code: "FORBIDDEN", 
+            message: gatingResult.reason || "You do not have access to purchase this item"
+          });
         }
         
         // Find an available artifact from this drop

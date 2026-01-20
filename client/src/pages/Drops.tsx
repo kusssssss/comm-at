@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 import Nav from "@/components/Nav";
-import { ChevronLeft, ChevronRight, User, Lock, Eye, EyeOff, Clock, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, User, Lock, Eye, EyeOff, Clock, Sparkles, Shield, Calendar, AlertCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { DecryptText, CycleNumber, GlitchHover } from "@/components/Effects2200";
 import { InlineCountdown } from "@/components/Countdown";
@@ -33,6 +33,13 @@ export default function Drops() {
   const isBlurred = (currentDrop as any)?.isBlurred ?? false;
   const isRestricted = (currentDrop as any)?.isRestricted ?? false;
   const minimumTierRequired = (currentDrop as any)?.minimumTierRequired ?? null;
+  
+  // Gating info from API
+  const gating = (currentDrop as any)?.gating ?? null;
+  const isLayerGated = gating?.isLayerGated ?? false;
+  const isAttendanceLocked = gating?.isAttendanceLocked ?? false;
+  const canPurchase = gating?.canPurchase ?? true;
+  const gatingReason = gating?.reason ?? null;
 
   // Fetch UGC for current drop (only if not restricted)
   const { data: ugcList } = trpc.ugc.getByDrop.useQuery(
@@ -522,17 +529,73 @@ export default function Drops() {
                     </div>
                   )}
 
+                  {/* Gating Requirements Banner */}
+                  {!isRestricted && (isLayerGated || isAttendanceLocked) && (
+                    <div className={`border p-4 rounded-lg space-y-3 ${
+                      canPurchase 
+                        ? 'bg-green-900/10 border-green-500/30' 
+                        : 'bg-amber-900/10 border-amber-500/30'
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        {canPurchase ? (
+                          <Shield className="w-4 h-4 text-green-400" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4 text-amber-400" />
+                        )}
+                        <span className={`text-sm font-medium uppercase tracking-wider ${
+                          canPurchase ? 'text-green-400' : 'text-amber-400'
+                        }`}>
+                          {canPurchase ? 'Access Granted' : 'Restricted Access'}
+                        </span>
+                      </div>
+                      
+                      {/* Requirements list */}
+                      <div className="space-y-2">
+                        {isLayerGated && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Shield className="w-3 h-3 text-[#3B82F6]" />
+                            <span className="text-[#888888]">
+                              Requires <span className="text-[#3B82F6] font-medium">{gating?.requiredLayerLabel}</span> layer or higher
+                            </span>
+                          </div>
+                        )}
+                        {isAttendanceLocked && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Calendar className="w-3 h-3 text-[#3B82F6]" />
+                            <span className="text-[#888888]">
+                              Requires attendance at <span className="text-[#3B82F6] font-medium">{gating?.attendanceLockEventTitle || 'a specific gathering'}</span>
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {!canPurchase && gatingReason && (
+                        <p className="text-xs text-amber-400/70 mt-2">
+                          {gatingReason}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Action CTAs - only for non-restricted */}
                   {!isRestricted && (
                     <div className="space-y-4">
                       {/* Primary: Acquire button - only show if sale window is open or upcoming */}
                       {(currentDrop.saleWindowStart || currentDrop.saleWindowEnd) && (
                         <button 
-                          onClick={() => setLocation(`/acquire/${currentDrop.id}`)}
-                          className="w-full bg-[#3B82F6] text-black px-8 py-4 text-sm font-semibold tracking-wider uppercase hover:bg-[#60A5FA] transition-all duration-300 flex items-center justify-center gap-2"
+                          onClick={() => canPurchase ? setLocation(`/acquire/${currentDrop.id}`) : null}
+                          disabled={!canPurchase}
+                          className={`w-full px-8 py-4 text-sm font-semibold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 ${
+                            canPurchase 
+                              ? 'bg-[#3B82F6] text-black hover:bg-[#60A5FA]' 
+                              : 'bg-[#333333] text-[#666666] cursor-not-allowed'
+                          }`}
                         >
-                          <Sparkles className="w-4 h-4" />
-                          Acquire This Mark
+                          {canPurchase ? (
+                            <><Sparkles className="w-4 h-4" />Acquire This Mark</>
+                          ) : (
+                            <><Lock className="w-4 h-4" />Locked</>
+                          )}
                         </button>
                       )}
                       
