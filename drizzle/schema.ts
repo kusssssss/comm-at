@@ -825,6 +825,9 @@ export type InsertNotification = typeof notifications.$inferInsert;
 // ============================================================================
 export const rsvpStatusEnum = mysqlEnum("rsvpStatus", [
   "pending",
+  "approved",
+  "denied",
+  "waitlisted",
   "confirmed",
   "cancelled",
   "attended",
@@ -842,6 +845,13 @@ export const eventRsvps = mysqlTable("event_rsvps", {
   checkedInAt: timestamp("checkedInAt"),
   checkedInById: int("checkedInById"), // Staff who checked them in
   notes: text("notes"),
+  
+  // Access request fields
+  requestMessage: text("requestMessage"), // User's message when requesting access
+  adminResponse: text("adminResponse"), // Admin's response when approving/denying
+  respondedById: int("respondedById"), // Admin who responded
+  respondedAt: timestamp("respondedAt"), // When the response was made
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

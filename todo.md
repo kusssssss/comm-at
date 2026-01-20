@@ -484,3 +484,36 @@
 - [x] Add event.promoteFromWaitlist for admin manual promotion
 - [x] Add pass_promoted to audit action enum
 - [x] Add vitest tests for waitlist logic (28 tests passing)
+
+
+## Request Access Flow (Completed)
+- [x] Use existing event_rsvps table for access requests
+- [x] Add access request status enum (pending, approved, denied, waitlisted)
+- [x] Add requestMessage and adminResponse fields to event_rsvps
+- [x] Create event.requestAccess endpoint for users
+- [x] Create event.getMyAccessRequest endpoint for users
+- [x] Create event.getMyAccessRequests endpoint for all user requests
+- [x] Create event.getPendingRequests endpoint for admins
+- [x] Create event.approveRequest endpoint (creates pass on approval)
+- [x] Create event.denyRequest endpoint
+- [x] Create event.waitlistRequest endpoint
+- [x] Send notifications on request status change
+- [x] Add vitest tests for access request flow (14 tests passing)
+
+## Member Pass Display (Completed)
+- [x] Create MyPasses page (/my-passes) showing all user's event passes
+- [x] Generate QR codes for each pass using qrcode library
+- [x] Show pass status (confirmed, waitlisted, used, revoked)
+- [x] Show pass code for manual entry
+- [x] Allow downloading QR code as image
+- [x] Show waitlist position for waitlisted passes
+- [x] Add cancel pass functionality with confirmation dialog
+- [x] Separate upcoming, past, and revoked passes
+- [x] Add event.getMyPasses endpoint to router
+- [x] Add route to App.tsx
+
+## Waitlist Notifications (Completed)
+- [x] Send notification when user is promoted from waitlist (revokePass, cancelPass, manual promotion)
+- [x] Send notification when added to waitlist (claimPass)
+- [x] Send notification when request is approved/denied/waitlisted (access request flow)
+- [x] Include event title and waitlist position in notifications

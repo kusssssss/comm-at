@@ -27,6 +27,7 @@ import EventDetail from "./pages/EventDetail";
 import Archive from "./pages/Archive";
 import Leaderboard from "./pages/Leaderboard";
 import Referral from "./pages/Referral";
+import MyPasses from "./pages/MyPasses";
 
 // Staff pages
 import Staff from "./pages/Staff";
@@ -68,6 +69,7 @@ function Router() {
       {/* Protected routes (marked users) */}
       <Route path="/inside" component={Inside} />
       <Route path="/profile" component={Profile} />
+      <Route path="/my-passes" component={MyPasses} />
       <Route path="/events" component={Events} />
       <Route path="/gatherings" component={Events} />
       <Route path="/events/:id" component={EventDetail} />

@@ -120,6 +120,13 @@
       "when": 1768908025749,
       "tag": "0016_secret_greymalkin",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1768908278441,
+      "tag": "0017_outgoing_ultragirl",
+      "breakpoints": true
     }
   ]
 }

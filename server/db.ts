@@ -10,6 +10,7 @@ import {
   markingLogs, InsertMarkingLog,
   events, InsertEvent,
   eventPasses, InsertEventPass,
+  eventRsvps, InsertEventRsvp,
   checkInLogs, InsertCheckInLog,
   auditLogs, InsertAuditLog,
   doctrineCards, InsertDoctrineCard,
@@ -1383,7 +1384,6 @@ import {
   notificationSubscriptions, InsertNotificationSubscription,
   notificationPreferences, InsertNotificationPreference,
   notifications, InsertNotification,
-  eventRsvps, InsertEventRsvp,
   reputationEvents, InsertReputationEvent,
   referrals, InsertReferral,
   sponsors, InsertSponsor,
@@ -2697,4 +2697,209 @@ export async function getCipherAuditLogs(userId?: number, limit: number = 100) {
   }
   
   return query.orderBy(desc(cipherAuditLogs.createdAt)).limit(limit);
+}
+
+
+// ============================================================================
+// ACCESS REQUEST (RSVP) FUNCTIONS
+// ============================================================================
+
+export async function createAccessRequest(data: {
+  eventId: number;
+  userId: number;
+  requestMessage?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if user already has a request for this event
+  const existing = await db.select().from(eventRsvps)
+    .where(and(
+      eq(eventRsvps.eventId, data.eventId),
+      eq(eventRsvps.userId, data.userId)
+    ))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    throw new Error("You already have a request for this event");
+  }
+  
+  const result = await db.insert(eventRsvps).values({
+    eventId: data.eventId,
+    userId: data.userId,
+    status: 'pending',
+    requestMessage: data.requestMessage || null,
+  });
+  
+  return result[0].insertId;
+}
+
+export async function getAccessRequestById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(eventRsvps)
+    .where(eq(eventRsvps.id, id))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAccessRequestByUserAndEvent(userId: number, eventId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(eventRsvps)
+    .where(and(
+      eq(eventRsvps.userId, userId),
+      eq(eventRsvps.eventId, eventId)
+    ))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAccessRequestsByEvent(eventId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: eventRsvps.id,
+    eventId: eventRsvps.eventId,
+    userId: eventRsvps.userId,
+    status: eventRsvps.status,
+    requestMessage: eventRsvps.requestMessage,
+    adminResponse: eventRsvps.adminResponse,
+    respondedById: eventRsvps.respondedById,
+    respondedAt: eventRsvps.respondedAt,
+    createdAt: eventRsvps.createdAt,
+    userName: users.name,
+    userCallSign: users.callSign,
+    userRole: users.role,
+    userChapter: users.chapter,
+  })
+    .from(eventRsvps)
+    .innerJoin(users, eq(eventRsvps.userId, users.id))
+    .where(eq(eventRsvps.eventId, eventId))
+    .orderBy(desc(eventRsvps.createdAt));
+}
+
+export async function getPendingAccessRequests(eventId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const query = db.select({
+    id: eventRsvps.id,
+    eventId: eventRsvps.eventId,
+    userId: eventRsvps.userId,
+    status: eventRsvps.status,
+    requestMessage: eventRsvps.requestMessage,
+    createdAt: eventRsvps.createdAt,
+    userName: users.name,
+    userCallSign: users.callSign,
+    userRole: users.role,
+    userChapter: users.chapter,
+    eventTitle: events.title,
+  })
+    .from(eventRsvps)
+    .innerJoin(users, eq(eventRsvps.userId, users.id))
+    .innerJoin(events, eq(eventRsvps.eventId, events.id))
+    .where(eq(eventRsvps.status, 'pending'))
+    .orderBy(desc(eventRsvps.createdAt));
+  
+  if (eventId) {
+    return db.select({
+      id: eventRsvps.id,
+      eventId: eventRsvps.eventId,
+      userId: eventRsvps.userId,
+      status: eventRsvps.status,
+      requestMessage: eventRsvps.requestMessage,
+      createdAt: eventRsvps.createdAt,
+      userName: users.name,
+      userCallSign: users.callSign,
+      userRole: users.role,
+      userChapter: users.chapter,
+      eventTitle: events.title,
+    })
+      .from(eventRsvps)
+      .innerJoin(users, eq(eventRsvps.userId, users.id))
+      .innerJoin(events, eq(eventRsvps.eventId, events.id))
+      .where(and(
+        eq(eventRsvps.status, 'pending'),
+        eq(eventRsvps.eventId, eventId)
+      ))
+      .orderBy(desc(eventRsvps.createdAt));
+  }
+  
+  return query;
+}
+
+export async function approveAccessRequest(
+  requestId: number, 
+  adminId: number, 
+  response?: string
+) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.update(eventRsvps).set({
+    status: 'approved',
+    adminResponse: response || null,
+    respondedById: adminId,
+    respondedAt: new Date(),
+  }).where(eq(eventRsvps.id, requestId));
+  
+  return true;
+}
+
+export async function denyAccessRequest(
+  requestId: number, 
+  adminId: number, 
+  response?: string
+) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.update(eventRsvps).set({
+    status: 'denied',
+    adminResponse: response || null,
+    respondedById: adminId,
+    respondedAt: new Date(),
+  }).where(eq(eventRsvps.id, requestId));
+  
+  return true;
+}
+
+export async function waitlistAccessRequest(
+  requestId: number, 
+  adminId: number, 
+  response?: string
+) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db.update(eventRsvps).set({
+    status: 'waitlisted',
+    adminResponse: response || null,
+    respondedById: adminId,
+    respondedAt: new Date(),
+  }).where(eq(eventRsvps.id, requestId));
+  
+  return true;
+}
+
+export async function getUserAccessRequests(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select({
+    id: eventRsvps.id,
+    eventId: eventRsvps.eventId,
+    status: eventRsvps.status,
+    requestMessage: eventRsvps.requestMessage,
+    adminResponse: eventRsvps.adminResponse,
+    respondedAt: eventRsvps.respondedAt,
+    createdAt: eventRsvps.createdAt,
+    eventTitle: events.title,
+    eventDate: events.eventDate,
+  })
+    .from(eventRsvps)
+    .innerJoin(events, eq(eventRsvps.eventId, events.id))
+    .where(eq(eventRsvps.userId, userId))
+    .orderBy(desc(eventRsvps.createdAt));
 }

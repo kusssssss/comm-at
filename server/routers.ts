@@ -909,6 +909,16 @@ export const appRouter = router({
             : `Claimed pass for ${event.title}${input.plusOneName ? ` (+1: ${input.plusOneName})` : ""}`,
         });
         
+        // Send notification if added to waitlist
+        if (isFull && waitlistPosition) {
+          await db.createNotification({
+            userId: ctx.user.id,
+            type: 'event_reminder',
+            title: 'Added to Waitlist',
+            body: `You're #${waitlistPosition} on the waitlist for "${event.title}". We'll notify you if a spot opens up.`,
+          });
+        }
+        
         return { 
           success: true, 
           qrPayload: result.qrPayload, 
@@ -959,6 +969,188 @@ export const appRouter = router({
         const position = waitlistedPasses.findIndex(p => p.id === pass.id) + 1;
         
         return { hasPass: true, isWaitlisted: true, position };
+      }),
+    
+    // Request access to invite-only event
+    requestAccess: protectedProcedure
+      .input(z.object({
+        eventId: z.number(),
+        message: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const event = await db.getEventById(input.eventId);
+        if (!event || event.status !== "published") {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Event not found" });
+        }
+        
+        // Check if already has a request
+        const existingRequest = await db.getAccessRequestByUserAndEvent(ctx.user.id, input.eventId);
+        if (existingRequest) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "You already have a request for this event" });
+        }
+        
+        // Check if already has a pass
+        const existingPass = await db.getEventPassByUserAndEvent(ctx.user.id, input.eventId);
+        if (existingPass) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "You already have a pass for this event" });
+        }
+        
+        const requestId = await db.createAccessRequest({
+          eventId: input.eventId,
+          userId: ctx.user.id,
+          requestMessage: input.message,
+        });
+        
+        return { success: true, requestId };
+      }),
+    
+    // Get my access request status
+    getMyAccessRequest: protectedProcedure
+      .input(z.object({ eventId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const request = await db.getAccessRequestByUserAndEvent(ctx.user.id, input.eventId);
+        return request || null;
+      }),
+    
+    // Get all my access requests
+    getMyAccessRequests: protectedProcedure
+      .query(async ({ ctx }) => {
+        return db.getUserAccessRequests(ctx.user.id);
+      }),
+    
+    // Get all my event passes
+    getMyPasses: protectedProcedure
+      .query(async ({ ctx }) => {
+        const passes = await db.getEventPassesByUser(ctx.user.id);
+        
+        // Enrich with event data
+        const enriched = await Promise.all(passes.map(async (pass) => {
+          const event = await db.getEventById(pass.eventId);
+          return {
+            ...pass,
+            event: event ? {
+              id: event.id,
+              title: event.title,
+              eventDate: event.eventDate,
+              startDatetime: event.startDatetime,
+              venueName: event.venueName,
+              city: event.city,
+            } : null,
+          };
+        }));
+        
+        return enriched;
+      }),
+    
+    // Admin: get pending access requests
+    getPendingRequests: adminProcedure
+      .input(z.object({ eventId: z.number().optional() }))
+      .query(async ({ input }) => {
+        return db.getPendingAccessRequests(input.eventId);
+      }),
+    
+    // Admin: get all access requests for an event
+    getEventRequests: adminProcedure
+      .input(z.object({ eventId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getAccessRequestsByEvent(input.eventId);
+      }),
+    
+    // Admin: approve access request
+    approveRequest: adminProcedure
+      .input(z.object({
+        requestId: z.number(),
+        response: z.string().optional(),
+        createPass: z.boolean().optional().default(true),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const request = await db.getAccessRequestById(input.requestId);
+        if (!request) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Request not found" });
+        }
+        
+        await db.approveAccessRequest(input.requestId, ctx.user.id, input.response);
+        
+        // Optionally create a pass for the user
+        if (input.createPass) {
+          const event = await db.getEventById(request.eventId);
+          const confirmedCount = await db.getConfirmedPassCount(request.eventId);
+          const capacity = event?.capacity || 0;
+          const isFull = capacity > 0 && confirmedCount >= capacity;
+          
+          let waitlistPosition: number | undefined;
+          if (isFull) {
+            const waitlistCount = await db.getWaitlistCount(request.eventId);
+            waitlistPosition = waitlistCount + 1;
+          }
+          
+          await db.createEventPassWithWaitlist(
+            request.eventId,
+            request.userId,
+            isFull,
+            waitlistPosition
+          );
+        }
+        
+        // Create notification for user
+        await db.createNotification({
+          userId: request.userId,
+          type: 'system_announcement',
+          title: 'Access Request Approved',
+          body: `Your request to access the event has been approved.${input.response ? ` Note: ${input.response}` : ''}`,
+        });
+        
+        return { success: true };
+      }),
+    
+    // Admin: deny access request
+    denyRequest: adminProcedure
+      .input(z.object({
+        requestId: z.number(),
+        response: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const request = await db.getAccessRequestById(input.requestId);
+        if (!request) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Request not found" });
+        }
+        
+        await db.denyAccessRequest(input.requestId, ctx.user.id, input.response);
+        
+        // Create notification for user
+        await db.createNotification({
+          userId: request.userId,
+          type: 'system_announcement',
+          title: 'Access Request Denied',
+          body: `Your request to access the event has been denied.${input.response ? ` Reason: ${input.response}` : ''}`,
+        });
+        
+        return { success: true };
+      }),
+    
+    // Admin: waitlist access request
+    waitlistRequest: adminProcedure
+      .input(z.object({
+        requestId: z.number(),
+        response: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const request = await db.getAccessRequestById(input.requestId);
+        if (!request) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Request not found" });
+        }
+        
+        await db.waitlistAccessRequest(input.requestId, ctx.user.id, input.response);
+        
+        // Create notification for user
+        await db.createNotification({
+          userId: request.userId,
+          type: 'system_announcement',
+          title: 'Access Request Waitlisted',
+          body: `Your request has been added to the waitlist.${input.response ? ` Note: ${input.response}` : ''}`,
+        });
+        
+        return { success: true };
       }),
     
     // Admin: list all events
@@ -1104,6 +1296,14 @@ export const appRouter = router({
               referenceType: "event",
               details: `Promoted from waitlist for ${event?.title || 'event'}`,
             });
+            
+            // Send notification to promoted user
+            await db.createNotification({
+              userId: nextInLine.userId,
+              type: 'event_reminder',
+              title: 'You\'ve Been Promoted from the Waitlist!',
+              body: `Great news! A spot opened up for "${event?.title || 'the event'}" and you've been promoted from the waitlist. Your pass is now confirmed.`,
+            });
           }
         }
         
@@ -1146,6 +1346,14 @@ export const appRouter = router({
               referenceType: "event",
               details: `Promoted from waitlist for ${event?.title || 'event'}`,
             });
+            
+            // Send notification to promoted user
+            await db.createNotification({
+              userId: nextInLine.userId,
+              type: 'event_reminder',
+              title: 'You\'ve Been Promoted from the Waitlist!',
+              body: `Great news! A spot opened up for "${event?.title || 'the event'}" and you've been promoted from the waitlist. Your pass is now confirmed.`,
+            });
           }
         }
         
@@ -1185,6 +1393,14 @@ export const appRouter = router({
           targetType: "pass",
           targetId: input.passId,
           description: `Promoted user from waitlist`,
+        });
+        
+        // Send notification to promoted user
+        await db.createNotification({
+          userId: pass.userId,
+          type: 'event_reminder',
+          title: 'You\'ve Been Promoted from the Waitlist!',
+          body: `Great news! You've been manually promoted from the waitlist for "${event?.title || 'the event'}". Your pass is now confirmed.`,
         });
         
         return { success: true };
