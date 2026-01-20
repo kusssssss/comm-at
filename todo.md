@@ -301,3 +301,9 @@
 - [x] Update global theme colors in index.css (OKLCH format)
 - [x] Update Effects2200.tsx boot sequence colors
 - [x] Review and fix any UI issues - all sections verified working
+
+## Restore Sponsor Section
+- [x] Add sponsor/partners section back to homepage
+- [x] Place after Artifacts section and before Newsletter
+- [x] Use SponsorShowcase component
+- [x] Add 6 sample sponsors (FEELBERT GROUP, NEON DISTRICT, MIDNIGHT LABS, URBAN COLLECTIVE, SOUND SYSTEM, STREET KINGS)

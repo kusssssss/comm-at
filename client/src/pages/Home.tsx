@@ -4,6 +4,7 @@ import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Calendar, MapPin, Users, ChevronDown, Eye, EyeOff, Lock, Unlock, Shield, Layers } from 'lucide-react';
 import Nav from '@/components/Nav';
+import { SponsorShowcase } from '@/components/SponsorShowcase';
 
 // Layer badge component
 function LayerBadge({ layer }: { layer: string }) {
@@ -574,6 +575,9 @@ export default function Home() {
         {/* Product Grid section */}
         <ProductGridSection products={products} index={events.length + 3} />
       </div>
+
+      {/* Partners/Sponsors Section */}
+      <SponsorShowcase />
 
       {/* Newsletter - non-sticky, at the end */}
       <NewsletterSection />
