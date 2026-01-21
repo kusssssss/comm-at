@@ -748,7 +748,36 @@ export const appRouter = router({
   // EVENT ROUTER
   // ============================================================================
   event: router({
-    // Public: list published events with reveal system
+    // Public: list published events for home page (no auth required)
+    publicList: publicProcedure.query(async () => {
+      const events = await db.getPublishedEvents();
+      const now = new Date();
+      
+      // Return basic event info for public display (no sensitive location data)
+      return events.map(event => ({
+        id: event.id,
+        title: event.title,
+        slug: event.slug,
+        tagline: event.tagline,
+        description: event.description,
+        category: event.category,
+        city: event.city,
+        area: event.area,
+        eventDate: event.eventDate,
+        startDatetime: event.startDatetime,
+        endDatetime: event.endDatetime,
+        coverImageUrl: event.coverImageUrl,
+        capacity: event.capacity,
+        featuredOrder: event.featuredOrder,
+        eventAccessType: event.eventAccessType,
+        // Don't reveal venue details publicly
+        venueName: null,
+        venueAddress: null,
+        coordinates: null,
+      }));
+    }),
+
+    // Marked users: list published events with reveal system
     list: markedProcedure.query(async ({ ctx }) => {
       const events = await db.getPublishedEvents();
       const now = new Date();
@@ -762,7 +791,7 @@ export const appRouter = router({
         // Check role eligibility
         const roleHierarchy = ["marked_initiate", "marked_member", "marked_inner_circle"];
         const userRoleIndex = roleHierarchy.indexOf(ctx.user.role);
-        const requiredRoleIndex = roleHierarchy.indexOf(event.eligibilityMinState as string);
+        const requiredRoleIndex = roleHierarchy.indexOf(event.markState as string);
         
         if (userRoleIndex >= requiredRoleIndex || isStaff(ctx.user)) {
           const passCount = await db.getEventPassCount(event.id);
@@ -777,7 +806,7 @@ export const appRouter = router({
             endDatetime: event.endDatetime,
             timeRevealHoursBefore: event.timeRevealHoursBefore,
             locationRevealHoursBefore: event.locationRevealHoursBefore,
-            markState: (event.eligibilityMinState || 'initiate') as any,
+            markState: (event.markState || 'initiate') as any,
             venueName: event.venueName,
             venueAddress: event.venueAddress,
             area: event.area,

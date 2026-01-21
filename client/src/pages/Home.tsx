@@ -544,7 +544,8 @@ function ScrollProgress({ currentIndex, total, onDotClick }: { currentIndex: num
 // Main Home Component
 export default function Home() {
   const { user } = useAuth();
-  const { data: eventsData } = trpc.event.list.useQuery();
+  // Use public endpoint for home page (no auth required)
+  const { data: eventsData } = trpc.event.publicList.useQuery();
   const { data: dropsData } = trpc.drop.list.useQuery();
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);

@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, title, eventDate, eventVisibility FROM events LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, title, eventDate, eventVisibility FROM events LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "THE MIDNIGHT SESSION",
+      "eventDate": "2026-02-15 21:00:00",
+      "eventVisibility": "public"
+    },
+    {
+      "id": "2",
+      "title": "CHAPTER INITIATION",
+      "eventDate": "2026-02-20 20:00:00",
+      "eventVisibility": "public"
+    },
+    {
+      "id": "30001",
+      "title": "THE HANGING",
+      "eventDate": "NULL",
+      "eventVisibility": "public"
+    },
+    {
+      "id": "30002",
+      "title": "THE LAUNCH",
+      "eventDate": "2026-02-25 19:00:00",
+      "eventVisibility": "public"
+    },
+    {
+      "id": "30003",
+      "title": "GENESIS",
+      "eventDate": "2026-02-25 19:00:00",
+      "eventVisibility": "public"
+    },
+    {
+      "id": "60001",
+      "title": "UNDERGROUND FREQUENCIES",
+      "eventDate": "2026-03-01 00:00:00",
+      "eventVisibility": "public"
+    },
+    {
+      "id": "60002",
+      "title": "THE COLLECTORS DINNER",
+      "eventDate": "2026-03-08 00:00:00",
+      "eventVisibility": "public"
+    },
+    {
+      "id": "60003",
+      "title": "BALI RETREAT",
+      "eventDate": "2026-03-20 00:00:00",
+      "eventVisibility": "public"
+    },
+    {
+      "id": "60004",
+      "title": "STREET CULTURE NIGHT",
+      "eventDate": "2026-03-28 00:00:00",
+      "eventVisibility": "public"
+    },
+    {
+      "id": "60005",
+      "title": "THE ARCHIVE OPENING",
+      "eventDate": "2026-04-05 00:00:00",
+      "eventVisibility": "public"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\teventDate\teventVisibility\n1\tTHE MIDNIGHT SESSION\t2026-02-15 21:00:00\tpublic\n2\tCHAPTER INITIATION\t2026-02-20 20:00:00\tpublic\n30001\tTHE HANGING\tNULL\tpublic\n30002\tTHE LAUNCH\t2026-02-25 19:00:00\tpublic\n30003\tGENESIS\t2026-02-25 19:00:00\tpublic\n60001\tUNDERGROUND FREQUENCIES\t2026-03-01 00:00:00\tpublic\n60002\tTHE COLLECTORS DINNER\t2026-03-08 00:00:00\tpublic\n60003\tBALI RETREAT\t2026-03-20 00:00:00\tpublic\n60004\tSTREET CULTURE NIGHT\t2026-03-28 00:00:00\tpublic\n60005\tTHE ARCHIVE OPENING\t2026-04-05 00:00:00\tpublic\n",
+  "stderr": "",
+  "execution_time_ms": 1529
+}
