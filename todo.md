@@ -546,3 +546,65 @@
 - [x] Fix sponsor section buttons scaling/cut off on mobile
 - [x] Updated SponsorShowcase grid to use responsive breakpoints (cols-2 on mobile, cols-3 on sm, cols-6 on md)
 - [x] Updated gold sponsors grid to use 1 column on mobile
+
+
+## Social Media MVP (Admin-Ran Content, Member Engagement)
+
+### Database Schema
+- [x] Create posts table (id, authorId, content, mediaUrls, visibility, createdAt, updatedAt, isPinned)
+- [x] Create comments table (id, postId, userId, content, parentId for replies, createdAt)
+- [x] Create likes table (id, userId, postId/commentId, type, createdAt)
+- [x] Create follows table (id, followerId, followingId, createdAt)
+- [x] Create user_profiles table (bio, coverImageUrl, location, website, isPublic)
+- [x] Create bookmarks table for saved posts
+- [x] Add post visibility enum (public, members, inner_circle, private)
+- [x] Add post type enum (text, photo, video, announcement, event_recap, drop_preview)
+
+### Social Feed API (Completed)
+- [x] Create social.feed endpoint (feed with pagination, filtering by visibility/layer)
+- [x] Create social.getById endpoint (single post with comments)
+- [x] Create social.createPost endpoint (admin only)
+- [x] Create social.updatePost endpoint (admin only)
+- [x] Create social.deletePost endpoint (admin only)
+- [x] Create social.togglePin endpoint (admin only)
+- [x] Create social.adminList endpoint (admin only)
+
+### Comments & Reactions (Completed)
+- [x] Create social.addComment endpoint (members can comment)
+- [x] Create social.deleteComment endpoint (own comments or admin)
+- [x] Create social.getCommentsByPost endpoint (for a post)
+- [x] Create social.toggleLike endpoint (like/unlike posts and comments)
+- [x] Create social.getLikes endpoint (who liked a post/comment)
+
+### Follow System (Completed)
+- [x] Create social.toggleFollow endpoint (follow/unfollow users)
+- [x] Create social.getFollowers endpoint (list followers)
+- [x] Create social.getFollowing endpoint (list following)
+- [x] Create social.isFollowing endpoint (check if following)
+
+### User Profiles (Completed)
+- [x] Create social.getProfile endpoint (public profile data)
+- [x] Create social.updateProfile endpoint (own profile)
+- [x] Create social.toggleBookmark endpoint (bookmark posts)
+- [x] Create social.getBookmarks endpoint (user's bookmarks)
+
+### Social Feed UI (Completed)
+- [x] Create Feed page (/feed) with posts display
+- [x] Post card component (content, media, author, timestamp, likes, comments count)
+- [x] Comments section (expandable with replies)
+- [x] Like button with animation
+- [x] Bookmark button
+- [x] Share button (copy link)
+
+### Admin Post Creation (Completed)
+- [x] Create AdminPosts page (/admin/posts)
+- [x] Post creation form (content, media URLs, visibility, pin option, allow comments)
+- [x] Post management list (edit, delete, pin/unpin)
+- [x] Post type selection (text, photo, video, announcement, event_recap, drop_preview)
+- [x] Visibility selection (public, members, inner_circle, private)
+
+### Notifications
+- [ ] Notify when someone likes your comment
+- [ ] Notify when someone replies to your comment
+- [ ] Notify when someone you follow posts
+- [ ] Notify when someone follows you

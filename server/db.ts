@@ -18,7 +18,14 @@ import {
   clearanceRequests, InsertClearanceRequest,
   memoryLogs, InsertMemoryLog,
   marks, InsertMark,
-  userCredentials, InsertUserCredential, UserCredential
+  userCredentials, InsertUserCredential, UserCredential,
+  // Social tables
+  posts, InsertPost, Post,
+  comments, InsertComment, Comment,
+  likes, InsertLike, Like,
+  follows, InsertFollow, Follow,
+  userProfiles, InsertUserProfile, UserProfile,
+  bookmarks, InsertBookmark, Bookmark
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -3006,4 +3013,546 @@ export async function getAccessRequestStats(eventId?: number) {
   }
   
   return stats;
+}
+
+
+// ============================================================================
+// SOCIAL FEED FUNCTIONS - Posts, Comments, Likes, Follows
+// ============================================================================
+
+// --- POSTS ---
+
+export async function createPost(data: InsertPost) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(posts).values({
+    ...data,
+    publishedAt: data.scheduledFor ? null : new Date(),
+  });
+  
+  return { id: result[0].insertId };
+}
+
+export async function getPostById(postId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select({
+    post: posts,
+    author: {
+      id: users.id,
+      name: users.name,
+      callSign: users.callSign,
+      role: users.role,
+    },
+  })
+    .from(posts)
+    .innerJoin(users, eq(posts.authorId, users.id))
+    .where(eq(posts.id, postId))
+    .limit(1);
+  
+  if (result.length === 0) return null;
+  
+  return {
+    ...result[0].post,
+    author: result[0].author,
+  };
+}
+
+export async function getFeedPosts(options: {
+  visibility?: 'public' | 'members' | 'inner_circle';
+  limit?: number;
+  offset?: number;
+  authorId?: number;
+  postType?: string;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [
+    isNotNull(posts.publishedAt),
+  ];
+  
+  if (options.visibility) {
+    // Show posts at or below the user's visibility level
+    const visibilityLevels = ['public', 'members', 'inner_circle'];
+    const userLevel = visibilityLevels.indexOf(options.visibility);
+    const allowedVisibilities = visibilityLevels.slice(0, userLevel + 1);
+    conditions.push(inArray(posts.visibility, allowedVisibilities as any));
+  } else {
+    conditions.push(eq(posts.visibility, 'public'));
+  }
+  
+  if (options.authorId) {
+    conditions.push(eq(posts.authorId, options.authorId));
+  }
+  
+  if (options.postType) {
+    conditions.push(eq(posts.postType, options.postType as any));
+  }
+  
+  const result = await db.select({
+    post: posts,
+    author: {
+      id: users.id,
+      name: users.name,
+      callSign: users.callSign,
+      role: users.role,
+    },
+  })
+    .from(posts)
+    .innerJoin(users, eq(posts.authorId, users.id))
+    .where(and(...conditions))
+    .orderBy(desc(posts.isPinned), desc(posts.publishedAt))
+    .limit(options.limit || 20)
+    .offset(options.offset || 0);
+  
+  return result.map(r => ({
+    ...r.post,
+    author: r.author,
+  }));
+}
+
+export async function updatePost(postId: number, data: Partial<InsertPost>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(posts)
+    .set(data)
+    .where(eq(posts.id, postId));
+}
+
+export async function deletePost(postId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Delete related comments and likes first
+  await db.delete(comments).where(eq(comments.postId, postId));
+  await db.delete(likes).where(and(
+    eq(likes.targetType, 'post'),
+    eq(likes.targetId, postId)
+  ));
+  await db.delete(bookmarks).where(eq(bookmarks.postId, postId));
+  await db.delete(posts).where(eq(posts.id, postId));
+}
+
+export async function pinPost(postId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(posts)
+    .set({ isPinned: true, pinnedAt: new Date() })
+    .where(eq(posts.id, postId));
+}
+
+export async function unpinPost(postId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(posts)
+    .set({ isPinned: false, pinnedAt: null })
+    .where(eq(posts.id, postId));
+}
+
+// --- COMMENTS ---
+
+export async function createComment(data: InsertComment) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(comments).values(data);
+  
+  // Update post comment count
+  await db.update(posts)
+    .set({ commentsCount: sql`${posts.commentsCount} + 1` })
+    .where(eq(posts.id, data.postId));
+  
+  // If this is a reply, update parent reply count
+  if (data.parentId) {
+    await db.update(comments)
+      .set({ repliesCount: sql`${comments.repliesCount} + 1` })
+      .where(eq(comments.id, data.parentId));
+  }
+  
+  return { id: result[0].insertId };
+}
+
+export async function getCommentsByPost(postId: number, options?: {
+  limit?: number;
+  offset?: number;
+  parentId?: number | null;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [
+    eq(comments.postId, postId),
+    eq(comments.isHidden, false),
+  ];
+  
+  // If parentId is null, get top-level comments; if specified, get replies
+  if (options?.parentId === null || options?.parentId === undefined) {
+    conditions.push(sql`${comments.parentId} IS NULL`);
+  } else {
+    conditions.push(eq(comments.parentId, options.parentId));
+  }
+  
+  const result = await db.select({
+    comment: comments,
+    user: {
+      id: users.id,
+      name: users.name,
+      callSign: users.callSign,
+      role: users.role,
+    },
+  })
+    .from(comments)
+    .innerJoin(users, eq(comments.userId, users.id))
+    .where(and(...conditions))
+    .orderBy(desc(comments.createdAt))
+    .limit(options?.limit || 50)
+    .offset(options?.offset || 0);
+  
+  return result.map(r => ({
+    ...r.comment,
+    user: r.user,
+  }));
+}
+
+export async function deleteComment(commentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const comment = await db.select().from(comments).where(eq(comments.id, commentId)).limit(1);
+  if (comment.length === 0) return;
+  
+  // Delete likes on this comment
+  await db.delete(likes).where(and(
+    eq(likes.targetType, 'comment'),
+    eq(likes.targetId, commentId)
+  ));
+  
+  // Delete the comment
+  await db.delete(comments).where(eq(comments.id, commentId));
+  
+  // Update post comment count
+  await db.update(posts)
+    .set({ commentsCount: sql`${posts.commentsCount} - 1` })
+    .where(eq(posts.id, comment[0].postId));
+  
+  // If this was a reply, update parent reply count
+  if (comment[0].parentId) {
+    await db.update(comments)
+      .set({ repliesCount: sql`${comments.repliesCount} - 1` })
+      .where(eq(comments.id, comment[0].parentId));
+  }
+}
+
+export async function hideComment(commentId: number, adminId: number, reason?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(comments)
+    .set({
+      isHidden: true,
+      hiddenReason: reason,
+      hiddenById: adminId,
+    })
+    .where(eq(comments.id, commentId));
+}
+
+// --- LIKES ---
+
+export async function toggleLike(userId: number, targetType: 'post' | 'comment', targetId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if already liked
+  const existing = await db.select()
+    .from(likes)
+    .where(and(
+      eq(likes.userId, userId),
+      eq(likes.targetType, targetType),
+      eq(likes.targetId, targetId)
+    ))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    // Unlike
+    await db.delete(likes).where(eq(likes.id, existing[0].id));
+    
+    // Update count
+    if (targetType === 'post') {
+      await db.update(posts)
+        .set({ likesCount: sql`${posts.likesCount} - 1` })
+        .where(eq(posts.id, targetId));
+    } else {
+      await db.update(comments)
+        .set({ likesCount: sql`${comments.likesCount} - 1` })
+        .where(eq(comments.id, targetId));
+    }
+    
+    return { liked: false };
+  } else {
+    // Like
+    await db.insert(likes).values({
+      userId,
+      targetType,
+      targetId,
+    });
+    
+    // Update count
+    if (targetType === 'post') {
+      await db.update(posts)
+        .set({ likesCount: sql`${posts.likesCount} + 1` })
+        .where(eq(posts.id, targetId));
+    } else {
+      await db.update(comments)
+        .set({ likesCount: sql`${comments.likesCount} + 1` })
+        .where(eq(comments.id, targetId));
+    }
+    
+    return { liked: true };
+  }
+}
+
+export async function getUserLikes(userId: number, targetType: 'post' | 'comment', targetIds: number[]) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  if (targetIds.length === 0) return [];
+  
+  const result = await db.select()
+    .from(likes)
+    .where(and(
+      eq(likes.userId, userId),
+      eq(likes.targetType, targetType),
+      inArray(likes.targetId, targetIds)
+    ));
+  
+  return result.map(l => l.targetId);
+}
+
+// --- FOLLOWS ---
+
+export async function toggleFollow(followerId: number, followingId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  if (followerId === followingId) {
+    throw new Error("Cannot follow yourself");
+  }
+  
+  // Check if already following
+  const existing = await db.select()
+    .from(follows)
+    .where(and(
+      eq(follows.followerId, followerId),
+      eq(follows.followingId, followingId)
+    ))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    // Unfollow
+    await db.delete(follows).where(eq(follows.id, existing[0].id));
+    
+    // Update counts
+    await db.update(userProfiles)
+      .set({ followingCount: sql`${userProfiles.followingCount} - 1` })
+      .where(eq(userProfiles.userId, followerId));
+    
+    await db.update(userProfiles)
+      .set({ followersCount: sql`${userProfiles.followersCount} - 1` })
+      .where(eq(userProfiles.userId, followingId));
+    
+    return { following: false };
+  } else {
+    // Follow
+    await db.insert(follows).values({
+      followerId,
+      followingId,
+    });
+    
+    // Update counts (create profile if doesn't exist)
+    const followerProfile = await db.select().from(userProfiles).where(eq(userProfiles.userId, followerId)).limit(1);
+    if (followerProfile.length === 0) {
+      await db.insert(userProfiles).values({ userId: followerId, followingCount: 1 });
+    } else {
+      await db.update(userProfiles)
+        .set({ followingCount: sql`${userProfiles.followingCount} + 1` })
+        .where(eq(userProfiles.userId, followerId));
+    }
+    
+    const followingProfile = await db.select().from(userProfiles).where(eq(userProfiles.userId, followingId)).limit(1);
+    if (followingProfile.length === 0) {
+      await db.insert(userProfiles).values({ userId: followingId, followersCount: 1 });
+    } else {
+      await db.update(userProfiles)
+        .set({ followersCount: sql`${userProfiles.followersCount} + 1` })
+        .where(eq(userProfiles.userId, followingId));
+    }
+    
+    return { following: true };
+  }
+}
+
+export async function isFollowing(followerId: number, followingId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const result = await db.select()
+    .from(follows)
+    .where(and(
+      eq(follows.followerId, followerId),
+      eq(follows.followingId, followingId)
+    ))
+    .limit(1);
+  
+  return result.length > 0;
+}
+
+export async function getFollowers(userId: number, limit: number = 50, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    follow: follows,
+    user: {
+      id: users.id,
+      name: users.name,
+      callSign: users.callSign,
+      role: users.role,
+    },
+  })
+    .from(follows)
+    .innerJoin(users, eq(follows.followerId, users.id))
+    .where(eq(follows.followingId, userId))
+    .orderBy(desc(follows.createdAt))
+    .limit(limit)
+    .offset(offset);
+  
+  return result.map(r => r.user);
+}
+
+export async function getFollowing(userId: number, limit: number = 50, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    follow: follows,
+    user: {
+      id: users.id,
+      name: users.name,
+      callSign: users.callSign,
+      role: users.role,
+    },
+  })
+    .from(follows)
+    .innerJoin(users, eq(follows.followingId, users.id))
+    .where(eq(follows.followerId, userId))
+    .orderBy(desc(follows.createdAt))
+    .limit(limit)
+    .offset(offset);
+  
+  return result.map(r => r.user);
+}
+
+// --- USER PROFILES ---
+
+export async function getUserProfile(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select()
+    .from(userProfiles)
+    .where(eq(userProfiles.userId, userId))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function upsertUserProfile(userId: number, data: Partial<InsertUserProfile>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const existing = await getUserProfile(userId);
+  
+  if (existing) {
+    await db.update(userProfiles)
+      .set(data)
+      .where(eq(userProfiles.userId, userId));
+  } else {
+    await db.insert(userProfiles).values({
+      userId,
+      ...data,
+    });
+  }
+}
+
+// --- BOOKMARKS ---
+
+export async function toggleBookmark(userId: number, postId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const existing = await db.select()
+    .from(bookmarks)
+    .where(and(
+      eq(bookmarks.userId, userId),
+      eq(bookmarks.postId, postId)
+    ))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    await db.delete(bookmarks).where(eq(bookmarks.id, existing[0].id));
+    return { bookmarked: false };
+  } else {
+    await db.insert(bookmarks).values({ userId, postId });
+    return { bookmarked: true };
+  }
+}
+
+export async function getUserBookmarks(userId: number, limit: number = 50, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    bookmark: bookmarks,
+    post: posts,
+    author: {
+      id: users.id,
+      name: users.name,
+      callSign: users.callSign,
+      role: users.role,
+    },
+  })
+    .from(bookmarks)
+    .innerJoin(posts, eq(bookmarks.postId, posts.id))
+    .innerJoin(users, eq(posts.authorId, users.id))
+    .where(eq(bookmarks.userId, userId))
+    .orderBy(desc(bookmarks.createdAt))
+    .limit(limit)
+    .offset(offset);
+  
+  return result.map(r => ({
+    ...r.post,
+    author: r.author,
+    bookmarkedAt: r.bookmark.createdAt,
+  }));
+}
+
+export async function isBookmarked(userId: number, postId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const result = await db.select()
+    .from(bookmarks)
+    .where(and(
+      eq(bookmarks.userId, userId),
+      eq(bookmarks.postId, postId)
+    ))
+    .limit(1);
+  
+  return result.length > 0;
 }

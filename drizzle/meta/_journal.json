@@ -127,6 +127,13 @@
       "when": 1768908278441,
       "tag": "0017_outgoing_ultragirl",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1768995969479,
+      "tag": "0018_pink_puma",
+      "breakpoints": true
     }
   ]
 }

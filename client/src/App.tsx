@@ -28,6 +28,7 @@ import Archive from "./pages/Archive";
 import Leaderboard from "./pages/Leaderboard";
 import Referral from "./pages/Referral";
 import MyPasses from "./pages/MyPasses";
+import Feed from "./pages/Feed";
 
 // Staff pages
 import Staff from "./pages/Staff";
@@ -36,6 +37,7 @@ import StaffCheckIn from "./pages/StaffCheckIn";
 // Admin pages
 import Admin from "./pages/Admin";
 import AdminAccessRequests from "./pages/AdminAccessRequests";
+import AdminPosts from "./pages/AdminPosts";
 
 // Dev tools
 import Dev from "./pages/Dev";
@@ -71,6 +73,7 @@ function Router() {
       <Route path="/inside" component={Inside} />
       <Route path="/profile" component={Profile} />
       <Route path="/my-passes" component={MyPasses} />
+      <Route path="/feed" component={Feed} />
       <Route path="/events" component={Events} />
       <Route path="/gatherings" component={Events} />
       <Route path="/events/:id" component={EventDetail} />
@@ -88,6 +91,7 @@ function Router() {
       {/* Admin routes */}
       <Route path="/admin" component={Admin} />
       <Route path="/admin/access-requests" component={AdminAccessRequests} />
+      <Route path="/admin/posts" component={AdminPosts} />
       <Route path="/admin/:section" component={Admin} />
       
       {/* Dev tools */}

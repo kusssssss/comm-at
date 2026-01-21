@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, bigint, datetime } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, bigint, datetime, json } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 // ============================================================================
@@ -1030,3 +1030,173 @@ export const sponsorInquiries = mysqlTable("sponsor_inquiries", {
 
 export type SponsorInquiry = typeof sponsorInquiries.$inferSelect;
 export type InsertSponsorInquiry = typeof sponsorInquiries.$inferInsert;
+
+
+// ============================================================================
+// SOCIAL MEDIA TABLES - Posts, Comments, Likes, Follows
+// ============================================================================
+
+// Post visibility enum
+export const postVisibilityEnum = mysqlEnum("postVisibility", [
+  "public",       // Visible to all visitors
+  "members",      // Visible to logged-in members only
+  "inner_circle", // Visible to inner circle and above
+  "private"       // Only visible to author and admins
+]);
+
+// Post type enum
+export const postTypeEnum = mysqlEnum("postType", [
+  "text",         // Text-only post
+  "photo",        // Single or multiple photos
+  "video",        // Video content
+  "announcement", // Official announcements (pinned style)
+  "event_recap",  // Event recap/highlights
+  "drop_preview"  // Drop/merch preview
+]);
+
+// ============================================================================
+// POSTS TABLE - Admin-created content for the social feed
+// ============================================================================
+export const posts = mysqlTable("posts", {
+  id: int("id").autoincrement().primaryKey(),
+  authorId: int("authorId").notNull(), // Admin who created the post
+  
+  // Content
+  content: text("content"), // Main text content (supports markdown)
+  mediaUrls: json("mediaUrls").$type<string[]>(), // Array of image/video URLs
+  
+  // Metadata
+  postType: postTypeEnum.default("text").notNull(),
+  visibility: postVisibilityEnum.default("public").notNull(),
+  
+  // Linked content (optional)
+  linkedEventId: int("linkedEventId"), // If post is about an event
+  linkedDropId: int("linkedDropId"), // If post is about a drop
+  
+  // Display options
+  isPinned: boolean("isPinned").default(false).notNull(),
+  pinnedAt: timestamp("pinnedAt"),
+  allowComments: boolean("allowComments").default(true).notNull(),
+  
+  // Engagement stats (denormalized for performance)
+  likesCount: int("likesCount").default(0).notNull(),
+  commentsCount: int("commentsCount").default(0).notNull(),
+  sharesCount: int("sharesCount").default(0).notNull(),
+  
+  // Scheduling
+  scheduledFor: timestamp("scheduledFor"), // For scheduled posts
+  publishedAt: timestamp("publishedAt"), // When actually published
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Post = typeof posts.$inferSelect;
+export type InsertPost = typeof posts.$inferInsert;
+
+// ============================================================================
+// COMMENTS TABLE - Member comments on posts
+// ============================================================================
+export const comments = mysqlTable("comments", {
+  id: int("id").autoincrement().primaryKey(),
+  postId: int("postId").notNull(),
+  userId: int("userId").notNull(), // Member who commented
+  
+  // Content
+  content: text("content").notNull(),
+  
+  // Threading (for replies)
+  parentId: int("parentId"), // If this is a reply to another comment
+  
+  // Engagement stats
+  likesCount: int("likesCount").default(0).notNull(),
+  repliesCount: int("repliesCount").default(0).notNull(),
+  
+  // Moderation
+  isHidden: boolean("isHidden").default(false).notNull(), // Admin can hide comments
+  hiddenReason: varchar("hiddenReason", { length: 255 }),
+  hiddenById: int("hiddenById"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Comment = typeof comments.$inferSelect;
+export type InsertComment = typeof comments.$inferInsert;
+
+// ============================================================================
+// LIKES TABLE - Likes on posts and comments
+// ============================================================================
+export const likeTargetTypeEnum = mysqlEnum("likeTargetType", [
+  "post",
+  "comment"
+]);
+
+export const likes = mysqlTable("likes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  targetType: likeTargetTypeEnum.notNull(),
+  targetId: int("targetId").notNull(), // postId or commentId
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Like = typeof likes.$inferSelect;
+export type InsertLike = typeof likes.$inferInsert;
+
+// ============================================================================
+// FOLLOWS TABLE - Member follow relationships
+// ============================================================================
+export const follows = mysqlTable("follows", {
+  id: int("id").autoincrement().primaryKey(),
+  followerId: int("followerId").notNull(), // User who is following
+  followingId: int("followingId").notNull(), // User being followed
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Follow = typeof follows.$inferSelect;
+export type InsertFollow = typeof follows.$inferInsert;
+
+// ============================================================================
+// USER PROFILES TABLE - Extended profile info for social features
+// ============================================================================
+export const userProfiles = mysqlTable("user_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  
+  // Profile content
+  bio: text("bio"),
+  coverImageUrl: varchar("coverImageUrl", { length: 512 }),
+  avatarUrl: varchar("avatarUrl", { length: 512 }),
+  location: varchar("location", { length: 128 }),
+  website: varchar("website", { length: 255 }),
+  
+  // Privacy settings
+  isPublic: boolean("isPublic").default(true).notNull(),
+  showActivity: boolean("showActivity").default(true).notNull(),
+  showFollowers: boolean("showFollowers").default(true).notNull(),
+  
+  // Social stats (denormalized for performance)
+  followersCount: int("followersCount").default(0).notNull(),
+  followingCount: int("followingCount").default(0).notNull(),
+  postsLikedCount: int("postsLikedCount").default(0).notNull(),
+  commentsCount: int("commentsCount").default(0).notNull(),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserProfile = typeof userProfiles.$inferSelect;
+export type InsertUserProfile = typeof userProfiles.$inferInsert;
+
+// ============================================================================
+// BOOKMARKS TABLE - Saved posts for later
+// ============================================================================
+export const bookmarks = mysqlTable("bookmarks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  postId: int("postId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Bookmark = typeof bookmarks.$inferSelect;
+export type InsertBookmark = typeof bookmarks.$inferInsert;

@@ -2845,6 +2845,393 @@ export const appRouter = router({
   // CIPHER ROUTER - Personal Cipher (TOTP) System
   // ============================================================================
   cipher: cipherRouter,
+
+  // ============================================================================
+  // SOCIAL ROUTER - Posts, Comments, Likes, Follows
+  // ============================================================================
+  social: router({
+    // --- FEED ---
+    
+    // Public: Get feed posts
+    feed: publicProcedure
+      .input(z.object({
+        limit: z.number().min(1).max(50).default(20),
+        offset: z.number().min(0).default(0),
+        postType: z.enum(['text', 'photo', 'video', 'announcement', 'event_recap', 'drop_preview']).optional(),
+      }).optional())
+      .query(async ({ input, ctx }) => {
+        const user = ctx.user;
+        let visibility: 'public' | 'members' | 'inner_circle' = 'public';
+        
+        if (user) {
+          if (user.role === 'marked_inner_circle' || user.role === 'admin') {
+            visibility = 'inner_circle';
+          } else if (isMarked(user as User) || isStaff(user as User)) {
+            visibility = 'members';
+          }
+        }
+        
+        const posts = await db.getFeedPosts({
+          visibility,
+          limit: input?.limit || 20,
+          offset: input?.offset || 0,
+          postType: input?.postType,
+        });
+        
+        // Get user's likes for these posts
+        let userLikes: number[] = [];
+        let userBookmarks: number[] = [];
+        if (user && posts.length > 0) {
+          const postIds = posts.map(p => p.id);
+          userLikes = await db.getUserLikes(user.id, 'post', postIds);
+          // Check bookmarks
+          const bookmarkChecks = await Promise.all(
+            postIds.map(id => db.isBookmarked(user.id, id))
+          );
+          userBookmarks = postIds.filter((_, i) => bookmarkChecks[i]);
+        }
+        
+        return posts.map(post => ({
+          ...post,
+          isLiked: userLikes.includes(post.id),
+          isBookmarked: userBookmarks.includes(post.id),
+        }));
+      }),
+    
+    // Public: Get single post with comments
+    getById: publicProcedure
+      .input(z.object({ postId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const post = await db.getPostById(input.postId);
+        if (!post) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Post not found' });
+        }
+        
+        // Check visibility
+        const user = ctx.user;
+        if (post.visibility !== 'public') {
+          if (!user) {
+            throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Login required' });
+          }
+          if (post.visibility === 'inner_circle' && 
+              user.role !== 'marked_inner_circle' && user.role !== 'admin') {
+            throw new TRPCError({ code: 'FORBIDDEN', message: 'Inner circle only' });
+          }
+          if (post.visibility === 'members' && !isMarked(user as User) && !isStaff(user as User)) {
+            throw new TRPCError({ code: 'FORBIDDEN', message: 'Members only' });
+          }
+        }
+        
+        // Get comments
+        const comments = await db.getCommentsByPost(input.postId, { parentId: null });
+        
+        // Get user's like status
+        let isLiked = false;
+        let isBookmarked = false;
+        if (user) {
+          const likes = await db.getUserLikes(user.id, 'post', [post.id]);
+          isLiked = likes.includes(post.id);
+          isBookmarked = await db.isBookmarked(user.id, post.id);
+        }
+        
+        return {
+          ...post,
+          isLiked,
+          isBookmarked,
+          comments,
+        };
+      }),
+    
+    // --- COMMENTS ---
+    
+    // Protected: Add comment
+    addComment: protectedProcedure
+      .input(z.object({
+        postId: z.number(),
+        content: z.string().min(1).max(2000),
+        parentId: z.number().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Check if post exists and allows comments
+        const post = await db.getPostById(input.postId);
+        if (!post) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Post not found' });
+        }
+        if (!post.allowComments) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Comments disabled on this post' });
+        }
+        
+        const result = await db.createComment({
+          postId: input.postId,
+          userId: ctx.user.id,
+          content: input.content,
+          parentId: input.parentId,
+        });
+        
+        return { success: true, commentId: result.id };
+      }),
+    
+    // Protected: Get replies to a comment
+    getReplies: publicProcedure
+      .input(z.object({
+        postId: z.number(),
+        parentId: z.number(),
+        limit: z.number().min(1).max(50).default(20),
+        offset: z.number().min(0).default(0),
+      }))
+      .query(async ({ input }) => {
+        return db.getCommentsByPost(input.postId, {
+          parentId: input.parentId,
+          limit: input.limit,
+          offset: input.offset,
+        });
+      }),
+    
+    // Admin: Delete comment
+    deleteComment: adminProcedure
+      .input(z.object({ commentId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteComment(input.commentId);
+        return { success: true };
+      }),
+    
+    // Admin: Hide comment (soft delete)
+    hideComment: adminProcedure
+      .input(z.object({
+        commentId: z.number(),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.hideComment(input.commentId, ctx.user.id, input.reason);
+        return { success: true };
+      }),
+    
+    // --- LIKES ---
+    
+    // Protected: Toggle like on post or comment
+    toggleLike: protectedProcedure
+      .input(z.object({
+        targetType: z.enum(['post', 'comment']),
+        targetId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return db.toggleLike(ctx.user.id, input.targetType, input.targetId);
+      }),
+    
+    // --- BOOKMARKS ---
+    
+    // Protected: Toggle bookmark
+    toggleBookmark: protectedProcedure
+      .input(z.object({ postId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        return db.toggleBookmark(ctx.user.id, input.postId);
+      }),
+    
+    // Protected: Get user's bookmarks
+    getBookmarks: protectedProcedure
+      .input(z.object({
+        limit: z.number().min(1).max(50).default(20),
+        offset: z.number().min(0).default(0),
+      }).optional())
+      .query(async ({ input, ctx }) => {
+        return db.getUserBookmarks(ctx.user.id, input?.limit || 20, input?.offset || 0);
+      }),
+    
+    // --- FOLLOWS ---
+    
+    // Protected: Toggle follow
+    toggleFollow: protectedProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        return db.toggleFollow(ctx.user.id, input.userId);
+      }),
+    
+    // Public: Check if following
+    isFollowing: protectedProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        return db.isFollowing(ctx.user.id, input.userId);
+      }),
+    
+    // Public: Get followers
+    getFollowers: publicProcedure
+      .input(z.object({
+        userId: z.number(),
+        limit: z.number().min(1).max(50).default(20),
+        offset: z.number().min(0).default(0),
+      }))
+      .query(async ({ input }) => {
+        return db.getFollowers(input.userId, input.limit, input.offset);
+      }),
+    
+    // Public: Get following
+    getFollowing: publicProcedure
+      .input(z.object({
+        userId: z.number(),
+        limit: z.number().min(1).max(50).default(20),
+        offset: z.number().min(0).default(0),
+      }))
+      .query(async ({ input }) => {
+        return db.getFollowing(input.userId, input.limit, input.offset);
+      }),
+    
+    // --- USER PROFILE ---
+    
+    // Public: Get user profile
+    getProfile: publicProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input }) => {
+        const profile = await db.getUserProfile(input.userId);
+        const user = await db.getUserById(input.userId);
+        
+        if (!user) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
+        }
+        
+        return {
+          userId: user.id,
+          name: user.name,
+          callSign: user.callSign,
+          role: user.role,
+          chapter: user.chapter,
+          reputationPoints: user.reputationPoints,
+          createdAt: user.createdAt,
+          ...profile,
+        };
+      }),
+    
+    // Protected: Update own profile
+    updateProfile: protectedProcedure
+      .input(z.object({
+        bio: z.string().max(500).optional(),
+        coverImageUrl: z.string().url().optional(),
+        avatarUrl: z.string().url().optional(),
+        location: z.string().max(128).optional(),
+        website: z.string().url().max(255).optional(),
+        isPublic: z.boolean().optional(),
+        showActivity: z.boolean().optional(),
+        showFollowers: z.boolean().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.upsertUserProfile(ctx.user.id, input);
+        return { success: true };
+      }),
+    
+    // --- ADMIN POST MANAGEMENT ---
+    
+    // Admin: Create post
+    createPost: adminProcedure
+      .input(z.object({
+        content: z.string().min(1).max(10000),
+        mediaUrls: z.array(z.string().url()).optional(),
+        postType: z.enum(['text', 'photo', 'video', 'announcement', 'event_recap', 'drop_preview']).default('text'),
+        visibility: z.enum(['public', 'members', 'inner_circle', 'private']).default('public'),
+        linkedEventId: z.number().optional(),
+        linkedDropId: z.number().optional(),
+        isPinned: z.boolean().optional(),
+        allowComments: z.boolean().default(true),
+        scheduledFor: z.date().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await db.createPost({
+          authorId: ctx.user.id,
+          content: input.content,
+          mediaUrls: input.mediaUrls,
+          postType: input.postType,
+          visibility: input.visibility,
+          linkedEventId: input.linkedEventId,
+          linkedDropId: input.linkedDropId,
+          isPinned: input.isPinned,
+          allowComments: input.allowComments,
+          scheduledFor: input.scheduledFor,
+        });
+        
+        await db.createAuditLog({
+          action: 'drop_created',
+          userId: ctx.user.id,
+          userName: ctx.user.callSign || ctx.user.name || 'Admin',
+          targetType: 'post',
+          targetId: result.id,
+          description: `Created ${input.postType} post`,
+        });
+        
+        return { success: true, postId: result.id };
+      }),
+    
+    // Admin: Update post
+    updatePost: adminProcedure
+      .input(z.object({
+        postId: z.number(),
+        content: z.string().min(1).max(10000).optional(),
+        mediaUrls: z.array(z.string().url()).optional(),
+        visibility: z.enum(['public', 'members', 'inner_circle', 'private']).optional(),
+        allowComments: z.boolean().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { postId, ...data } = input;
+        await db.updatePost(postId, data);
+        return { success: true };
+      }),
+    
+    // Admin: Delete post
+    deletePost: adminProcedure
+      .input(z.object({ postId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deletePost(input.postId);
+        return { success: true };
+      }),
+    
+    // Admin: Pin/unpin post
+    togglePin: adminProcedure
+      .input(z.object({ postId: z.number() }))
+      .mutation(async ({ input }) => {
+        const post = await db.getPostById(input.postId);
+        if (!post) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Post not found' });
+        }
+        
+        if (post.isPinned) {
+          await db.unpinPost(input.postId);
+          return { success: true, isPinned: false };
+        } else {
+          await db.pinPost(input.postId);
+          return { success: true, isPinned: true };
+        }
+      }),
+    
+    // Admin: Get all posts (including scheduled/private)
+    adminList: adminProcedure
+      .input(z.object({
+        limit: z.number().min(1).max(100).default(50),
+        offset: z.number().min(0).default(0),
+      }).optional())
+      .query(async ({ input }) => {
+        const db2 = await db.getDb();
+        if (!db2) return [];
+        
+        const { posts: postsTable, users: usersTable } = await import('../drizzle/schema');
+        const { desc } = await import('drizzle-orm');
+        
+        const result = await db2.select({
+          post: postsTable,
+          author: {
+            id: usersTable.id,
+            name: usersTable.name,
+            callSign: usersTable.callSign,
+          },
+        })
+          .from(postsTable)
+          .innerJoin(usersTable, (await import('drizzle-orm')).eq(postsTable.authorId, usersTable.id))
+          .orderBy(desc(postsTable.createdAt))
+          .limit(input?.limit || 50)
+          .offset(input?.offset || 0);
+        
+        return result.map(r => ({
+          ...r.post,
+          author: r.author,
+        }));
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
