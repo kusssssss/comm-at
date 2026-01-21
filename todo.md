@@ -536,3 +536,13 @@
 - [x] Add stats cards (pending, approved, denied, waitlisted)
 - [x] Add route to App.tsx
 - [x] Add vitest tests for bulk actions (9 tests passing)
+
+
+## Mobile UI Fixes
+- [ ] Fix sponsor section buttons scaling/cut off on mobile (THE COLLECTIVE section)
+
+
+## Mobile UI Fixes (Completed)
+- [x] Fix sponsor section buttons scaling/cut off on mobile
+- [x] Updated SponsorShowcase grid to use responsive breakpoints (cols-2 on mobile, cols-3 on sm, cols-6 on md)
+- [x] Updated gold sponsors grid to use 1 column on mobile
