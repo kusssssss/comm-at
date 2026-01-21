@@ -24,7 +24,7 @@ function MarqueeRow({ direction = 'left', speed = 30 }: { direction?: 'left' | '
         {symbols.map((symbol, i) => (
           <span 
             key={`a-${i}`} 
-            className="text-4xl md:text-5xl font-bold text-[#0ABAB5]/20 hover:text-[#0ABAB5]/40 transition-colors cursor-default"
+            className="text-4xl md:text-5xl font-bold text-[var(--mint)]/20 hover:text-[var(--mint)]/40 transition-colors cursor-default"
           >
             {symbol}
           </span>
@@ -33,7 +33,7 @@ function MarqueeRow({ direction = 'left', speed = 30 }: { direction?: 'left' | '
         {symbols.map((symbol, i) => (
           <span 
             key={`b-${i}`} 
-            className="text-4xl md:text-5xl font-bold text-[#0ABAB5]/20 hover:text-[#0ABAB5]/40 transition-colors cursor-default"
+            className="text-4xl md:text-5xl font-bold text-[var(--mint)]/20 hover:text-[var(--mint)]/40 transition-colors cursor-default"
           >
             {symbol}
           </span>
@@ -68,7 +68,7 @@ function RevealStatus({ status }: { status: 'tease' | 'window' | 'lock' | 'revea
     tease: { icon: EyeOff, color: 'text-neutral-500', label: 'TEASE' },
     window: { icon: Eye, color: 'text-yellow-500', label: 'WINDOW' },
     lock: { icon: Lock, color: 'text-orange-500', label: 'LOCKED' },
-    reveal: { icon: Unlock, color: 'text-[#0ABAB5]', label: 'REVEALED' }
+    reveal: { icon: Unlock, color: 'text-[var(--mint)]', label: 'REVEALED' }
   };
   
   const config = statusConfig[status];
@@ -166,8 +166,8 @@ function EventSection({ event, index, isFirst, sectionRef }: { event: any; index
             {/* Event Title with Layered Backdrop - FloatScroll style */}
             <div className="relative inline-block">
               {/* Tiffany Blue circular backdrop */}
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-32 h-32 md:w-48 md:h-48 lg:w-64 lg:h-64 rounded-full bg-[#0ABAB5]/20 blur-xl" />
-              <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-24 h-24 md:w-36 md:h-36 lg:w-48 lg:h-48 rounded-full bg-[#0ABAB5]/30" />
+              <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-32 h-32 md:w-48 md:h-48 lg:w-64 lg:h-64 rounded-full bg-[var(--mint)]/20 blur-xl" />
+              <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-24 h-24 md:w-36 md:h-36 lg:w-48 lg:h-48 rounded-full bg-[var(--mint)]/30" />
               <h1 className="relative text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 md:mb-6 tracking-tight leading-none uppercase">
                 {event?.title || 'UPCOMING GATHERING'}
               </h1>
@@ -216,7 +216,7 @@ function EventSection({ event, index, isFirst, sectionRef }: { event: any; index
 
             {/* CTA Button - Nocta Green Outlined Style */}
             <Link href={`/gatherings/${event?.id}`}>
-              <button className="px-8 md:px-12 py-3 md:py-4 border-2 border-[#0ABAB5] text-[#0ABAB5] font-medium tracking-wider hover:bg-[#0ABAB5] hover:text-black transition-all duration-300 uppercase text-sm md:text-base">
+              <button className="px-8 md:px-12 py-3 md:py-4 border-2 border-[var(--mint)] text-[var(--mint)] font-medium tracking-wider hover:bg-[var(--mint)] hover:text-black transition-all duration-300 uppercase text-sm md:text-base">
                 Request Access
               </button>
             </Link>
@@ -245,7 +245,7 @@ function StratifiedRealitySection({ index }: { index: number }) {
       {/* Background with subtle pattern */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-900 to-black">
         <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, #0ABAB5 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 2px 2px, var(--mint) 1px, transparent 0)`,
           backgroundSize: '40px 40px'
         }} />
       </div>
@@ -255,25 +255,25 @@ function StratifiedRealitySection({ index }: { index: number }) {
         <div className="max-w-4xl mx-auto text-center">
           {/* Icon */}
           <div className="flex justify-center mb-8">
-            <div className="w-20 h-20 rounded-full border-2 border-[#0ABAB5] flex items-center justify-center">
-              <Layers className="w-10 h-10 text-[#0ABAB5]" />
+            <div className="w-20 h-20 rounded-full border-2 border-[var(--mint)] flex items-center justify-center">
+              <Layers className="w-10 h-10 text-[var(--mint)]" />
             </div>
           </div>
 
           {/* Title */}
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight uppercase">
-            Stratified Reality
+            We Amplify Your Voice
           </h2>
 
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-neutral-400 mb-8 leading-relaxed">
-            Not everyone sees the same Indonesia.
+            A secret society that tells people what's happening.
           </p>
 
           {/* Description */}
           <p className="text-base md:text-lg text-neutral-500 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Unlock layers to reveal time, location, and access. 
-            Events are not posted — they are <span className="text-[#0ABAB5]">unlocked</span>.
+            We amplify campaigns and messages. Unlock layers to access exclusive gatherings, 
+            limited marks, and <span className="text-[var(--mint)]">inner circle</span> content.
           </p>
 
           {/* Layer badges */}
@@ -287,7 +287,7 @@ function StratifiedRealitySection({ index }: { index: number }) {
 
           {/* CTA */}
           <Link href="/inside">
-            <button className="px-12 py-4 border-2 border-[#0ABAB5] text-[#0ABAB5] font-medium tracking-wider hover:bg-[#0ABAB5] hover:text-black transition-all duration-300 uppercase">
+            <button className="px-12 py-4 border-2 border-[var(--mint)] text-[var(--mint)] font-medium tracking-wider hover:bg-[var(--mint)] hover:text-black transition-all duration-300 uppercase">
               Check Your Layer
             </button>
           </Link>
@@ -297,32 +297,37 @@ function StratifiedRealitySection({ index }: { index: number }) {
   );
 }
 
-// 2x2 Collection Grid with sticky scroll
+// 4 Pillars Collection Grid with sticky scroll
 function CollectionGridSection({ index }: { index: number }) {
+  // 4 Pillars: Platform, Production, Events, Community
   const collections = [
     {
-      title: 'CHAPTER ONE',
-      subtitle: 'The Beginning',
-      image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
-      link: '/gatherings'
+      title: 'PLATFORM',
+      subtitle: 'Amplify Your Voice',
+      description: 'Ads, campaigns, and message amplification',
+      image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80',
+      link: '/feed'
     },
     {
-      title: 'THE INNER CIRCLE',
-      subtitle: 'Members Only',
-      image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=80',
-      link: '/inside'
-    },
-    {
-      title: 'EXCLUSIVE MARKS',
-      subtitle: 'Limited Edition',
+      title: 'PRODUCTION',
+      subtitle: 'Limited Artifacts',
+      description: 'Exclusive merch and physical receipts',
       image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
       link: '/marks'
     },
     {
-      title: 'THE COLLECTIVE',
-      subtitle: 'Join Us',
+      title: 'EVENTS',
+      subtitle: 'Secret Gatherings',
+      description: 'Activism, benefit concerts, education',
+      image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
+      link: '/gatherings'
+    },
+    {
+      title: 'COMMUNITY',
+      subtitle: 'The Inner Circle',
+      description: 'Build trust and connection',
       image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&q=80',
-      link: '/referral'
+      link: '/inside'
     }
   ];
 
@@ -374,7 +379,7 @@ function LayersSection({ index }: { index: number }) {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <p className="text-xs tracking-[0.3em] text-[#0ABAB5] mb-4 uppercase">Stratified Identity</p>
+            <p className="text-xs tracking-[0.3em] text-[var(--mint)] mb-4 uppercase">Stratified Identity</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight uppercase">
               Your Layer
             </h2>
@@ -406,7 +411,7 @@ function LayersSection({ index }: { index: number }) {
           {/* CTA */}
           <div className="text-center mt-12">
             <Link href="/inside">
-              <button className="px-8 py-3 bg-[#0ABAB5] text-black font-medium tracking-wider hover:bg-[#0ABAB5] transition-colors uppercase">
+              <button className="px-8 py-3 bg-[var(--mint)] text-black font-medium tracking-wider hover:bg-[var(--mint)] transition-colors uppercase">
                 Upgrade Your Layer
               </button>
             </Link>
@@ -428,7 +433,7 @@ function ProductGridSection({ products, index }: { products: any[]; index: numbe
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <p className="text-xs tracking-[0.3em] text-[#0ABAB5] mb-2 uppercase">Stratified Commerce</p>
+            <p className="text-xs tracking-[0.3em] text-[var(--mint)] mb-2 uppercase">Stratified Commerce</p>
             <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight uppercase">Artifacts</h2>
           </div>
           <Link href="/marks">
@@ -512,9 +517,9 @@ function NewsletterSection() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className="flex-1 bg-neutral-900 border border-neutral-700 px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-[#0ABAB5]"
+            className="flex-1 bg-neutral-900 border border-neutral-700 px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-[var(--mint)]"
           />
-          <button className="bg-[#0ABAB5] text-black px-6 py-3 font-medium tracking-wider hover:bg-[#089E99] transition-colors uppercase">
+          <button className="bg-[var(--mint)] text-black px-6 py-3 font-medium tracking-wider hover:bg-[#089E99] transition-colors uppercase">
             Subscribe
           </button>
         </div>
@@ -532,7 +537,7 @@ function ScrollProgress({ currentIndex, total, onDotClick }: { currentIndex: num
           key={index}
           onClick={() => onDotClick(index)}
           className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 cursor-pointer hover:scale-125 ${
-            index === currentIndex ? 'bg-[#0ABAB5] scale-125' : 'bg-neutral-600 hover:bg-neutral-400'
+            index === currentIndex ? 'bg-[var(--mint)] scale-125' : 'bg-neutral-600 hover:bg-neutral-400'
           }`}
           aria-label={`Go to section ${index + 1}`}
         />

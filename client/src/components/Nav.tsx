@@ -34,12 +34,12 @@ export default function Nav({
 
   const isActive = (path: string) => location === path;
 
-  // Public navigation links
+  // 4 Pillars navigation - Platform, Production, Events, Community
   const publicLinks = [
-    { href: "/marks", label: "MARKS", icon: Sparkles },
-    { href: "/verify", label: "VERIFY", icon: Shield },
-    { href: "/gatherings", label: "GATHERINGS", icon: Calendar },
-    { href: "/sponsors", label: "SPONSORS", icon: Handshake },
+    { href: "/feed", label: "PLATFORM", icon: Users },
+    { href: "/marks", label: "PRODUCTION", icon: Sparkles },
+    { href: "/gatherings", label: "EVENTS", icon: Calendar },
+    { href: "/inside", label: "COMMUNITY", icon: Shield },
   ];
 
   // Member-only links (shown when logged in)
@@ -100,7 +100,7 @@ export default function Nav({
                 <span 
                   className={`text-xs tracking-widest transition-colors cursor-pointer flex items-center gap-1.5 ${
                     isActive(link.href) 
-                      ? "text-[#3B82F6]" 
+                      ? "text-[var(--mint)]" 
                       : "text-[#666666] hover:text-white"
                   }`}
                 >
@@ -118,7 +118,7 @@ export default function Nav({
                 <span 
                   className={`text-xs tracking-widest transition-colors cursor-pointer flex items-center gap-1.5 ${
                     isActive(link.href) 
-                      ? "text-[#3B82F6]" 
+                      ? "text-[var(--mint)]" 
                       : "text-[#666666] hover:text-white"
                   }`}
                 >
@@ -132,14 +132,14 @@ export default function Nav({
             {!loading && (
               user ? (
                 <Link href="/profile">
-                  <span className="flex items-center gap-2 text-xs tracking-widest text-[#3B82F6] hover:text-white transition-colors cursor-pointer">
+                  <span className="flex items-center gap-2 text-xs tracking-widest text-[var(--mint)] hover:text-white transition-colors cursor-pointer">
                     <User className="w-3.5 h-3.5" />
                     {user.callSign || user.name?.split(' ')[0] || 'PROFILE'}
                   </span>
                 </Link>
               ) : (
                 <Link href="/inside">
-                  <span className="flex items-center gap-2 px-4 py-2 bg-[#3B82F6] text-white text-xs tracking-widest hover:bg-[#7c28c9] transition-colors cursor-pointer">
+                  <span className="flex items-center gap-2 px-4 py-2 bg-[var(--mint)] text-white text-xs tracking-widest hover:bg-[var(--mint-dark)] transition-colors cursor-pointer">
                     <LogIn className="w-3.5 h-3.5" />
                     ENTER
                   </span>
@@ -229,7 +229,7 @@ export default function Nav({
                         <span 
                           className={`flex items-center justify-center gap-3 text-lg tracking-[0.2em] ${
                             isActive(link.href) 
-                              ? "text-[#3B82F6]" 
+                              ? "text-[var(--mint)]" 
                               : "text-white"
                           }`}
                         >
@@ -258,7 +258,7 @@ export default function Nav({
                           <span 
                             className={`flex items-center justify-center gap-3 text-lg tracking-[0.2em] ${
                               isActive(link.href) 
-                                ? "text-[#3B82F6]" 
+                                ? "text-[var(--mint)]" 
                                 : "text-white"
                             }`}
                           >
@@ -281,14 +281,14 @@ export default function Nav({
               >
                 {user ? (
                   <Link href="/profile" onClick={() => setMenuOpen(false)}>
-                    <span className="flex items-center gap-3 text-[#3B82F6] text-lg tracking-[0.2em]">
+                    <span className="flex items-center gap-3 text-[var(--mint)] text-lg tracking-[0.2em]">
                       <User className="w-4 h-4" />
                       {user.callSign || 'PROFILE'}
                     </span>
                   </Link>
                 ) : (
                   <Link href="/inside" onClick={() => setMenuOpen(false)}>
-                    <span className="flex items-center gap-3 px-8 py-3 bg-[#3B82F6] text-white text-sm tracking-[0.2em]">
+                    <span className="flex items-center gap-3 px-8 py-3 bg-[var(--mint)] text-white text-sm tracking-[0.2em]">
                       <LogIn className="w-4 h-4" />
                       ENTER THE COLLECTIVE
                     </span>

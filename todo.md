@@ -608,3 +608,26 @@
 - [ ] Notify when someone replies to your comment
 - [ ] Notify when someone you follow posts
 - [ ] Notify when someone follows you
+
+
+## NOCTA-Inspired Rebrand & 4 Pillars Update
+### Vision & Identity
+- [x] Update vision: "We amplify people's voice"
+- [x] Update identity: Secret society platform that tells people what's happening, amplifies campaigns and messages
+
+### Color Scheme (NOCTA-inspired)
+- [x] Update primary colors: Black, mint, ivory white, chrome, charcoal/soft black
+- [x] Update index.css with new color variables (--mint, --mint-dark, --ivory, --chrome, --charcoal, --soft-black)
+- [x] Update component styling to use new palette (var(--mint) across Home.tsx, Nav.tsx)
+
+### 4 Pillars Navigation
+- [x] Platform (Ads, Campaigns, Branded Promotions) - /feed
+- [x] Production (Content creation, amplification) - /marks
+- [x] Events (Gatherings, ticket sales, organizing) - /gatherings
+- [x] Community (Trust building, street creds) - /inside
+
+### Branding Updates
+- [x] Update Home.tsx hero section with new messaging ("We Amplify Your Voice")
+- [x] Update taglines and copy throughout the platform
+- [x] Align design with NOCTA aesthetic (minimal, premium, streetwear)
+- [x] Update 4 Pillars collection grid with Platform/Production/Events/Community
