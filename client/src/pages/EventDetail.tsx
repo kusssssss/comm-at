@@ -182,16 +182,16 @@ export default function EventDetail() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="px-6 py-4 border-b border-border/30">
+      <header className="px-4 md:px-6 py-4 border-b border-border/30">
         <nav className="flex items-center justify-between max-w-4xl mx-auto">
-          <Link href="/gatherings" className="text-mono text-sm tracking-[0.3em] text-foreground/80 hover:text-foreground transition-colors">
+          <Link href="/gatherings" className="text-mono text-xs md:text-sm tracking-[0.3em] text-foreground/80 hover:text-foreground transition-colors">
             COMM@
           </Link>
-          <span className="text-xs text-muted-foreground tracking-wider">GATHERING</span>
+          <span className="text-[10px] md:text-xs text-muted-foreground tracking-wider">GATHERING</span>
         </nav>
       </header>
 
-      <main className="px-6 py-12">
+      <main className="px-4 md:px-6 py-8 md:py-12">
         <div className="max-w-lg mx-auto space-y-8">
           {/* Event Header with Reveal State */}
           <div className="text-center animate-fade-in">

@@ -125,8 +125,8 @@ export default function Feed() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black text-white">
-        <div className="container max-w-2xl py-8">
-          <h1 className="text-2xl font-bold mb-6">Feed</h1>
+        <div className="container max-w-2xl py-6 md:py-8 px-4">
+          <h1 className="text-xl md:text-2xl font-bold mb-6">Feed</h1>
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
               <Card key={i} className="bg-zinc-900 border-zinc-800">
@@ -150,9 +150,9 @@ export default function Feed() {
   
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="container max-w-2xl py-8">
+      <div className="container max-w-2xl py-6 md:py-8 px-4">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Feed</h1>
+          <h1 className="text-xl md:text-2xl font-bold">Feed</h1>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-zinc-400">
               {posts?.length || 0} posts

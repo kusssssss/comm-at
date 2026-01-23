@@ -73,18 +73,18 @@ export default function Referral() {
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-blue-500/20">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="container mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
           <Link href="/">
-            <span className="text-2xl font-bold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">@</span>
+            <span className="text-xl md:text-2xl font-bold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">@</span>
           </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/inside" className="text-sm tracking-wider text-gray-400 hover:text-white transition-colors">INSIDE</Link>
-            <Link href="/ranks" className="text-sm tracking-wider text-gray-400 hover:text-white transition-colors">RANKS</Link>
+          <nav className="flex items-center gap-4 md:gap-6">
+            <Link href="/inside" className="text-xs md:text-sm tracking-wider text-gray-400 hover:text-white transition-colors">INSIDE</Link>
+            <Link href="/ranks" className="text-xs md:text-sm tracking-wider text-gray-400 hover:text-white transition-colors">RANKS</Link>
           </nav>
         </div>
       </header>
 
-      <main className="pt-24 pb-16 px-4">
+      <main className="pt-20 md:pt-24 pb-12 md:pb-16 px-4">
         <div className="container mx-auto max-w-2xl">
           {/* Title */}
           <motion.div
@@ -92,7 +92,7 @@ export default function Referral() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <ChromaticText className="text-4xl md:text-5xl font-bold mb-4">
+            <ChromaticText className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">
               REFER & EARN
             </ChromaticText>
             <p className="text-gray-500 tracking-wider">

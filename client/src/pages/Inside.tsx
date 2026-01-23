@@ -86,29 +86,29 @@ export default function Inside() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="px-6 py-4 border-b border-border/30 sticky top-0 bg-background/95 backdrop-blur-sm z-40">
+      <header className="px-4 md:px-6 py-4 border-b border-border/30 sticky top-0 bg-background/95 backdrop-blur-sm z-40">
         <nav className="flex items-center justify-between max-w-4xl mx-auto">
           <Link href="/" className="text-mono text-sm tracking-[0.3em] text-foreground/80 hover:text-foreground transition-colors">
             COMM@
           </Link>
-          <div className="flex items-center gap-6">
-            <Link href="/gatherings" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <div className="flex items-center gap-3 md:gap-6 overflow-x-auto">
+            <Link href="/gatherings" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
               Events
             </Link>
-            <Link href="/ranks" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Leaderboard
+            <Link href="/ranks" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap hidden sm:block">
+              Ranks
             </Link>
-            <Link href="/refer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/refer" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap hidden sm:block">
               Refer
             </Link>
-            <Link href="/profile" className="text-sm text-[#3B82F6] hover:text-[#3B82F6]/80 transition-colors">
+            <Link href="/profile" className="text-xs md:text-sm text-[#3B82F6] hover:text-[#3B82F6]/80 transition-colors whitespace-nowrap">
               {user?.callSign}
             </Link>
           </div>
         </nav>
       </header>
 
-      <main className="px-6 py-12">
+      <main className="px-4 md:px-6 py-8 md:py-12">
         <div className="max-w-2xl mx-auto space-y-12">
           {/* Welcome */}
           <div className="text-center animate-fade-in">
@@ -127,22 +127,22 @@ export default function Inside() {
               <Users className="w-4 h-4 text-muted-foreground" />
               <h2 className="text-sm text-muted-foreground tracking-wider uppercase">The Collective</h2>
             </div>
-            <div className="grid grid-cols-4 gap-3">
-              <div className="card-noir p-4 text-center">
-                <p className="text-2xl text-[#3B82F6] font-light">{stats?.totalMarked || 0}</p>
-                <p className="text-xs text-muted-foreground">Members</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3">
+              <div className="card-noir p-3 md:p-4 text-center">
+                <p className="text-xl md:text-2xl text-[#3B82F6] font-light">{stats?.totalMarked || 0}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground">Members</p>
               </div>
-              <div className="card-noir p-4 text-center">
-                <p className="text-2xl text-foreground font-light">{stats?.totalArtifacts || 0}</p>
-                <p className="text-xs text-muted-foreground">Marks</p>
+              <div className="card-noir p-3 md:p-4 text-center">
+                <p className="text-xl md:text-2xl text-foreground font-light">{stats?.totalArtifacts || 0}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground">Marks</p>
               </div>
-              <div className="card-noir p-4 text-center">
-                <p className="text-2xl text-foreground font-light">{stats?.totalDrops || 0}</p>
-                <p className="text-xs text-muted-foreground">Drops</p>
+              <div className="card-noir p-3 md:p-4 text-center">
+                <p className="text-xl md:text-2xl text-foreground font-light">{stats?.totalDrops || 0}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground">Drops</p>
               </div>
-              <div className="card-noir p-4 text-center">
-                <p className="text-2xl text-foreground font-light">{stats?.totalEvents || 0}</p>
-                <p className="text-xs text-muted-foreground">Events</p>
+              <div className="card-noir p-3 md:p-4 text-center">
+                <p className="text-xl md:text-2xl text-foreground font-light">{stats?.totalEvents || 0}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground">Events</p>
               </div>
             </div>
           </section>

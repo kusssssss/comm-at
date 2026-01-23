@@ -631,3 +631,26 @@
 - [x] Update taglines and copy throughout the platform
 - [x] Align design with NOCTA aesthetic (minimal, premium, streetwear)
 - [x] Update 4 Pillars collection grid with Platform/Production/Events/Community
+
+
+## Copywriting & Mobile Responsiveness Fixes (Jan 23, 2026)
+### Copywriting - Make More Self-Explanatory
+- [x] Home.tsx - Simplify "Stratified Reality" language (changed to "Membership Tiers")
+- [x] Home.tsx - Add clearer explanations for Layer system (now "Access Level" with plain descriptions)
+- [x] Home.tsx - Make "Artifacts" section more understandable (now "Limited Merch" / "Exclusive Drops")
+- [x] Home.tsx - Updated hero subtitle: "A members-only network for exclusive events, limited merch, and insider access"
+- [x] Home.tsx - Updated tier descriptions to plain language (e.g., "Free tier. Browse public events")
+- [x] Home.tsx - Updated event reveal messages ("Date revealed to verified members" instead of "Time reveals when you are cleared")
+- [x] Nav.tsx - Navigation labels are clear (PLATFORM, PRODUCTION, EVENTS, COMMUNITY)
+
+### Mobile Responsiveness Issues
+- [x] Test Home.tsx on mobile viewport - Nav already has mobile menu
+- [x] Test /feed (Platform) page on mobile - Fixed container padding
+- [x] Test /marks (Production) page on mobile - Already has touch swipe support
+- [x] Test /gatherings (Events) page on mobile - Fixed header and grid layout
+- [x] Test /inside (Community) page on mobile - Fixed header nav and stats grid
+- [x] Test /ranks page on mobile - Fixed header and title sizing
+- [x] Test /refer page on mobile - Fixed header and title sizing
+- [x] Test EventDetail page on mobile - Fixed header padding
+- [x] Test Profile page on mobile - Fixed header and main padding
+- [x] All pages now have responsive padding (px-4 md:px-6) and text sizing

@@ -190,7 +190,7 @@ function EventSection({ event, index, isFirst, sectionRef }: { event: any; index
               ) : (
                 <div className="flex items-center gap-3 text-neutral-500">
                   <Calendar className="w-4 h-4" />
-                  <span className="italic">Time reveals when you are cleared</span>
+                  <span className="italic">Date revealed to verified members</span>
                 </div>
               )}
               
@@ -202,7 +202,7 @@ function EventSection({ event, index, isFirst, sectionRef }: { event: any; index
               ) : (
                 <div className="flex items-center gap-3 text-neutral-500">
                   <MapPin className="w-4 h-4" />
-                  <span className="italic">Location reveals for Signal and above</span>
+                  <span className="italic">Location revealed to active members</span>
                 </div>
               )}
               
@@ -267,13 +267,14 @@ function StratifiedRealitySection({ index }: { index: number }) {
 
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-neutral-400 mb-8 leading-relaxed">
-            A secret society that tells people what's happening.
+            A members-only network for exclusive events, limited merch, and insider access.
           </p>
 
           {/* Description */}
           <p className="text-base md:text-lg text-neutral-500 mb-12 max-w-2xl mx-auto leading-relaxed">
-            We amplify campaigns and messages. Unlock layers to access exclusive gatherings, 
-            limited marks, and <span className="text-[var(--mint)]">inner circle</span> content.
+            Join our community to get early access to events, exclusive merchandise drops, 
+            and connect with <span className="text-[var(--mint)]">like-minded people</span>. 
+            The more active you are, the more you unlock.
           </p>
 
           {/* Layer badges */}
@@ -358,14 +359,14 @@ function CollectionGridSection({ index }: { index: number }) {
   );
 }
 
-// Layers Explanation Section with sticky scroll
+// Membership Tiers Section with sticky scroll
 function LayersSection({ index }: { index: number }) {
   const layers = [
-    { name: 'STREETLIGHT', level: 0, description: 'Public view. See that something is happening.', color: 'bg-neutral-600' },
-    { name: 'VERIFIED', level: 1, description: 'Request access. See the time window.', color: 'bg-blue-600' },
-    { name: 'SIGNAL', level: 2, description: 'Late reveal access. Time reveals 6 hours before.', color: 'bg-cyan-500' },
-    { name: 'INNER ROOM', level: 3, description: 'Private rooms. Full location reveal.', color: 'bg-purple-600' },
-    { name: 'BLACK LABEL', level: 4, description: 'Partner circle. Invite-only artifacts.', color: 'bg-black border border-white' }
+    { name: 'STREETLIGHT', level: 0, description: 'Free tier. Browse public events and see what\'s happening.', color: 'bg-neutral-600' },
+    { name: 'VERIFIED', level: 1, description: 'Verified member. Request event access and see event times.', color: 'bg-blue-600' },
+    { name: 'SIGNAL', level: 2, description: 'Active member. Get early event details 6 hours before others.', color: 'bg-cyan-500' },
+    { name: 'INNER ROOM', level: 3, description: 'VIP access. See full event locations and join private gatherings.', color: 'bg-purple-600' },
+    { name: 'BLACK LABEL', level: 4, description: 'Partner tier. Exclusive merch drops and invite-only events.', color: 'bg-black border border-white' }
   ];
 
   return (
@@ -379,13 +380,13 @@ function LayersSection({ index }: { index: number }) {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <p className="text-xs tracking-[0.3em] text-[var(--mint)] mb-4 uppercase">Stratified Identity</p>
+            <p className="text-xs tracking-[0.3em] text-[var(--mint)] mb-4 uppercase">Membership Tiers</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight uppercase">
-              Your Layer
+              Your Access Level
             </h2>
             <p className="text-neutral-400 max-w-lg mx-auto">
-              Every member has a Layer, Reputation, and Clearance. 
-              What you see depends on who you are.
+              Your membership tier determines what events, merch, and content you can access. 
+              Level up by attending events and engaging with the community.
             </p>
           </div>
 
@@ -411,8 +412,8 @@ function LayersSection({ index }: { index: number }) {
           {/* CTA */}
           <div className="text-center mt-12">
             <Link href="/inside">
-              <button className="px-8 py-3 bg-[var(--mint)] text-black font-medium tracking-wider hover:bg-[var(--mint)] transition-colors uppercase">
-                Upgrade Your Layer
+              <button className="px-8 py-3 bg-[var(--mint)] text-black font-medium tracking-wider hover:bg-[var(--mint-dark)] transition-colors uppercase">
+                Check Your Tier
               </button>
             </Link>
           </div>
@@ -433,8 +434,8 @@ function ProductGridSection({ products, index }: { products: any[]; index: numbe
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <p className="text-xs tracking-[0.3em] text-[var(--mint)] mb-2 uppercase">Stratified Commerce</p>
-            <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight uppercase">Artifacts</h2>
+            <p className="text-xs tracking-[0.3em] text-[var(--mint)] mb-2 uppercase">Exclusive Drops</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight uppercase">Limited Merch</h2>
           </div>
           <Link href="/marks">
             <span className="text-xs tracking-[0.2em] text-neutral-400 hover:text-white transition-colors uppercase">
@@ -445,8 +446,8 @@ function ProductGridSection({ products, index }: { products: any[]; index: numbe
 
         {/* Description */}
         <p className="text-neutral-500 mb-8 max-w-lg">
-          Merch is the physical receipt of "I was there" and "I belong." 
-          Artifacts are tied to layers and proof.
+          Exclusive merchandise only available to members. 
+          Some items require attending specific events or reaching certain membership tiers.
         </p>
 
         {/* Product Grid */}
@@ -509,7 +510,7 @@ function NewsletterSection() {
           Never Miss A Drop
         </h2>
         <p className="text-neutral-400 mb-8 max-w-md mx-auto">
-          Subscribe to receive updates on exclusive gatherings, limited artifacts, and layer upgrades.
+          Get notified about upcoming events, new merch drops, and membership perks.
         </p>
         <div className="flex flex-col sm:flex-row max-w-md mx-auto gap-2 sm:gap-0">
           <input

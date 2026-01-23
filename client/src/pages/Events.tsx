@@ -105,16 +105,16 @@ export default function Events() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="px-6 py-4 border-b border-border/30 sticky top-0 bg-background/95 backdrop-blur-sm z-40">
+      <header className="px-4 md:px-6 py-4 border-b border-border/30 sticky top-0 bg-background/95 backdrop-blur-sm z-40">
         <nav className="flex items-center justify-between max-w-4xl mx-auto">
-          <Link href="/inside" className="text-mono text-sm tracking-[0.3em] text-foreground/80 hover:text-foreground transition-colors">
+          <Link href="/inside" className="text-mono text-xs md:text-sm tracking-[0.3em] text-foreground/80 hover:text-foreground transition-colors">
             COMM@
           </Link>
-          <span className="text-xs text-muted-foreground tracking-wider">GATHERINGS</span>
+          <span className="text-[10px] md:text-xs text-muted-foreground tracking-wider">GATHERINGS</span>
         </nav>
       </header>
 
-      <main className="px-6 py-12">
+      <main className="px-4 md:px-6 py-8 md:py-12">
         <div className="max-w-2xl mx-auto space-y-12">
           {/* Header */}
           <div className="text-center animate-fade-in">
@@ -188,7 +188,7 @@ export default function Events() {
                         </div>
                         
                         {/* Event Info Grid */}
-                        <div className="grid grid-cols-3 gap-4 text-sm mb-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm mb-3">
                           {/* Date/Time */}
                           <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4" style={{ color: event.timeRevealed ? '#0ABAB5' : '#666' }} />
