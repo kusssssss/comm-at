@@ -812,6 +812,8 @@ export const appRouter = router({
             area: event.area,
             city: event.city,
             coordinates: event.coordinates,
+            latitude: event.latitude,
+            longitude: event.longitude,
           }, userMarkState, now);
           
           // Get capacity info
@@ -831,6 +833,8 @@ export const appRouter = router({
             venueAddress: revealInfo.venueAddress,
             area: revealInfo.area,
             coordinates: revealInfo.coordinates,
+            latitude: revealInfo.latitude,
+            longitude: revealInfo.longitude,
             // Add reveal info
             revealState: revealInfo.state,
             revealStateLabel: getRevealStateLabel(revealInfo.state),

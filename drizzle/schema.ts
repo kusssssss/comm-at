@@ -458,7 +458,9 @@ export const events = mysqlTable("events", {
   locationText: text("locationText"),
   locationRevealHoursBefore: int("locationRevealHoursBefore").default(24).notNull(),
   locationRevealAt: timestamp("locationRevealAt"),
-  coordinates: varchar("coordinates", { length: 64 }), // lat,lng
+  coordinates: varchar("coordinates", { length: 64 }), // lat,lng (legacy)
+  latitude: varchar("latitude", { length: 32 }), // Precise latitude for map pin
+  longitude: varchar("longitude", { length: 32 }), // Precise longitude for map pin
   
   // Category for filtering
   category: varchar("category", { length: 64 }).default("community"), // speed, music, art, community, mission, merch

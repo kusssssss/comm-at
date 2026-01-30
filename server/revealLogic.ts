@@ -33,6 +33,8 @@ export interface RevealInfo {
   area: string | null;
   city: string | null;
   coordinates: string | null;
+  latitude: string | null;
+  longitude: string | null;
   timeRevealAt: Date | null;
   locationRevealAt: Date | null;
   countdownToTimeReveal: number | null; // milliseconds
@@ -57,6 +59,8 @@ export interface GatheringData {
   area: string | null;
   city: string | null;
   coordinates: string | null;
+  latitude: string | null;
+  longitude: string | null;
 }
 
 /**
@@ -154,6 +158,8 @@ export function calculateRevealInfo(
     area: locationRevealed ? gathering.area : null,
     city: gathering.city, // City is always shown
     coordinates: locationRevealed ? gathering.coordinates : null,
+    latitude: locationRevealed ? gathering.latitude : null,
+    longitude: locationRevealed ? gathering.longitude : null,
     timeRevealAt,
     locationRevealAt,
     countdownToTimeReveal,

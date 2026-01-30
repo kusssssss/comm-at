@@ -715,3 +715,30 @@
 - [x] Add category icons and badges
 - [x] Improved lineup display with numbered artist cards
 - [x] Better capacity visualization with progress bar
+
+
+## Event Location Pins & Map Integration - Jan 30, 2026
+### Backend Schema
+- [x] Add latitude field to events table (migration 0020)
+- [x] Add longitude field to events table (migration 0020)
+- [x] Run database migration
+
+### Update Event Data
+- [x] Add coordinates for all 7 seeded events (Jakarta locations)
+- [x] Ensure coordinates are accurate for each venue
+
+### Router Updates
+- [x] Include lat/lng in event.list response
+- [x] Only reveal coordinates when event location is revealed (stratified reality)
+- [x] Updated revealLogic.ts to include latitude/longitude in RevealInfo
+
+### Frontend - Event Detail Page
+- [x] Add map component showing venue pin when location is revealed
+- [x] Hide map when location is not yet revealed
+- [x] Added "Get Directions" link to Google Maps
+
+### Frontend - Homepage
+- [x] Add JakartaMapSection showing all event locations
+- [x] Show custom markers with event names
+- [x] Auto-fit bounds to show all markers
+- [x] Event legend with links to event pages

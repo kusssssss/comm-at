@@ -6,11 +6,12 @@ import { Link, useParams, useLocation } from "wouter";
 import { 
   Loader2, Calendar, MapPin, Users, Lock, Clock, CheckCircle2, QrCode, 
   Eye, EyeOff, Unlock, AlertTriangle, Mic2, Ticket, ArrowLeft, Share2,
-  Music, Utensils, Palette, Film, ShoppingBag, PartyPopper
+  Music, Utensils, Palette, Film, ShoppingBag, PartyPopper, Navigation
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import QRCode from "react-qr-code";
+import { MapView } from "@/components/Map";
 
 type RevealState = 'tease' | 'window' | 'locked' | 'revealed';
 
@@ -507,6 +508,47 @@ export default function EventDetail() {
                   </div>
                 )}
               </InfoCard>
+
+              {/* Map Card - Only shown when location is revealed */}
+              {locationRevealed && (event as any).latitude && (event as any).longitude && (
+                <div className="bg-[var(--soft-black)] border border-[var(--charcoal)] rounded-xl overflow-hidden">
+                  <div className="p-4 border-b border-[var(--charcoal)]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Navigation className="w-4 h-4 text-[var(--mint)]" />
+                        <span className="text-sm font-medium text-[var(--ivory)]">Venue Location</span>
+                      </div>
+                      <a 
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${(event as any).latitude},${(event as any).longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-[var(--mint)] hover:text-[var(--mint-dark)] transition-colors"
+                      >
+                        Get Directions →
+                      </a>
+                    </div>
+                  </div>
+                  <MapView
+                    className="h-[200px]"
+                    initialCenter={{
+                      lat: parseFloat((event as any).latitude),
+                      lng: parseFloat((event as any).longitude)
+                    }}
+                    initialZoom={16}
+                    onMapReady={(map) => {
+                      // Add marker for venue
+                      new google.maps.marker.AdvancedMarkerElement({
+                        map,
+                        position: {
+                          lat: parseFloat((event as any).latitude),
+                          lng: parseFloat((event as any).longitude)
+                        },
+                        title: event.venueName || event.title,
+                      });
+                    }}
+                  />
+                </div>
+              )}
 
               {/* Capacity Card */}
               <InfoCard icon={Users} label="Capacity">

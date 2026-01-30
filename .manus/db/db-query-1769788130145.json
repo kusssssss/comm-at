@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE events SET latitude = '-6.2614', longitude = '106.8106' WHERE title = 'SOUTHBERPESTA';\nUPDATE events SET latitude = '-6.2607', longitude = '106.7816' WHERE title = 'THE VOID';\nUPDATE events SET latitude = '-6.2297', longitude = '106.8295' WHERE title = 'GALLERY AFTER DARK';\nUPDATE events SET latitude = '-6.2088', longitude = '106.8456' WHERE title = 'ROOFTOP SESSIONS';\nUPDATE events SET latitude = '-6.2550', longitude = '106.7654' WHERE title = 'SUPPER CLUB';\nUPDATE events SET latitude = '-6.2392', longitude = '106.7925' WHERE title = 'FILM NOIR';\nUPDATE events SET latitude = '-6.1754', longitude = '106.8272' WHERE title = 'DROP 003';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute UPDATE events SET latitude = '-6.2614', longitude = '106.8106' WHERE title = 'SOUTHBERPESTA';\nUPDATE events SET latitude = '-6.2607', longitude = '106.7816' WHERE title = 'THE VOID';\nUPDATE events SET latitude = '-6.2297', longitude = '106.8295' WHERE title = 'GALLERY AFTER DARK';\nUPDATE events SET latitude = '-6.2088', longitude = '106.8456' WHERE title = 'ROOFTOP SESSIONS';\nUPDATE events SET latitude = '-6.2550', longitude = '106.7654' WHERE title = 'SUPPER CLUB';\nUPDATE events SET latitude = '-6.2392', longitude = '106.7925' WHERE title = 'FILM NOIR';\nUPDATE events SET latitude = '-6.1754', longitude = '106.8272' WHERE title = 'DROP 003';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2929
+}

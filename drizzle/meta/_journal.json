@@ -141,6 +141,13 @@
       "when": 1769786770220,
       "tag": "0019_breezy_spiral",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1769788110368,
+      "tag": "0020_oval_vermin",
+      "breakpoints": true
     }
   ]
 }

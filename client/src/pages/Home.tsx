@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/_core/hooks/useAuth';
-import { Calendar, MapPin, Users, ChevronDown, Eye, EyeOff, Lock, Unlock, Shield, Layers } from 'lucide-react';
+import { Calendar, MapPin, Users, ChevronDown, Eye, EyeOff, Lock, Unlock, Shield, Layers, Navigation } from 'lucide-react';
 import Nav from '@/components/Nav';
+import { MapView } from '@/components/Map';
 // SponsorShowcase hidden from homepage - accessible via /sponsors
 // import { SponsorShowcase } from '@/components/SponsorShowcase';
 
@@ -500,6 +501,125 @@ function ProductGridSection({ products, index }: { products: any[]; index: numbe
   );
 }
 
+// Jakarta Events Map Section (non-sticky, before newsletter)
+function JakartaMapSection({ events }: { events: any[] }) {
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+
+  // Filter events with coordinates
+  const eventsWithCoords = events.filter((e: any) => e.latitude && e.longitude);
+
+  const handleMapReady = (map: google.maps.Map) => {
+    mapRef.current = map;
+    
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.map = null);
+    markersRef.current = [];
+
+    // Add markers for each event
+    eventsWithCoords.forEach((event: any) => {
+      const lat = parseFloat(event.latitude);
+      const lng = parseFloat(event.longitude);
+      
+      if (!isNaN(lat) && !isNaN(lng)) {
+        // Create custom marker content
+        const markerContent = document.createElement('div');
+        markerContent.innerHTML = `
+          <div style="
+            background: var(--mint, #6FCF97);
+            color: black;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            white-space: nowrap;
+            cursor: pointer;
+          ">
+            ${event.title}
+          </div>
+        `;
+
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          map,
+          position: { lat, lng },
+          title: event.title,
+          content: markerContent,
+        });
+
+        markersRef.current.push(marker);
+      }
+    });
+
+    // Fit bounds to show all markers
+    if (markersRef.current.length > 0) {
+      const bounds = new google.maps.LatLngBounds();
+      eventsWithCoords.forEach((event: any) => {
+        const lat = parseFloat(event.latitude);
+        const lng = parseFloat(event.longitude);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          bounds.extend({ lat, lng });
+        }
+      });
+      map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
+    }
+  };
+
+  if (eventsWithCoords.length === 0) return null;
+
+  return (
+    <section className="relative z-50 bg-[var(--charcoal)] py-16">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Navigation className="w-5 h-5 text-[var(--mint)]" />
+              <h2 className="text-2xl md:text-3xl font-bold text-[var(--ivory)] tracking-tight uppercase">
+                Event Locations
+              </h2>
+            </div>
+            <p className="text-[var(--chrome)] text-sm">
+              Upcoming gatherings across Jakarta
+            </p>
+          </div>
+          <div className="hidden md:flex items-center gap-2 text-sm text-[var(--chrome)]">
+            <MapPin className="w-4 h-4" />
+            <span>{eventsWithCoords.length} locations</span>
+          </div>
+        </div>
+
+        {/* Map Container */}
+        <div className="rounded-2xl overflow-hidden border border-[var(--charcoal)]">
+          <MapView
+            className="h-[400px] md:h-[500px]"
+            initialCenter={{ lat: -6.2088, lng: 106.8456 }} // Jakarta center
+            initialZoom={11}
+            onMapReady={handleMapReady}
+          />
+        </div>
+
+        {/* Event Legend */}
+        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          {eventsWithCoords.slice(0, 4).map((event: any) => (
+            <Link key={event.id} href={`/gatherings/${event.id}`}>
+              <div className="bg-[var(--soft-black)] border border-[var(--charcoal)] rounded-lg p-4 hover:border-[var(--mint)]/30 transition-colors cursor-pointer">
+                <div className="flex items-start gap-3">
+                  <div className="w-3 h-3 rounded-full bg-[var(--mint)] mt-1 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[var(--ivory)] font-medium text-sm truncate">{event.title}</p>
+                    <p className="text-[var(--chrome)] text-xs mt-1">{event.area || event.city || 'Jakarta'}</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // Newsletter Section (non-sticky, at the end)
 function NewsletterSection() {
   const [email, setEmail] = useState('');
@@ -648,6 +768,9 @@ export default function Home() {
       </div>
 
       {/* Sponsors section hidden from homepage - accessible via /sponsors */}
+
+      {/* Jakarta Events Map - shows all event locations */}
+      <JakartaMapSection events={events} />
 
       {/* Newsletter - non-sticky, at the end */}
       <NewsletterSection />
