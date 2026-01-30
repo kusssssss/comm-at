@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, title, slug FROM events ORDER BY id LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, title, slug FROM events ORDER BY id LIMIT 10;",
+  "rows": [
+    {
+      "id": "90001",
+      "title": "THE VOID",
+      "slug": "the-void"
+    },
+    {
+      "id": "90002",
+      "title": "SUPPER CLUB",
+      "slug": "supper-club-feb"
+    },
+    {
+      "id": "90003",
+      "title": "GALLERY AFTER DARK",
+      "slug": "gallery-after-dark"
+    },
+    {
+      "id": "90004",
+      "title": "ROOFTOP SESSIONS",
+      "slug": "rooftop-sessions-feb"
+    },
+    {
+      "id": "90005",
+      "title": "FILM NOIR",
+      "slug": "film-noir-screening"
+    },
+    {
+      "id": "90006",
+      "title": "DROP 003",
+      "slug": "drop-003-release"
+    },
+    {
+      "id": "90007",
+      "title": "SOUTHBERPESTA",
+      "slug": "southberpesta-blokm"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tslug\n90001\tTHE VOID\tthe-void\n90002\tSUPPER CLUB\tsupper-club-feb\n90003\tGALLERY AFTER DARK\tgallery-after-dark\n90004\tROOFTOP SESSIONS\trooftop-sessions-feb\n90005\tFILM NOIR\tfilm-noir-screening\n90006\tDROP 003\tdrop-003-release\n90007\tSOUTHBERPESTA\tsouthberpesta-blokm\n",
+  "stderr": "",
+  "execution_time_ms": 1575
+}

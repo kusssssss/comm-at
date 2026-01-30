@@ -702,3 +702,16 @@
 - [x] Check/add registration info field to events table (added via migration 0019)
 - [x] Update all seeded events with complete info (7 events updated)
 - [x] Update EventDetail page to show all fields clearly (Lineup with Mic2 icon, Registration with Ticket icon)
+
+
+## Event Detail Page Redesign - Jan 30, 2026
+- [x] Add hero image section with event cover (50-60vh with gradient overlay)
+- [x] Improve layout with clear sections for all info (2-column grid on desktop)
+- [x] Display: Event name, Tagline, Line up, Date, Time, Place, Registration/FDC info
+- [x] Add visual hierarchy and better typography (card-based sections)
+- [x] Make the page feel premium and complete (countdown timers, progress bars)
+- [x] Ensure mobile responsiveness (single column on mobile)
+- [x] Add share button functionality
+- [x] Add category icons and badges
+- [x] Improved lineup display with numbered artist cards
+- [x] Better capacity visualization with progress bar
