@@ -1,13 +1,42 @@
 /**
- * MissionMap v2 - Clean, minimal, Jakarta-focused
+ * MissionMap v3 - District color-coded, click navigation
  * Dark tactical styling with hover-reveal markers
  */
 
 import { useRef } from 'react';
 import { MapView } from '@/components/Map';
 
-// Jakarta center and bounds
+// Jakarta center
 const JAKARTA_CENTER = { lat: -6.2088, lng: 106.8200 };
+
+// District color scheme
+const DISTRICT_COLORS: Record<string, { primary: string; glow: string; rgba: string }> = {
+  'West': { primary: '#FF6B6B', glow: 'rgba(255, 107, 107, 0.4)', rgba: 'rgba(255, 107, 107, 0.3)' },      // Coral Red
+  'North': { primary: '#4ECDC4', glow: 'rgba(78, 205, 196, 0.4)', rgba: 'rgba(78, 205, 196, 0.3)' },       // Teal
+  'South': { primary: '#6FCF97', glow: 'rgba(111, 207, 151, 0.4)', rgba: 'rgba(111, 207, 151, 0.3)' },     // Mint (default)
+  'East': { primary: '#FFE66D', glow: 'rgba(255, 230, 109, 0.4)', rgba: 'rgba(255, 230, 109, 0.3)' },      // Gold
+  'Central': { primary: '#A78BFA', glow: 'rgba(167, 139, 250, 0.4)', rgba: 'rgba(167, 139, 250, 0.3)' },   // Purple
+};
+
+// Map areas to districts
+const areaToDistrict: Record<string, string> = {
+  'Blok M': 'South',
+  'Kemang': 'South',
+  'SCBD': 'South',
+  'Senopati': 'South',
+  'Menteng': 'Central',
+  'PIK': 'North',
+  'Sudirman': 'Central',
+  'Kuningan': 'South',
+  'Kelapa Gading': 'North',
+  'Tangerang': 'West',
+  'Cengkareng': 'West',
+  'Grogol': 'West',
+  'Cakung': 'East',
+  'Bekasi': 'East',
+  'Ciracas': 'East',
+  'Jakarta': 'Central',
+};
 
 // Area coordinates for non-authenticated markers
 const areaCoordinates: Record<string, { lat: number; lng: number }> = {
@@ -22,6 +51,24 @@ const areaCoordinates: Record<string, { lat: number; lng: number }> = {
   'Kelapa Gading': { lat: -6.1600, lng: 106.9050 },
   'Jakarta': { lat: -6.2088, lng: 106.8456 },
 };
+
+// Get district from area or coordinates
+function getDistrict(area: string, lat?: number, lng?: number): string {
+  if (areaToDistrict[area]) return areaToDistrict[area];
+  
+  // Fallback: determine by coordinates
+  if (lat && lng) {
+    if (lng < 106.78) return 'West';
+    if (lat < -6.25) return 'South';
+    if (lat > -6.15) return 'North';
+    if (lng > 106.88) return 'East';
+  }
+  return 'Central';
+}
+
+function getDistrictColor(district: string) {
+  return DISTRICT_COLORS[district] || DISTRICT_COLORS['Central'];
+}
 
 interface MissionMapProps {
   events: any[];
@@ -45,7 +92,7 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
   const handleMapReady = (map: google.maps.Map) => {
     mapRef.current = map;
     
-    // Apply dark style via styledMapType
+    // Apply dark style
     const darkStyle = new google.maps.StyledMapType([
       { elementType: "geometry", stylers: [{ color: "#0a0a0f" }] },
       { elementType: "labels.text.stroke", stylers: [{ color: "#0a0a0f" }] },
@@ -66,7 +113,6 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
     map.mapTypes.set('dark', darkStyle);
     map.setMapTypeId('dark');
     
-    // Disable all UI
     map.setOptions({
       disableDefaultUI: true,
       zoomControl: false,
@@ -81,23 +127,27 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
     markersRef.current = [];
 
     if (isAuthenticated) {
-      // AUTHENTICATED: Show exact location pins with pulse
+      // AUTHENTICATED: Show exact location pins with district colors
       eventsWithLocation.forEach((event: any) => {
         const lat = parseFloat(event.latitude);
         const lng = parseFloat(event.longitude);
         
         if (!isNaN(lat) && !isNaN(lng)) {
+          const district = getDistrict(event.area || 'Jakarta', lat, lng);
+          const colors = getDistrictColor(district);
+          
           const markerEl = document.createElement('div');
           markerEl.style.cssText = 'position: relative; cursor: pointer;';
           markerEl.innerHTML = `
-            <div style="
+            <div class="marker-dot" style="
               width: 14px;
               height: 14px;
-              background: #6FCF97;
+              background: ${colors.primary};
               border-radius: 50%;
-              box-shadow: 0 0 20px #6FCF97, 0 0 40px rgba(111, 207, 151, 0.4);
+              box-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.glow};
               position: relative;
               z-index: 2;
+              transition: transform 0.2s;
             "></div>
             <div style="
               position: absolute;
@@ -106,9 +156,9 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
               transform: translate(-50%, -50%);
               width: 30px;
               height: 30px;
-              border: 2px solid rgba(111, 207, 151, 0.6);
+              border: 2px solid ${colors.rgba};
               border-radius: 50%;
-              animation: pulse 2s infinite;
+              animation: pulse-${district} 2s infinite;
             "></div>
             <div style="
               position: absolute;
@@ -116,7 +166,7 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
               left: 50%;
               transform: translateX(-50%);
               background: rgba(0, 0, 0, 0.95);
-              border: 1px solid #6FCF97;
+              border: 1px solid ${colors.primary};
               padding: 10px 14px;
               border-radius: 4px;
               white-space: nowrap;
@@ -126,10 +176,11 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
               z-index: 10;
             " class="marker-tip">
               <div style="color: #fff; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">${event.title}</div>
-              <div style="color: #6FCF97; font-size: 10px; margin-top: 3px;">${event.venueName || event.area || 'Jakarta'}</div>
+              <div style="color: ${colors.primary}; font-size: 10px; margin-top: 3px;">${event.venueName || event.area || 'Jakarta'}</div>
+              <div style="color: ${colors.primary}; font-size: 9px; margin-top: 2px; opacity: 0.7;">${district} Jakarta</div>
             </div>
             <style>
-              @keyframes pulse {
+              @keyframes pulse-${district} {
                 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
                 50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
               }
@@ -139,11 +190,15 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
           // Hover effect
           markerEl.addEventListener('mouseenter', () => {
             const tip = markerEl.querySelector('.marker-tip') as HTMLElement;
+            const dot = markerEl.querySelector('.marker-dot') as HTMLElement;
             if (tip) tip.style.opacity = '1';
+            if (dot) dot.style.transform = 'scale(1.3)';
           });
           markerEl.addEventListener('mouseleave', () => {
             const tip = markerEl.querySelector('.marker-tip') as HTMLElement;
+            const dot = markerEl.querySelector('.marker-dot') as HTMLElement;
             if (tip) tip.style.opacity = '0';
+            if (dot) dot.style.transform = 'scale(1)';
           });
 
           const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -152,6 +207,7 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
             content: markerEl,
           });
 
+          // Click to navigate
           marker.addListener('click', () => {
             window.location.href = `/gatherings/${event.id}`;
           });
@@ -160,10 +216,12 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
         }
       });
     } else {
-      // NOT AUTHENTICATED: Show area rings
+      // NOT AUTHENTICATED: Show area rings with district colors
       Object.entries(areaGroups).forEach(([area, areaEvents]) => {
         const coords = areaCoordinates[area] || areaCoordinates['Jakarta'];
         const count = areaEvents.length;
+        const district = getDistrict(area);
+        const colors = getDistrictColor(district);
         
         const markerEl = document.createElement('div');
         markerEl.style.cssText = 'position: relative; cursor: pointer;';
@@ -171,16 +229,16 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
           <div style="
             width: 50px;
             height: 50px;
-            border: 2px solid rgba(111, 207, 151, 0.3);
+            border: 2px solid ${colors.rgba};
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: areaPulse 3s infinite;
+            animation: areaPulse-${district} 3s infinite;
             transition: all 0.3s;
           " class="area-ring">
             <span style="
-              color: #6FCF97;
+              color: ${colors.primary};
               font-size: 16px;
               font-weight: bold;
               font-family: monospace;
@@ -192,8 +250,8 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.95);
-            border: 1px solid rgba(111, 207, 151, 0.5);
-            color: #6FCF97;
+            border: 1px solid ${colors.primary};
+            color: ${colors.primary};
             padding: 8px 12px;
             border-radius: 4px;
             font-size: 11px;
@@ -205,9 +263,12 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
             pointer-events: none;
             transition: opacity 0.2s;
             z-index: 10;
-          " class="area-tip">${area}</div>
+          " class="area-tip">
+            <div>${area}</div>
+            <div style="font-size: 9px; opacity: 0.7; margin-top: 2px;">${district} Jakarta</div>
+          </div>
           <style>
-            @keyframes areaPulse {
+            @keyframes areaPulse-${district} {
               0%, 100% { transform: scale(1); opacity: 0.5; }
               50% { transform: scale(1.1); opacity: 0.8; }
             }
@@ -220,8 +281,8 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
           const ring = markerEl.querySelector('.area-ring') as HTMLElement;
           if (tip) tip.style.opacity = '1';
           if (ring) {
-            ring.style.borderColor = '#6FCF97';
-            ring.style.boxShadow = '0 0 30px rgba(111, 207, 151, 0.4)';
+            ring.style.borderColor = colors.primary;
+            ring.style.boxShadow = `0 0 30px ${colors.glow}`;
           }
         });
         markerEl.addEventListener('mouseleave', () => {
@@ -229,9 +290,14 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
           const ring = markerEl.querySelector('.area-ring') as HTMLElement;
           if (tip) tip.style.opacity = '0';
           if (ring) {
-            ring.style.borderColor = 'rgba(111, 207, 151, 0.3)';
+            ring.style.borderColor = colors.rgba;
             ring.style.boxShadow = 'none';
           }
+        });
+
+        // Click to navigate to events page filtered by area
+        markerEl.addEventListener('click', () => {
+          window.location.href = `/gatherings?area=${encodeURIComponent(area)}`;
         });
 
         const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -244,11 +310,11 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
       });
     }
 
-    // Fit to Jakarta bounds - tighter focus
+    // Fit to Jakarta bounds
     setTimeout(() => {
       const bounds = new google.maps.LatLngBounds();
-      bounds.extend({ lat: -6.30, lng: 106.75 }); // SW
-      bounds.extend({ lat: -6.12, lng: 106.92 }); // NE
+      bounds.extend({ lat: -6.30, lng: 106.75 });
+      bounds.extend({ lat: -6.12, lng: 106.92 });
       map.fitBounds(bounds, 60);
     }, 100);
   };
@@ -260,6 +326,22 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
       <div className="absolute top-0 right-0 w-12 h-12 border-r-2 border-t-2 border-[#6FCF97]/20 pointer-events-none z-20" />
       <div className="absolute bottom-0 left-0 w-12 h-12 border-l-2 border-b-2 border-[#6FCF97]/20 pointer-events-none z-20" />
       <div className="absolute bottom-0 right-0 w-12 h-12 border-r-2 border-b-2 border-[#6FCF97]/20 pointer-events-none z-20" />
+
+      {/* District Legend */}
+      <div className="absolute top-4 right-4 z-30 bg-black/80 backdrop-blur-sm border border-white/10 rounded-lg p-3">
+        <div className="text-[10px] text-white/50 uppercase tracking-wider mb-2 font-mono">Districts</div>
+        <div className="space-y-1.5">
+          {Object.entries(DISTRICT_COLORS).map(([district, colors]) => (
+            <div key={district} className="flex items-center gap-2">
+              <div 
+                className="w-2.5 h-2.5 rounded-full" 
+                style={{ backgroundColor: colors.primary, boxShadow: `0 0 6px ${colors.glow}` }}
+              />
+              <span className="text-[10px] text-white/70 font-mono uppercase">{district}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Map */}
       <MapView

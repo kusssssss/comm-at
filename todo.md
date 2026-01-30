@@ -779,3 +779,21 @@
 - [x] Remove grid overlay (cleaner look)
 - [x] Corner accents for tactical feel
 - [x] Vignette overlay for cinematic effect
+
+
+## Map Enhancements - Jan 31, 2026
+### Marker Click Navigation
+- [x] Make markers clickable to navigate to event detail pages
+- [x] Add cursor pointer on hover
+- [x] Non-auth markers link to /gatherings?area=X
+
+### District Color Coding
+- [x] West Jakarta - Coral Red (#FF6B6B)
+- [x] North Jakarta - Teal (#4ECDC4)
+- [x] South Jakarta - Mint (#6FCF97)
+- [x] East Jakarta - Gold (#FFE66D)
+- [x] Central Jakarta - Purple (#A78BFA)
+- [x] Update area markers to use district colors
+- [x] Update authenticated markers to use district colors
+- [x] Added district legend in top-right corner
+- [x] Tooltips show district name
