@@ -501,25 +501,15 @@ function ProductGridSection({ products, index }: { products: any[]; index: numbe
   );
 }
 
-// Hero Map Section - Sticky scroll with futuristic MissionMap
-// Uses @vis.gl/react-google-maps with tactical styling
+// Hero Map Section - Clean, minimal, Jakarta-focused
 function HeroMapSection({ events, index, isAuthenticated }: { events: any[]; index: number; isAuthenticated: boolean }) {
-  // Filter events with coordinates or area info
   const eventsWithLocation = events.filter((e: any) => e.latitude && e.longitude || e.area);
-
-  // Group events by area for display
-  const areaGroups = eventsWithLocation.reduce((acc: Record<string, any[]>, event: any) => {
-    const area = event.area || 'Jakarta';
-    if (!acc[area]) acc[area] = [];
-    acc[area].push(event);
-    return acc;
-  }, {});
-
+  
   if (eventsWithLocation.length === 0) return null;
 
   return (
     <section 
-      className="h-screen w-full sticky top-0 bg-[#050508]"
+      className="h-screen w-full sticky top-0 bg-black"
       style={{ zIndex: index + 1 }}
     >
       {/* Full-screen Mission Map */}
@@ -529,64 +519,31 @@ function HeroMapSection({ events, index, isAuthenticated }: { events: any[]; ind
         className="absolute inset-0 w-full h-full"
       />
 
-      {/* Content Overlay - Left Side */}
-      <div className="absolute inset-0 z-20 pointer-events-none">
-        <div className="h-full flex items-center">
-          <div className="container mx-auto px-6 md:px-8 lg:px-16">
-            <div className="max-w-lg pointer-events-auto">
-              {/* Header Badge */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-[#6FCF97]/10 border border-[#6FCF97]/30 backdrop-blur-sm">
-                  <Target className="w-5 h-5 text-[#6FCF97]" />
+      {/* Minimal bottom info bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
+        <div className="bg-gradient-to-t from-black/90 via-black/50 to-transparent pt-20 pb-8">
+          <div className="container mx-auto px-6">
+            <div className="flex items-end justify-between">
+              {/* Left: Status */}
+              <div className="pointer-events-auto">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-2 h-2 rounded-full bg-[#6FCF97] animate-pulse" />
+                  <span className="text-[#6FCF97] text-xs font-mono uppercase tracking-wider">
+                    {isAuthenticated ? 'LIVE' : 'RESTRICTED'}
+                  </span>
                 </div>
-                <span className="text-xs tracking-[0.3em] text-[#6FCF97] uppercase font-mono">
-                  {isAuthenticated ? 'CLEARANCE: ACTIVE' : 'CLEARANCE: PENDING'}
-                </span>
+                <p className="text-white/60 text-sm">
+                  {eventsWithLocation.length} active locations
+                </p>
               </div>
 
-              {/* Title */}
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight uppercase leading-none">
-                {isAuthenticated ? 'MISSION TARGETS' : 'JAKARTA OPS'}
-              </h2>
-
-              {/* Subtitle */}
-              <p className="text-lg text-neutral-300 mb-8 leading-relaxed font-light">
-                {isAuthenticated 
-                  ? `${eventsWithLocation.length} targets with coordinates confirmed.`
-                  : `${eventsWithLocation.length} targets across ${Object.keys(areaGroups).length} sectors. Authenticate to reveal coordinates.`
-                }
-              </p>
-
-              {/* Event List - Tactical Style */}
-              <div className="space-y-2 mb-8">
-                {eventsWithLocation.slice(0, 3).map((event: any, idx: number) => (
-                  <Link key={event.id} href={`/gatherings/${event.id}`}>
-                    <div className="flex items-center gap-4 p-4 bg-black/60 backdrop-blur-md border border-[#6FCF97]/20 rounded-lg hover:border-[#6FCF97]/50 transition-all cursor-pointer group">
-                      <div className="w-8 h-8 rounded bg-[#6FCF97]/10 flex items-center justify-center flex-shrink-0 border border-[#6FCF97]/30">
-                        <span className="text-[#6FCF97] font-mono text-sm font-bold">{String(idx + 1).padStart(2, '0')}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium truncate group-hover:text-[#6FCF97] transition-colors font-mono text-sm uppercase">
-                          {event.title}
-                        </p>
-                        <p className="text-neutral-500 text-xs font-mono">
-                          {isAuthenticated && event.venueName ? `LOC: ${event.venueName}` : `SECTOR: ${event.area || 'JAKARTA'}`}
-                        </p>
-                      </div>
-                      <Radio className="w-4 h-4 text-[#6FCF97]/50 group-hover:text-[#6FCF97] transition-colors animate-pulse" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-
-              {/* CTA */}
+              {/* Right: CTA if not authenticated */}
               {!isAuthenticated && (
                 <a 
                   href="/inside"
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-[#6FCF97]/10 border border-[#6FCF97] text-[#6FCF97] font-mono tracking-wider hover:bg-[#6FCF97] hover:text-black transition-all duration-300 uppercase text-sm"
+                  className="pointer-events-auto px-6 py-3 border border-[#6FCF97]/50 text-[#6FCF97] text-xs font-mono uppercase tracking-wider hover:bg-[#6FCF97] hover:text-black transition-all"
                 >
-                  <Lock className="w-4 h-4" />
-                  AUTHENTICATE TO REVEAL
+                  Unlock
                 </a>
               )}
             </div>
@@ -594,10 +551,9 @@ function HeroMapSection({ events, index, isAuthenticated }: { events: any[]; ind
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce">
-        <span className="text-xs text-[#6FCF97]/50 tracking-wider uppercase font-mono">Scroll</span>
-        <ChevronDown className="w-6 h-6 text-[#6FCF97]/50" />
+      {/* Scroll hint */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
+        <ChevronDown className="w-5 h-5 text-white/30 animate-bounce" />
       </div>
     </section>
   );

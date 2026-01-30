@@ -766,3 +766,16 @@
 - [x] Area indicators with glow effects for non-logged-in users
 - [x] Status bar showing CLEARANCE status and target count
 - [x] Vignette overlays for cinematic effect
+
+
+## Mission Map Redesign v2 - Jan 30, 2026
+### Requirements
+- [x] Remove ugly UI elements - cleaner design (removed verbose status bars)
+- [x] Focus map only on Jakarta region (tighter bounds: -6.30 to -6.12 lat)
+- [x] Minimal text - show only on hover (tooltips appear on hover)
+- [x] More futuristic faction-style aesthetic (dark map style with StyledMapType)
+- [x] Remove verbose status bars and labels (minimal bottom bar only)
+- [x] Cleaner marker design with hover tooltips (pulse dots for auth, rings for non-auth)
+- [x] Remove grid overlay (cleaner look)
+- [x] Corner accents for tactical feel
+- [x] Vignette overlay for cinematic effect

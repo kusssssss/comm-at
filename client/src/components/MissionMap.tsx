@@ -1,15 +1,15 @@
 /**
- * MissionMap - Futuristic tactical map component
- * Uses the existing MapView component with the Manus proxy
- * Features: Dark theme, pulse markers, HUD overlays
+ * MissionMap v2 - Clean, minimal, Jakarta-focused
+ * Dark tactical styling with hover-reveal markers
  */
 
-import { useRef, useEffect } from 'react';
-import { Link } from 'wouter';
-import { MapPin, Lock, Target, Radio, Crosshair } from 'lucide-react';
+import { useRef } from 'react';
 import { MapView } from '@/components/Map';
 
-// Area center coordinates for Jakarta neighborhoods
+// Jakarta center and bounds
+const JAKARTA_CENTER = { lat: -6.2088, lng: 106.8200 };
+
+// Area coordinates for non-authenticated markers
 const areaCoordinates: Record<string, { lat: number; lng: number }> = {
   'Blok M': { lat: -6.2436, lng: 106.7981 },
   'Kemang': { lat: -6.2607, lng: 106.8137 },
@@ -23,80 +23,6 @@ const areaCoordinates: Record<string, { lat: number; lng: number }> = {
   'Jakarta': { lat: -6.2088, lng: 106.8456 },
 };
 
-// Dark tactical map style
-const missionMapStyle = [
-  { elementType: "geometry", stylers: [{ color: "#0a0a0a" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#0a0a0a" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#4a5568" }] },
-  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#1a1a2e" }] },
-  { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#6FCF97" }] },
-  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#3d4f5f" }] },
-  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#0d1f12" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#1a1a2e" }] },
-  { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#0f0f1a" }] },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#1e3a5f" }] },
-  { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#6FCF97" }] },
-  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#15152a" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#050510" }] },
-];
-
-// HUD Corner decorations
-function HUDCorner({ position }: { position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' }) {
-  const positionClasses = {
-    'top-left': 'top-4 left-4',
-    'top-right': 'top-4 right-4 rotate-90',
-    'bottom-left': 'bottom-4 left-4 -rotate-90',
-    'bottom-right': 'bottom-4 right-4 rotate-180',
-  };
-
-  return (
-    <div className={`absolute ${positionClasses[position]} pointer-events-none z-20`}>
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-        <path d="M0 40V0H40" stroke="#6FCF97" strokeWidth="2" strokeOpacity="0.5" />
-        <path d="M0 30V0H30" stroke="#6FCF97" strokeWidth="1" strokeOpacity="0.3" />
-      </svg>
-    </div>
-  );
-}
-
-// Scan line animation
-function ScanLine() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-      <div 
-        className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#6FCF97]/50 to-transparent"
-        style={{
-          animation: 'scan 4s linear infinite',
-        }}
-      />
-      <style>{`
-        @keyframes scan {
-          0% { top: 0; opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { top: 100%; opacity: 0; }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-// Grid overlay
-function GridOverlay() {
-  return (
-    <div 
-      className="absolute inset-0 pointer-events-none z-10 opacity-10"
-      style={{
-        backgroundImage: `
-          linear-gradient(to right, #6FCF97 1px, transparent 1px),
-          linear-gradient(to bottom, #6FCF97 1px, transparent 1px)
-        `,
-        backgroundSize: '50px 50px',
-      }}
-    />
-  );
-}
-
 interface MissionMapProps {
   events: any[];
   isAuthenticated: boolean;
@@ -107,10 +33,8 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
   const mapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
 
-  // Filter events with location data
   const eventsWithLocation = events.filter((e: any) => e.latitude && e.longitude || e.area);
 
-  // Group events by area for non-authenticated users
   const areaGroups = eventsWithLocation.reduce((acc: Record<string, any[]>, event: any) => {
     const area = event.area || 'Jakarta';
     if (!acc[area]) acc[area] = [];
@@ -121,60 +45,113 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
   const handleMapReady = (map: google.maps.Map) => {
     mapRef.current = map;
     
-    // Apply dark tactical style
-    map.setOptions({ styles: missionMapStyle });
+    // Apply dark style via styledMapType
+    const darkStyle = new google.maps.StyledMapType([
+      { elementType: "geometry", stylers: [{ color: "#0a0a0f" }] },
+      { elementType: "labels.text.stroke", stylers: [{ color: "#0a0a0f" }] },
+      { elementType: "labels.text.fill", stylers: [{ color: "#2a2a3a" }] },
+      { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#1a1a2a" }] },
+      { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#3a5a4a" }] },
+      { featureType: "poi", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#0d1510" }] },
+      { featureType: "road", elementType: "geometry", stylers: [{ color: "#151520" }] },
+      { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#0a0a10" }] },
+      { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#1a2530" }] },
+      { featureType: "road.highway", elementType: "labels", stylers: [{ visibility: "off" }] },
+      { featureType: "transit", stylers: [{ visibility: "off" }] },
+      { featureType: "water", elementType: "geometry", stylers: [{ color: "#050508" }] },
+      { featureType: "water", elementType: "labels", stylers: [{ visibility: "off" }] },
+    ], { name: 'Dark' });
+
+    map.mapTypes.set('dark', darkStyle);
+    map.setMapTypeId('dark');
     
+    // Disable all UI
+    map.setOptions({
+      disableDefaultUI: true,
+      zoomControl: false,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+      clickableIcons: false,
+    });
+
     // Clear existing markers
     markersRef.current.forEach(marker => marker.map = null);
     markersRef.current = [];
 
     if (isAuthenticated) {
-      // LOGGED IN: Show specific location pins with pulse effect
+      // AUTHENTICATED: Show exact location pins with pulse
       eventsWithLocation.forEach((event: any) => {
         const lat = parseFloat(event.latitude);
         const lng = parseFloat(event.longitude);
         
         if (!isNaN(lat) && !isNaN(lng)) {
-          const markerContent = document.createElement('div');
-          markerContent.innerHTML = `
-            <div style="position: relative; cursor: pointer;">
-              <div style="
-                position: absolute;
-                inset: -8px;
-                border-radius: 50%;
-                background: rgba(111, 207, 151, 0.2);
-                animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-              "></div>
-              <div style="
-                position: absolute;
-                inset: -4px;
-                border-radius: 50%;
-                background: rgba(111, 207, 151, 0.3);
-                animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-              "></div>
-              <div style="
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
-                background: #6FCF97;
-                border: 2px solid white;
-                box-shadow: 0 0 20px rgba(111, 207, 151, 0.5);
-              "></div>
+          const markerEl = document.createElement('div');
+          markerEl.style.cssText = 'position: relative; cursor: pointer;';
+          markerEl.innerHTML = `
+            <div style="
+              width: 14px;
+              height: 14px;
+              background: #6FCF97;
+              border-radius: 50%;
+              box-shadow: 0 0 20px #6FCF97, 0 0 40px rgba(111, 207, 151, 0.4);
+              position: relative;
+              z-index: 2;
+            "></div>
+            <div style="
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 30px;
+              height: 30px;
+              border: 2px solid rgba(111, 207, 151, 0.6);
+              border-radius: 50%;
+              animation: pulse 2s infinite;
+            "></div>
+            <div style="
+              position: absolute;
+              bottom: calc(100% + 10px);
+              left: 50%;
+              transform: translateX(-50%);
+              background: rgba(0, 0, 0, 0.95);
+              border: 1px solid #6FCF97;
+              padding: 10px 14px;
+              border-radius: 4px;
+              white-space: nowrap;
+              opacity: 0;
+              pointer-events: none;
+              transition: opacity 0.2s;
+              z-index: 10;
+            " class="marker-tip">
+              <div style="color: #fff; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">${event.title}</div>
+              <div style="color: #6FCF97; font-size: 10px; margin-top: 3px;">${event.venueName || event.area || 'Jakarta'}</div>
             </div>
             <style>
-              @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
-              @keyframes pulse { 50% { opacity: .5; } }
+              @keyframes pulse {
+                0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+                50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+              }
             </style>
           `;
+
+          // Hover effect
+          markerEl.addEventListener('mouseenter', () => {
+            const tip = markerEl.querySelector('.marker-tip') as HTMLElement;
+            if (tip) tip.style.opacity = '1';
+          });
+          markerEl.addEventListener('mouseleave', () => {
+            const tip = markerEl.querySelector('.marker-tip') as HTMLElement;
+            if (tip) tip.style.opacity = '0';
+          });
 
           const marker = new google.maps.marker.AdvancedMarkerElement({
             map,
             position: { lat, lng },
-            title: event.title,
-            content: markerContent,
+            content: markerEl,
           });
 
-          // Add click listener
           marker.addListener('click', () => {
             window.location.href = `/gatherings/${event.id}`;
           });
@@ -183,139 +160,119 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
         }
       });
     } else {
-      // NOT LOGGED IN: Show area indicators only
+      // NOT AUTHENTICATED: Show area rings
       Object.entries(areaGroups).forEach(([area, areaEvents]) => {
         const coords = areaCoordinates[area] || areaCoordinates['Jakarta'];
-        const eventCount = areaEvents.length;
+        const count = areaEvents.length;
         
-        const markerContent = document.createElement('div');
-        markerContent.innerHTML = `
+        const markerEl = document.createElement('div');
+        markerEl.style.cssText = 'position: relative; cursor: pointer;';
+        markerEl.innerHTML = `
           <div style="
-            position: relative;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            border: 2px solid rgba(111, 207, 151, 0.5);
-            border-radius: 24px;
-            padding: 12px 20px;
-            box-shadow: 0 0 30px rgba(111, 207, 151, 0.2);
-            cursor: pointer;
-          ">
-            <div style="
-              display: flex;
-              align-items: center;
-              gap: 8px;
-            ">
-              <div style="
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: #6FCF97;
-                animation: pulse 2s infinite;
-              "></div>
-              <span style="
-                color: #6FCF97;
-                font-weight: bold;
-                font-size: 14px;
-                text-transform: uppercase;
-                letter-spacing: 0.1em;
-                font-family: monospace;
-              ">${area}</span>
-              <span style="
-                color: rgba(255,255,255,0.5);
-                font-size: 12px;
-                font-family: monospace;
-              ">(${eventCount})</span>
-            </div>
+            width: 50px;
+            height: 50px;
+            border: 2px solid rgba(111, 207, 151, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: areaPulse 3s infinite;
+            transition: all 0.3s;
+          " class="area-ring">
+            <span style="
+              color: #6FCF97;
+              font-size: 16px;
+              font-weight: bold;
+              font-family: monospace;
+            ">${count}</span>
           </div>
+          <div style="
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(111, 207, 151, 0.5);
+            color: #6FCF97;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: monospace;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 10;
+          " class="area-tip">${area}</div>
           <style>
-            @keyframes pulse { 50% { opacity: .5; } }
+            @keyframes areaPulse {
+              0%, 100% { transform: scale(1); opacity: 0.5; }
+              50% { transform: scale(1.1); opacity: 0.8; }
+            }
           </style>
         `;
+
+        // Hover effect
+        markerEl.addEventListener('mouseenter', () => {
+          const tip = markerEl.querySelector('.area-tip') as HTMLElement;
+          const ring = markerEl.querySelector('.area-ring') as HTMLElement;
+          if (tip) tip.style.opacity = '1';
+          if (ring) {
+            ring.style.borderColor = '#6FCF97';
+            ring.style.boxShadow = '0 0 30px rgba(111, 207, 151, 0.4)';
+          }
+        });
+        markerEl.addEventListener('mouseleave', () => {
+          const tip = markerEl.querySelector('.area-tip') as HTMLElement;
+          const ring = markerEl.querySelector('.area-ring') as HTMLElement;
+          if (tip) tip.style.opacity = '0';
+          if (ring) {
+            ring.style.borderColor = 'rgba(111, 207, 151, 0.3)';
+            ring.style.boxShadow = 'none';
+          }
+        });
 
         const marker = new google.maps.marker.AdvancedMarkerElement({
           map,
           position: coords,
-          title: `${area} - ${eventCount} events`,
-          content: markerContent,
+          content: markerEl,
         });
 
         markersRef.current.push(marker);
       });
     }
 
-    // Fit bounds to show all markers
-    if (markersRef.current.length > 0) {
+    // Fit to Jakarta bounds - tighter focus
+    setTimeout(() => {
       const bounds = new google.maps.LatLngBounds();
-      if (isAuthenticated) {
-        eventsWithLocation.forEach((event: any) => {
-          const lat = parseFloat(event.latitude);
-          const lng = parseFloat(event.longitude);
-          if (!isNaN(lat) && !isNaN(lng)) {
-            bounds.extend({ lat, lng });
-          }
-        });
-      } else {
-        Object.keys(areaGroups).forEach((area) => {
-          const coords = areaCoordinates[area] || areaCoordinates['Jakarta'];
-          bounds.extend(coords);
-        });
-      }
-      map.fitBounds(bounds, { top: 100, right: 100, bottom: 100, left: 100 });
-    }
+      bounds.extend({ lat: -6.30, lng: 106.75 }); // SW
+      bounds.extend({ lat: -6.12, lng: 106.92 }); // NE
+      map.fitBounds(bounds, 60);
+    }, 100);
   };
 
-  if (eventsWithLocation.length === 0) {
-    return (
-      <div className={`bg-[#050508] flex items-center justify-center ${className}`}>
-        <div className="text-center">
-          <Crosshair className="w-12 h-12 text-[#6FCF97]/30 mx-auto mb-4" />
-          <p className="text-[#6FCF97]/50 uppercase tracking-wider text-sm font-mono">No targets detected</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className={`relative ${className}`}>
-      {/* HUD Corners */}
-      <HUDCorner position="top-left" />
-      <HUDCorner position="top-right" />
-      <HUDCorner position="bottom-left" />
-      <HUDCorner position="bottom-right" />
-
-      {/* Grid Overlay */}
-      <GridOverlay />
-
-      {/* Scan Line */}
-      <ScanLine />
-
-      {/* Status Bar - Top */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-        <div className="bg-black/80 backdrop-blur-sm border border-[#6FCF97]/30 rounded-full px-6 py-2 flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#6FCF97] animate-pulse" />
-            <span className="text-[#6FCF97] text-xs font-mono uppercase">
-              {isAuthenticated ? 'CLEARANCE: ACTIVE' : 'CLEARANCE: PENDING'}
-            </span>
-          </div>
-          <div className="w-px h-4 bg-[#6FCF97]/30" />
-          <span className="text-white/60 text-xs font-mono">
-            {eventsWithLocation.length} TARGETS
-          </span>
-        </div>
-      </div>
+    <div className={`relative bg-[#050508] ${className}`}>
+      {/* Corner accents */}
+      <div className="absolute top-0 left-0 w-12 h-12 border-l-2 border-t-2 border-[#6FCF97]/20 pointer-events-none z-20" />
+      <div className="absolute top-0 right-0 w-12 h-12 border-r-2 border-t-2 border-[#6FCF97]/20 pointer-events-none z-20" />
+      <div className="absolute bottom-0 left-0 w-12 h-12 border-l-2 border-b-2 border-[#6FCF97]/20 pointer-events-none z-20" />
+      <div className="absolute bottom-0 right-0 w-12 h-12 border-r-2 border-b-2 border-[#6FCF97]/20 pointer-events-none z-20" />
 
       {/* Map */}
       <MapView
         className="w-full h-full"
-        initialCenter={{ lat: -6.2088, lng: 106.8456 }}
-        initialZoom={11}
+        initialCenter={JAKARTA_CENTER}
+        initialZoom={13}
         onMapReady={handleMapReady}
       />
 
-      {/* Vignette overlay */}
-      <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-      <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-r from-black/50 via-transparent to-black/30" />
+      {/* Vignette */}
+      <div className="absolute inset-0 pointer-events-none z-10" style={{
+        background: 'radial-gradient(ellipse at center, transparent 30%, rgba(5,5,8,0.7) 100%)'
+      }} />
     </div>
   );
 }
