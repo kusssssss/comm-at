@@ -742,3 +742,27 @@
 - [x] Show custom markers with event names
 - [x] Auto-fit bounds to show all markers
 - [x] Event legend with links to event pages
+
+
+## Hero Map Section - Jan 30, 2026
+### Requirements
+- [x] Create hero map section as first sticky scroll on homepage (HeroMapSection component)
+- [x] Not logged in: Show area indicators only (Blok M, Kemang, SCBD, etc.) with event counts
+- [x] Logged in: Show specific location pins with exact coordinates and event titles
+- [x] Move map to prominent hero position (index 0, first sticky section)
+- [x] Style map to match NOCTA aesthetic (dark gradient overlays, mint accents)
+- [x] Added area coordinates for Jakarta neighborhoods (10 areas)
+- [x] Event list overlay on left side with links to event pages
+- [x] "Sign In to Reveal Locations" CTA for non-authenticated users
+
+
+## Futuristic Mission Map - Jan 30, 2026
+### Requirements
+- [x] Install @vis.gl/react-google-maps package (installed but reverted to MapView due to proxy compatibility)
+- [x] Create futuristic dark map style (mission control aesthetic) - missionMapStyle in MissionMap.tsx
+- [x] Refactor HeroMapSection to use MissionMap component
+- [x] Add tactical overlay elements (grid lines, scan effects, HUD corners)
+- [x] Custom marker pins with pulse animations for authenticated users
+- [x] Area indicators with glow effects for non-logged-in users
+- [x] Status bar showing CLEARANCE status and target count
+- [x] Vignette overlays for cinematic effect

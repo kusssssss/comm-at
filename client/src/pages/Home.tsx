@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/_core/hooks/useAuth';
-import { Calendar, MapPin, Users, ChevronDown, Eye, EyeOff, Lock, Unlock, Shield, Layers, Navigation } from 'lucide-react';
+import { Calendar, MapPin, Users, ChevronDown, Eye, EyeOff, Lock, Unlock, Shield, Layers, Navigation, Target, Radio } from 'lucide-react';
 import Nav from '@/components/Nav';
-import { MapView } from '@/components/Map';
+import { MissionMap } from '@/components/MissionMap';
 // SponsorShowcase hidden from homepage - accessible via /sponsors
 // import { SponsorShowcase } from '@/components/SponsorShowcase';
 
@@ -501,120 +501,103 @@ function ProductGridSection({ products, index }: { products: any[]; index: numbe
   );
 }
 
-// Jakarta Events Map Section (non-sticky, before newsletter)
-function JakartaMapSection({ events }: { events: any[] }) {
-  const mapRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+// Hero Map Section - Sticky scroll with futuristic MissionMap
+// Uses @vis.gl/react-google-maps with tactical styling
+function HeroMapSection({ events, index, isAuthenticated }: { events: any[]; index: number; isAuthenticated: boolean }) {
+  // Filter events with coordinates or area info
+  const eventsWithLocation = events.filter((e: any) => e.latitude && e.longitude || e.area);
 
-  // Filter events with coordinates
-  const eventsWithCoords = events.filter((e: any) => e.latitude && e.longitude);
+  // Group events by area for display
+  const areaGroups = eventsWithLocation.reduce((acc: Record<string, any[]>, event: any) => {
+    const area = event.area || 'Jakarta';
+    if (!acc[area]) acc[area] = [];
+    acc[area].push(event);
+    return acc;
+  }, {});
 
-  const handleMapReady = (map: google.maps.Map) => {
-    mapRef.current = map;
-    
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.map = null);
-    markersRef.current = [];
-
-    // Add markers for each event
-    eventsWithCoords.forEach((event: any) => {
-      const lat = parseFloat(event.latitude);
-      const lng = parseFloat(event.longitude);
-      
-      if (!isNaN(lat) && !isNaN(lng)) {
-        // Create custom marker content
-        const markerContent = document.createElement('div');
-        markerContent.innerHTML = `
-          <div style="
-            background: var(--mint, #6FCF97);
-            color: black;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            white-space: nowrap;
-            cursor: pointer;
-          ">
-            ${event.title}
-          </div>
-        `;
-
-        const marker = new google.maps.marker.AdvancedMarkerElement({
-          map,
-          position: { lat, lng },
-          title: event.title,
-          content: markerContent,
-        });
-
-        markersRef.current.push(marker);
-      }
-    });
-
-    // Fit bounds to show all markers
-    if (markersRef.current.length > 0) {
-      const bounds = new google.maps.LatLngBounds();
-      eventsWithCoords.forEach((event: any) => {
-        const lat = parseFloat(event.latitude);
-        const lng = parseFloat(event.longitude);
-        if (!isNaN(lat) && !isNaN(lng)) {
-          bounds.extend({ lat, lng });
-        }
-      });
-      map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
-    }
-  };
-
-  if (eventsWithCoords.length === 0) return null;
+  if (eventsWithLocation.length === 0) return null;
 
   return (
-    <section className="relative z-50 bg-[var(--charcoal)] py-16">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Navigation className="w-5 h-5 text-[var(--mint)]" />
-              <h2 className="text-2xl md:text-3xl font-bold text-[var(--ivory)] tracking-tight uppercase">
-                Event Locations
-              </h2>
-            </div>
-            <p className="text-[var(--chrome)] text-sm">
-              Upcoming gatherings across Jakarta
-            </p>
-          </div>
-          <div className="hidden md:flex items-center gap-2 text-sm text-[var(--chrome)]">
-            <MapPin className="w-4 h-4" />
-            <span>{eventsWithCoords.length} locations</span>
-          </div>
-        </div>
+    <section 
+      className="h-screen w-full sticky top-0 bg-[#050508]"
+      style={{ zIndex: index + 1 }}
+    >
+      {/* Full-screen Mission Map */}
+      <MissionMap 
+        events={events} 
+        isAuthenticated={isAuthenticated} 
+        className="absolute inset-0 w-full h-full"
+      />
 
-        {/* Map Container */}
-        <div className="rounded-2xl overflow-hidden border border-[var(--charcoal)]">
-          <MapView
-            className="h-[400px] md:h-[500px]"
-            initialCenter={{ lat: -6.2088, lng: 106.8456 }} // Jakarta center
-            initialZoom={11}
-            onMapReady={handleMapReady}
-          />
-        </div>
-
-        {/* Event Legend */}
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-          {eventsWithCoords.slice(0, 4).map((event: any) => (
-            <Link key={event.id} href={`/gatherings/${event.id}`}>
-              <div className="bg-[var(--soft-black)] border border-[var(--charcoal)] rounded-lg p-4 hover:border-[var(--mint)]/30 transition-colors cursor-pointer">
-                <div className="flex items-start gap-3">
-                  <div className="w-3 h-3 rounded-full bg-[var(--mint)] mt-1 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-[var(--ivory)] font-medium text-sm truncate">{event.title}</p>
-                    <p className="text-[var(--chrome)] text-xs mt-1">{event.area || event.city || 'Jakarta'}</p>
-                  </div>
+      {/* Content Overlay - Left Side */}
+      <div className="absolute inset-0 z-20 pointer-events-none">
+        <div className="h-full flex items-center">
+          <div className="container mx-auto px-6 md:px-8 lg:px-16">
+            <div className="max-w-lg pointer-events-auto">
+              {/* Header Badge */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-[#6FCF97]/10 border border-[#6FCF97]/30 backdrop-blur-sm">
+                  <Target className="w-5 h-5 text-[#6FCF97]" />
                 </div>
+                <span className="text-xs tracking-[0.3em] text-[#6FCF97] uppercase font-mono">
+                  {isAuthenticated ? 'CLEARANCE: ACTIVE' : 'CLEARANCE: PENDING'}
+                </span>
               </div>
-            </Link>
-          ))}
+
+              {/* Title */}
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight uppercase leading-none">
+                {isAuthenticated ? 'MISSION TARGETS' : 'JAKARTA OPS'}
+              </h2>
+
+              {/* Subtitle */}
+              <p className="text-lg text-neutral-300 mb-8 leading-relaxed font-light">
+                {isAuthenticated 
+                  ? `${eventsWithLocation.length} targets with coordinates confirmed.`
+                  : `${eventsWithLocation.length} targets across ${Object.keys(areaGroups).length} sectors. Authenticate to reveal coordinates.`
+                }
+              </p>
+
+              {/* Event List - Tactical Style */}
+              <div className="space-y-2 mb-8">
+                {eventsWithLocation.slice(0, 3).map((event: any, idx: number) => (
+                  <Link key={event.id} href={`/gatherings/${event.id}`}>
+                    <div className="flex items-center gap-4 p-4 bg-black/60 backdrop-blur-md border border-[#6FCF97]/20 rounded-lg hover:border-[#6FCF97]/50 transition-all cursor-pointer group">
+                      <div className="w-8 h-8 rounded bg-[#6FCF97]/10 flex items-center justify-center flex-shrink-0 border border-[#6FCF97]/30">
+                        <span className="text-[#6FCF97] font-mono text-sm font-bold">{String(idx + 1).padStart(2, '0')}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium truncate group-hover:text-[#6FCF97] transition-colors font-mono text-sm uppercase">
+                          {event.title}
+                        </p>
+                        <p className="text-neutral-500 text-xs font-mono">
+                          {isAuthenticated && event.venueName ? `LOC: ${event.venueName}` : `SECTOR: ${event.area || 'JAKARTA'}`}
+                        </p>
+                      </div>
+                      <Radio className="w-4 h-4 text-[#6FCF97]/50 group-hover:text-[#6FCF97] transition-colors animate-pulse" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* CTA */}
+              {!isAuthenticated && (
+                <a 
+                  href="/inside"
+                  className="inline-flex items-center gap-3 px-8 py-4 bg-[#6FCF97]/10 border border-[#6FCF97] text-[#6FCF97] font-mono tracking-wider hover:bg-[#6FCF97] hover:text-black transition-all duration-300 uppercase text-sm"
+                >
+                  <Lock className="w-4 h-4" />
+                  AUTHENTICATE TO REVEAL
+                </a>
+              )}
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce">
+        <span className="text-xs text-[#6FCF97]/50 tracking-wider uppercase font-mono">Scroll</span>
+        <ChevronDown className="w-6 h-6 text-[#6FCF97]/50" />
       </div>
     </section>
   );
@@ -693,8 +676,8 @@ export default function Home() {
     isNew: true
   })) || [];
 
-  // Total sections: events + collection grid + products (stratified reality and layers hidden from homepage)
-  const totalSections = events.length + 2;
+  // Total sections: hero map + events + collection grid + products
+  const totalSections = 1 + events.length + 2;
 
   // Scroll to specific section
   const scrollToSection = (index: number) => {
@@ -741,36 +724,40 @@ export default function Home() {
         className="relative"
         style={{ height: wrapperHeight }}
       >
+        {/* Hero Map Section - First sticky section */}
+        <HeroMapSection 
+          events={events} 
+          index={0} 
+          isAuthenticated={!!user}
+        />
+
         {/* Event sections */}
         {events.length > 0 ? (
           events.map((event: any, index: number) => (
             <EventSection 
               key={event.id} 
               event={event} 
-              index={index} 
-              isFirst={index === 0}
+              index={index + 1} 
+              isFirst={false}
               sectionRef={(el: HTMLElement | null) => { sectionRefs.current[index] = el; }}
             />
           ))
         ) : (
-          <section className="h-screen w-full flex items-center justify-center bg-neutral-900 sticky top-0">
+          <section className="h-screen w-full flex items-center justify-center bg-neutral-900 sticky top-0" style={{ zIndex: 2 }}>
             <p className="text-neutral-500">No gatherings available</p>
           </section>
         )}
 
         {/* Collection Grid section */}
-        <CollectionGridSection index={events.length} />
+        <CollectionGridSection index={events.length + 1} />
 
         {/* Product Grid section */}
-        <ProductGridSection products={products} index={events.length + 1} />
+        <ProductGridSection products={products} index={events.length + 2} />
 
         {/* Stratified Reality and Layers sections hidden from homepage - available for logged-in members */}
       </div>
 
       {/* Sponsors section hidden from homepage - accessible via /sponsors */}
-
-      {/* Jakarta Events Map - shows all event locations */}
-      <JakartaMapSection events={events} />
 
       {/* Newsletter - non-sticky, at the end */}
       <NewsletterSection />
