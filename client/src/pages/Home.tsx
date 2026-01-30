@@ -4,7 +4,8 @@ import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Calendar, MapPin, Users, ChevronDown, Eye, EyeOff, Lock, Unlock, Shield, Layers } from 'lucide-react';
 import Nav from '@/components/Nav';
-import { SponsorShowcase } from '@/components/SponsorShowcase';
+// SponsorShowcase hidden from homepage - accessible via /sponsors
+// import { SponsorShowcase } from '@/components/SponsorShowcase';
 
 // Horizontal scrolling marquee component - FloatScroll style
 function MarqueeRow({ direction = 'left', speed = 30 }: { direction?: 'left' | 'right'; speed?: number }) {
@@ -572,8 +573,8 @@ export default function Home() {
     isNew: true
   })) || [];
 
-  // Total sections: events + stratified reality + collection grid + layers + products
-  const totalSections = events.length + 4;
+  // Total sections: events + collection grid + products (stratified reality and layers hidden from homepage)
+  const totalSections = events.length + 2;
 
   // Scroll to specific section
   const scrollToSection = (index: number) => {
@@ -637,21 +638,16 @@ export default function Home() {
           </section>
         )}
 
-        {/* Stratified Reality explanation section */}
-        <StratifiedRealitySection index={events.length} />
-
         {/* Collection Grid section */}
-        <CollectionGridSection index={events.length + 1} />
-
-        {/* Layers explanation section */}
-        <LayersSection index={events.length + 2} />
+        <CollectionGridSection index={events.length} />
 
         {/* Product Grid section */}
-        <ProductGridSection products={products} index={events.length + 3} />
+        <ProductGridSection products={products} index={events.length + 1} />
+
+        {/* Stratified Reality and Layers sections hidden from homepage - available for logged-in members */}
       </div>
 
-      {/* Partners/Sponsors Section */}
-      <SponsorShowcase />
+      {/* Sponsors section hidden from homepage - accessible via /sponsors */}
 
       {/* Newsletter - non-sticky, at the end */}
       <NewsletterSection />

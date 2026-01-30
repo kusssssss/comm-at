@@ -654,3 +654,43 @@
 - [x] Test EventDetail page on mobile - Fixed header padding
 - [x] Test Profile page on mobile - Fixed header and main padding
 - [x] All pages now have responsive padding (px-4 md:px-6) and text sizing
+
+
+## Website Rework - Jan 30, 2026
+
+### Color Scheme Update (Muted, Elegant, Edgy)
+- [x] Update primary accent from bright mint to muted mint green (oklch 0.72 0.10 168)
+- [x] Update background to charcoal black (oklch 0.08 0.005 265)
+- [x] Add broken white for text/cards (oklch 0.95 0.008 85)
+- [x] Add chrome accents for borders/highlights (oklch 0.70 0.015 265)
+- [x] Remove/minimize neon effects
+- [x] Update index.css with new color variables
+- [x] Update Home.tsx with new color scheme
+- [x] Update Nav.tsx with new color scheme
+
+### Hide Sections from Homepage
+- [x] Hide Sponsors section from homepage (keep /sponsors route)
+- [x] Hide Secret Society / Membership Tiers section from homepage
+- [x] Keep Stratified Reality system for logged-in members only
+
+### Button Functionality & User Flow
+- [x] Ensure all event buttons on homepage lead to event detail page
+- [x] Event detail page shows full info (date, venue, description, pricing)
+- [x] "Claim Pass" button on event detail (prep for Stripe later)
+- [x] Ensure merch buttons lead to product detail page
+- [x] Product detail has "Acquire" button (prep for Stripe later)
+
+### Seed Cool Secret Events
+- [x] Add underground music night event (THE VOID - techno warehouse)
+- [x] Add secret art exhibition event (GALLERY AFTER DARK)
+- [x] Add private dinner event (SUPPER CLUB - 12 strangers)
+- [x] Add streetwear drop event (DROP 003)
+- [x] Add rooftop party event (ROOFTOP SESSIONS)
+- [x] Add film screening event (FILM NOIR)
+- [x] Mix of Jakarta locations (Kemang, Menteng, Senopati, SCBD, Blok M, PIK)
+- [x] Added SOUTHBERPESTA from Instagram (Jan 31, 2026 at Fragrant Blok M)
+
+### Payment Gateway (PARKED - waiting for Stripe account)
+- [ ] Stripe integration for IDR payments
+- [ ] Event ticket purchases
+- [ ] Merch purchases
