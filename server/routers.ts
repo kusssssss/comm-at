@@ -822,6 +822,9 @@ export const appRouter = router({
           
           eligible.push({
             ...event,
+            // Add lineup and registration info
+            lineup: event.lineup,
+            registrationInfo: event.registrationInfo,
             // Override location fields based on reveal state
             locationText: revealInfo.locationRevealed ? event.locationText : null,
             venueName: revealInfo.venueName,

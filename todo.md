@@ -694,3 +694,11 @@
 - [ ] Stripe integration for IDR payments
 - [ ] Event ticket purchases
 - [ ] Merch purchases
+
+
+## Event Info Requirements - Jan 30, 2026
+- [x] Each event must display: Event name, Line up, Date, Time, Place, How to register / FDC info
+- [x] Check/add lineup field to events table (added via migration 0019)
+- [x] Check/add registration info field to events table (added via migration 0019)
+- [x] Update all seeded events with complete info (7 events updated)
+- [x] Update EventDetail page to show all fields clearly (Lineup with Mic2 icon, Registration with Ticket icon)

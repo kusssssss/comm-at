@@ -436,6 +436,8 @@ export const events = mysqlTable("events", {
   chapter: varchar("chapter", { length: 128 }).default("South Jakarta").notNull(),
   description: text("description"),
   tagline: varchar("tagline", { length: 255 }), // One-liner "what it is"
+  lineup: text("lineup"), // JSON array of performers/artists
+  registrationInfo: text("registrationInfo"), // How to register, FDC info, RSVP details
   rules: text("rules"), // Event code of conduct
   capacity: int("capacity").notNull(),
   

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import { Link, useParams, useLocation } from "wouter";
-import { Loader2, Calendar, MapPin, Users, Lock, Clock, CheckCircle2, QrCode, Eye, EyeOff, Unlock, AlertTriangle } from "lucide-react";
+import { Loader2, Calendar, MapPin, Users, Lock, Clock, CheckCircle2, QrCode, Eye, EyeOff, Unlock, AlertTriangle, Mic2, Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import QRCode from "react-qr-code";
@@ -330,6 +330,43 @@ export default function EventDetail() {
                 </div>
               </div>
             </div>
+
+            {/* Lineup Section */}
+            {(event as any).lineup && (
+              <div className="py-4 border-b border-border/30">
+                <div className="flex items-start gap-3">
+                  <Mic2 className="w-5 h-5 text-[var(--mint)] mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground mb-2">Line Up</p>
+                    <div className="space-y-1">
+                      {(() => {
+                        try {
+                          const lineup = JSON.parse((event as any).lineup);
+                          return lineup.map((artist: string, i: number) => (
+                            <p key={i} className="text-foreground">{artist}</p>
+                          ));
+                        } catch {
+                          return <p className="text-foreground">{(event as any).lineup}</p>;
+                        }
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Registration / FDC Info */}
+            {(event as any).registrationInfo && (
+              <div className="py-4 border-b border-border/30">
+                <div className="flex items-start gap-3">
+                  <Ticket className="w-5 h-5 text-[var(--mint)] mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground mb-2">How to Register / Entry</p>
+                    <p className="text-foreground whitespace-pre-wrap">{(event as any).registrationInfo}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Capacity */}
             <div className="py-4 border-b border-border/30">
