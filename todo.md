@@ -810,3 +810,10 @@
 - [x] Use semi-transparent fills matching district colors (8% opacity fill, 40% stroke)
 - [x] Keep @ pins visible on top of overlays (markers rendered after polygons)
 - [x] Ensure overlays don't obstruct map interaction (clickable: false)
+
+
+## Real Jakarta District Boundaries - Jan 31, 2026
+- [x] Replace rectangular boxes with real Jakarta administrative boundaries (from BPS Indonesia via GitHub)
+- [x] Use proper polygon shapes that follow actual district borders (Polygon type from GeoJSON)
+- [x] Make boundaries look authentic and professional
+- [x] Created jakartaDistricts.ts with real coordinates for all 5 districts

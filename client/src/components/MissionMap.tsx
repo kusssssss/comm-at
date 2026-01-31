@@ -5,6 +5,7 @@
 
 import { useRef } from 'react';
 import { MapView } from '@/components/Map';
+import { JAKARTA_DISTRICT_BOUNDARIES } from '@/lib/jakartaDistricts';
 
 // Jakarta center
 const JAKARTA_CENTER = { lat: -6.2088, lng: 106.8200 };
@@ -38,41 +39,7 @@ const areaToDistrict: Record<string, string> = {
   'Jakarta': 'Central',
 };
 
-// District polygon boundaries (approximate)
-const DISTRICT_POLYGONS: Record<string, { lat: number; lng: number }[]> = {
-  'West': [
-    { lat: -6.10, lng: 106.68 },
-    { lat: -6.10, lng: 106.78 },
-    { lat: -6.22, lng: 106.78 },
-    { lat: -6.30, lng: 106.78 },
-    { lat: -6.30, lng: 106.68 },
-  ],
-  'North': [
-    { lat: -6.08, lng: 106.78 },
-    { lat: -6.08, lng: 106.95 },
-    { lat: -6.15, lng: 106.95 },
-    { lat: -6.15, lng: 106.78 },
-  ],
-  'Central': [
-    { lat: -6.15, lng: 106.78 },
-    { lat: -6.15, lng: 106.88 },
-    { lat: -6.22, lng: 106.88 },
-    { lat: -6.22, lng: 106.78 },
-  ],
-  'East': [
-    { lat: -6.15, lng: 106.88 },
-    { lat: -6.15, lng: 106.98 },
-    { lat: -6.30, lng: 106.98 },
-    { lat: -6.30, lng: 106.88 },
-    { lat: -6.22, lng: 106.88 },
-  ],
-  'South': [
-    { lat: -6.22, lng: 106.78 },
-    { lat: -6.22, lng: 106.88 },
-    { lat: -6.35, lng: 106.88 },
-    { lat: -6.35, lng: 106.78 },
-  ],
-};
+// Use real Jakarta district boundaries from BPS Indonesia data
 
 // Area coordinates for non-authenticated markers
 const areaCoordinates: Record<string, { lat: number; lng: number }> = {
@@ -158,8 +125,8 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
       clickableIcons: false,
     });
 
-    // Add district polygon overlays
-    Object.entries(DISTRICT_POLYGONS).forEach(([district, path]) => {
+    // Add real district polygon overlays from BPS Indonesia data
+    Object.entries(JAKARTA_DISTRICT_BOUNDARIES).forEach(([district, path]) => {
       const colors = getDistrictColor(district);
       new google.maps.Polygon({
         paths: path,
