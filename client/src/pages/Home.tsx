@@ -512,16 +512,20 @@ function HeroMapSection({ events, index, isAuthenticated }: { events: any[]; ind
       className="h-screen w-full sticky top-0 bg-black"
       style={{ zIndex: index + 1 }}
     >
-      {/* Full-screen Jakarta Map */}
+      {/* Full-screen Jakarta Map with Leaflet dark tiles */}
       <JakartaMap 
         events={events.map((e: any) => ({
           id: e.id,
           title: e.title,
+          tagline: e.tagline,
           latitude: e.latitude,
           longitude: e.longitude,
+          location: e.location,
           district: e.area || ''
         }))} 
-        className="absolute inset-0 w-full h-full"
+        className="absolute inset-0"
+        height="100%"
+        showDistricts={true}
       />
 
       {/* Minimal bottom info bar */}

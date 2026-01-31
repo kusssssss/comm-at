@@ -1,395 +1,364 @@
-import { useState, useEffect, useMemo } from 'react';
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  Marker,
-  ZoomableGroup,
-} from 'react-simple-maps';
-import { useLocation } from 'wouter';
+import { useEffect, useState, useMemo } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { useAuth } from '@/_core/hooks/useAuth';
+import { useLocation } from 'wouter';
+
+// District metadata
+const DISTRICTS: Record<string, { name: string; nameId: string; letter: string; color: string; center: [number, number] }> = {
+  'South Jakarta': { name: 'South Jakarta', nameId: 'Jakarta Selatan', letter: 'E', color: '#6FCF97', center: [-6.2615, 106.8100] },
+  'East Jakarta': { name: 'East Jakarta', nameId: 'Jakarta Timur', letter: 'D', color: '#FFE66D', center: [-6.2250, 106.9200] },
+  'Central Jakarta': { name: 'Central Jakarta', nameId: 'Jakarta Pusat', letter: 'C', color: '#A78BFA', center: [-6.1865, 106.8340] },
+  'West Jakarta': { name: 'West Jakarta', nameId: 'Jakarta Barat', letter: 'A', color: '#FF6B6B', center: [-6.1685, 106.7650] },
+  'North Jakarta': { name: 'North Jakarta', nameId: 'Jakarta Utara', letter: 'B', color: '#4ECDC4', center: [-6.1214, 106.9000] },
+};
+
+type DistrictName = keyof typeof DISTRICTS;
+
+// Get district from coordinates
+const getDistrictFromCoords = (lat: number, lng: number): DistrictName => {
+  if (lat > -6.15 && lng < 106.80) return 'West Jakarta';
+  if (lat > -6.15 && lng >= 106.80) return 'North Jakarta';
+  if (lat >= -6.22 && lat <= -6.15 && lng >= 106.80 && lng <= 106.88) return 'Central Jakarta';
+  if (lat > -6.22 && lng > 106.88) return 'East Jakarta';
+  return 'South Jakarta';
+};
+
+// Custom @ marker icon
+const createAtMarker = (color: string, isAuth: boolean, isHovered: boolean = false) => {
+  const size = isAuth ? (isHovered ? 44 : 38) : (isHovered ? 36 : 30);
+  const fontSize = isAuth ? (isHovered ? 20 : 18) : (isHovered ? 16 : 14);
+  
+  return L.divIcon({
+    html: `
+      <div style="
+        width: ${size}px;
+        height: ${size}px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      ">
+        ${isAuth ? `
+          <div style="
+            position: absolute;
+            width: ${size}px;
+            height: ${size}px;
+            border-radius: 50%;
+            border: 2px solid ${color};
+            opacity: 0.4;
+            animation: pulse 2s ease-in-out infinite;
+          "></div>
+        ` : ''}
+        <div style="
+          width: ${size - 8}px;
+          height: ${size - 8}px;
+          border-radius: 50%;
+          background: rgba(10, 10, 10, 0.95);
+          border: 2px solid ${color};
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 0 ${isHovered ? 20 : 10}px ${color}40;
+          transition: all 0.2s ease;
+        ">
+          <span style="
+            color: ${color};
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: ${fontSize}px;
+            font-weight: bold;
+          ">@</span>
+        </div>
+      </div>
+    `,
+    className: 'custom-at-marker',
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+    popupAnchor: [0, -size/2]
+  });
+};
 
 interface EventLocation {
   id: number;
   title: string;
+  tagline?: string;
   latitude: number | null;
   longitude: number | null;
-  district: string;
+  location?: string;
+  district?: string;
 }
 
 interface JakartaMapProps {
   events?: EventLocation[];
   className?: string;
-  showLabels?: boolean;
+  height?: string;
+  showDistricts?: boolean;
 }
 
-// District colors matching the reference image
-const DISTRICT_COLORS: Record<string, { fill: string; hover: string; name: string; indonesian: string }> = {
-  'JAKARTA BARAT': { fill: '#F5B7B1', hover: '#E6A8A2', name: 'West Jakarta', indonesian: 'Jakarta Barat' },
-  'JAKARTA UTARA': { fill: '#AED6F1', hover: '#9FC7E2', name: 'North Jakarta', indonesian: 'Jakarta Utara' },
-  'JAKARTA PUSAT': { fill: '#D7BDE2', hover: '#C8AED3', name: 'Central Jakarta', indonesian: 'Jakarta Pusat' },
-  'JAKARTA TIMUR': { fill: '#F9E79F', hover: '#EAD890', name: 'East Jakarta', indonesian: 'Jakarta Timur' },
-  'JAKARTA SELATAN': { fill: '#E8DAEF', hover: '#D9CBE0', name: 'South Jakarta', indonesian: 'Jakarta Selatan' },
-  'KEPULAUAN SERIBU': { fill: '#A9DFBF', hover: '#9AD0B0', name: 'Thousand Islands', indonesian: 'Kepulauan Seribu' },
-};
+// Component to set map bounds
+function SetBounds() {
+  const map = useMap();
+  useEffect(() => {
+    map.fitBounds([[-6.38, 106.65], [-6.08, 107.05]], { padding: [20, 20] });
+  }, [map]);
+  return null;
+}
 
-// District letter markers
-const DISTRICT_LETTERS: Record<string, string> = {
-  'JAKARTA BARAT': 'A',
-  'JAKARTA UTARA': 'B',
-  'JAKARTA PUSAT': 'C',
-  'JAKARTA TIMUR': 'D',
-  'JAKARTA SELATAN': 'E',
-};
-
-// Map district names to their approximate area for non-authenticated view
-const getDistrictFromCoords = (lat: number, lng: number): string => {
-  if (lat > -6.15 && lng < 106.8) return 'West Jakarta';
-  if (lat > -6.12) return 'North Jakarta';
-  if (lat > -6.18 && lat < -6.12 && lng > 106.8 && lng < 106.88) return 'Central Jakarta';
-  if (lng > 106.85) return 'East Jakarta';
-  return 'South Jakarta';
-};
-
-export function JakartaMap({ events = [], className = '', showLabels = true }: JakartaMapProps) {
+export function JakartaMap({ 
+  events = [], 
+  className = '',
+  height = '500px',
+  showDistricts = true
+}: JakartaMapProps) {
   const [, navigate] = useLocation();
   const { user } = useAuth();
+  const isAuthenticated = !!user;
   const [hoveredDistrict, setHoveredDistrict] = useState<string | null>(null);
   const [hoveredEvent, setHoveredEvent] = useState<number | null>(null);
   const [geoData, setGeoData] = useState<any>(null);
 
   // Load GeoJSON
   useEffect(() => {
-    fetch('/jakarta-districts.json')
+    fetch('/jakarta-real-boundaries.json')
       .then(res => res.json())
       .then(data => setGeoData(data))
-      .catch(err => console.error('Failed to load Jakarta map data:', err));
+      .catch(err => console.error('Failed to load Jakarta boundaries:', err));
   }, []);
 
-  // Group events by district for non-authenticated view
+  // Group events by district
   const eventsByDistrict = useMemo(() => {
     const grouped: Record<string, EventLocation[]> = {};
+    Object.keys(DISTRICTS).forEach(d => grouped[d] = []);
     events.forEach(event => {
       if (event.latitude && event.longitude) {
         const district = getDistrictFromCoords(event.latitude, event.longitude);
-        if (!grouped[district]) grouped[district] = [];
         grouped[district].push(event);
       }
     });
     return grouped;
   }, [events]);
 
-  // District centroids for area markers
-  const districtCentroids: Record<string, [number, number]> = {
-    'West Jakarta': [106.73, -6.17],
-    'North Jakarta': [106.88, -6.12],
-    'Central Jakarta': [106.84, -6.18],
-    'East Jakarta': [106.90, -6.24],
-    'South Jakarta': [106.82, -6.28],
+  // Style function for GeoJSON
+  const getStyle = (feature: any) => {
+    const name = feature?.properties?.name;
+    const color = feature?.properties?.color || '#888888';
+    const isHovered = hoveredDistrict === name;
+    
+    return {
+      fillColor: color,
+      fillOpacity: isHovered ? 0.35 : 0.15,
+      color: color,
+      weight: isHovered ? 2.5 : 1.5,
+      opacity: isHovered ? 1 : 0.7,
+    };
   };
 
-  if (!geoData) {
-    return (
-      <div className={`flex items-center justify-center bg-gray-100 ${className}`}>
-        <div className="text-gray-500">Loading map...</div>
-      </div>
-    );
-  }
+  // Event handlers for GeoJSON features
+  const onEachFeature = (feature: any, layer: L.Layer) => {
+    const name = feature?.properties?.name;
+    
+    layer.on({
+      mouseover: () => setHoveredDistrict(name),
+      mouseout: () => setHoveredDistrict(null),
+      click: () => navigate(`/gatherings?district=${encodeURIComponent(name)}`),
+    });
+  };
 
   return (
-    <div className={`relative ${className}`}>
-      <ComposableMap
-        projection="geoMercator"
-        projectionConfig={{
-          scale: 45000,
-          center: [106.845, -6.21],
-        }}
-        style={{ width: '100%', height: '100%' }}
+    <div className={`relative w-full ${className}`} style={{ height }}>
+      <MapContainer
+        center={[-6.2088, 106.8456]}
+        zoom={11}
+        style={{ height: '100%', width: '100%', background: '#0a0a0a' }}
+        zoomControl={false}
+        attributionControl={false}
+        scrollWheelZoom={true}
+        dragging={true}
       >
-        <ZoomableGroup zoom={1} minZoom={0.8} maxZoom={4}>
-          {/* District polygons */}
-          <Geographies geography={geoData}>
-            {({ geographies }) =>
-              geographies.map((geo) => {
-                const districtName = geo.properties.Name;
-                const colors = DISTRICT_COLORS[districtName] || { fill: '#E5E5E5', hover: '#D5D5D5', name: districtName, indonesian: '' };
-                const isHovered = hoveredDistrict === districtName;
-                const letter = DISTRICT_LETTERS[districtName];
+        {/* Dark tile layer - CartoDB Dark Matter */}
+        <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
+        
+        <SetBounds />
 
-                return (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill={isHovered ? colors.hover : colors.fill}
-                    stroke="#FFFFFF"
-                    strokeWidth={1.5}
-                    style={{
-                      default: { outline: 'none', transition: 'fill 0.2s ease' },
-                      hover: { outline: 'none', cursor: 'pointer' },
-                      pressed: { outline: 'none' },
-                    }}
-                    onMouseEnter={() => setHoveredDistrict(districtName)}
-                    onMouseLeave={() => setHoveredDistrict(null)}
-                    onClick={() => navigate(`/gatherings?district=${encodeURIComponent(colors.name)}`)}
-                  />
-                );
-              })
-            }
-          </Geographies>
+        {/* Real Jakarta district boundaries from GeoJSON */}
+        {showDistricts && geoData && (
+          <GeoJSON 
+            key={hoveredDistrict || 'default'} 
+            data={geoData} 
+            style={getStyle}
+            onEachFeature={onEachFeature}
+          />
+        )}
 
-          {/* District letter labels */}
-          {showLabels && (
-            <Geographies geography={geoData}>
-              {({ geographies }) =>
-                geographies.map((geo) => {
-                  const districtName = geo.properties.Name;
-                  const letter = DISTRICT_LETTERS[districtName];
-                  const centroid = geo.properties.centroid;
-
-                  if (!letter || !centroid) return null;
-
-                  return (
-                    <Marker key={`label-${geo.rsmKey}`} coordinates={centroid}>
-                      <g transform="translate(-12, -12)">
-                        <circle
-                          r="12"
-                          cx="12"
-                          cy="12"
-                          fill="white"
-                          stroke="#333"
-                          strokeWidth="2"
-                        />
-                        <text
-                          x="12"
-                          y="12"
-                          textAnchor="middle"
-                          dominantBaseline="central"
-                          style={{
-                            fontFamily: 'system-ui, sans-serif',
-                            fontSize: '12px',
-                            fontWeight: 'bold',
-                            fill: '#333',
-                          }}
-                        >
-                          {letter}
-                        </text>
-                      </g>
-                    </Marker>
-                  );
-                })
-              }
-            </Geographies>
-          )}
-
-          {/* Event markers */}
-          {user ? (
-            // Authenticated: Show exact event locations with @ markers
-            events.map((event) => {
-              if (!event.latitude || !event.longitude) return null;
-              const isHovered = hoveredEvent === event.id;
-
+        {/* Event markers */}
+        {isAuthenticated ? (
+          // Authenticated: Show exact event locations
+          events.filter(e => e.latitude && e.longitude).map((event) => {
+            const district = getDistrictFromCoords(event.latitude!, event.longitude!);
+            const color = DISTRICTS[district]?.color || '#6FCF97';
+            const isHovered = hoveredEvent === event.id;
+            
+            return (
+              <Marker
+                key={event.id}
+                position={[event.latitude!, event.longitude!]}
+                icon={createAtMarker(color, true, isHovered)}
+                eventHandlers={{
+                  click: () => navigate(`/gatherings/${event.id}`),
+                  mouseover: () => setHoveredEvent(event.id),
+                  mouseout: () => setHoveredEvent(null),
+                }}
+              >
+                <Popup className="dark-popup">
+                  <div className="p-3 min-w-[220px]">
+                    <h3 className="font-bold text-sm text-white mb-1">{event.title}</h3>
+                    {event.tagline && <p className="text-xs text-gray-400 mb-2">{event.tagline}</p>}
+                    {event.location && <p className="text-xs text-gray-300 mb-3">{event.location}</p>}
+                    <button 
+                      onClick={() => navigate(`/gatherings/${event.id}`)}
+                      className="w-full py-2 px-3 text-xs font-medium border border-[var(--mint)] text-[var(--mint)] rounded hover:bg-[var(--mint)] hover:text-black transition-all"
+                    >
+                      VIEW DETAILS
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })
+        ) : (
+          // Non-authenticated: Show district center markers with event count
+          Object.entries(eventsByDistrict)
+            .filter(([_, districtEvents]) => districtEvents.length > 0)
+            .map(([districtName, districtEvents]) => {
+              const district = DISTRICTS[districtName];
+              if (!district) return null;
+              const isHovered = hoveredDistrict === districtName;
+              
               return (
                 <Marker
-                  key={`event-${event.id}`}
-                  coordinates={[event.longitude, event.latitude]}
-                  onClick={() => navigate(`/gatherings/${event.id}`)}
-                  onMouseEnter={() => setHoveredEvent(event.id)}
-                  onMouseLeave={() => setHoveredEvent(null)}
+                  key={districtName}
+                  position={district.center}
+                  icon={createAtMarker(district.color, false, isHovered)}
+                  eventHandlers={{
+                    click: () => navigate(`/gatherings?district=${encodeURIComponent(districtName)}`),
+                    mouseover: () => setHoveredDistrict(districtName),
+                    mouseout: () => setHoveredDistrict(null),
+                  }}
                 >
-                  <g style={{ cursor: 'pointer' }}>
-                    {/* Pulse animation ring */}
-                    <circle
-                      r={isHovered ? 20 : 16}
-                      fill="none"
-                      stroke="var(--mint)"
-                      strokeWidth="2"
-                      opacity={0.4}
-                      style={{
-                        animation: 'pulse 2s ease-in-out infinite',
-                      }}
-                    />
-                    {/* Main marker */}
-                    <circle
-                      r={isHovered ? 14 : 12}
-                      fill="var(--charcoal)"
-                      stroke="var(--mint)"
-                      strokeWidth="2"
-                    />
-                    {/* @ symbol */}
-                    <text
-                      textAnchor="middle"
-                      dominantBaseline="central"
-                      style={{
-                        fontFamily: 'system-ui, sans-serif',
-                        fontSize: isHovered ? '14px' : '12px',
-                        fontWeight: 'bold',
-                        fill: 'var(--mint)',
-                      }}
-                    >
-                      @
-                    </text>
-                    {/* Tooltip */}
-                    {isHovered && (
-                      <g transform="translate(20, -10)">
-                        <rect
-                          x="0"
-                          y="-12"
-                          width={event.title.length * 7 + 16}
-                          height="24"
-                          rx="4"
-                          fill="var(--charcoal)"
-                          stroke="var(--mint)"
-                          strokeWidth="1"
-                        />
-                        <text
-                          x="8"
-                          y="0"
-                          dominantBaseline="central"
-                          style={{
-                            fontFamily: 'system-ui, sans-serif',
-                            fontSize: '11px',
-                            fontWeight: '500',
-                            fill: 'var(--ivory)',
-                          }}
+                  <Popup className="dark-popup">
+                    <div className="p-3 min-w-[200px]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span 
+                          className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold"
+                          style={{ backgroundColor: district.color + '30', color: district.color }}
                         >
-                          {event.title}
-                        </text>
-                      </g>
-                    )}
-                  </g>
+                          {district.letter}
+                        </span>
+                        <div>
+                          <span className="font-bold text-sm text-white block">{district.name}</span>
+                          <span className="text-xs text-gray-500">{district.nameId}</span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-400 mb-3">
+                        {districtEvents.length} gathering{districtEvents.length !== 1 ? 's' : ''} in this area
+                      </p>
+                      <p className="text-xs text-[var(--mint)]">Sign in to reveal exact locations</p>
+                    </div>
+                  </Popup>
                 </Marker>
               );
             })
-          ) : (
-            // Non-authenticated: Show area indicators
-            Object.entries(eventsByDistrict).map(([district, districtEvents]) => {
-              const coords = districtCentroids[district];
-              if (!coords) return null;
-              const isHovered = hoveredDistrict === district;
+        )}
+      </MapContainer>
 
-              return (
-                <Marker
-                  key={`area-${district}`}
-                  coordinates={coords}
-                  onClick={() => navigate(`/gatherings?district=${encodeURIComponent(district)}`)}
-                  onMouseEnter={() => setHoveredDistrict(district)}
-                  onMouseLeave={() => setHoveredDistrict(null)}
+      {/* Legend overlay */}
+      <div className="absolute bottom-4 left-4 bg-black/85 backdrop-blur-md rounded-xl p-4 z-[1000] border border-white/10">
+        <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-3 font-medium">Jakarta Districts</div>
+        <div className="space-y-2">
+          {Object.entries(DISTRICTS).map(([name, district]) => {
+            const eventCount = eventsByDistrict[name]?.length || 0;
+            return (
+              <div 
+                key={name} 
+                className={`flex items-center gap-2 text-xs cursor-pointer transition-all ${
+                  hoveredDistrict === name ? 'opacity-100' : 'opacity-70 hover:opacity-100'
+                }`}
+                onMouseEnter={() => setHoveredDistrict(name)}
+                onMouseLeave={() => setHoveredDistrict(null)}
+                onClick={() => navigate(`/gatherings?district=${encodeURIComponent(name)}`)}
+              >
+                <span 
+                  className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold"
+                  style={{ backgroundColor: district.color + '30', color: district.color }}
                 >
-                  <g style={{ cursor: 'pointer' }}>
-                    {/* Outer ring */}
-                    <circle
-                      r={isHovered ? 24 : 20}
-                      fill="none"
-                      stroke="var(--mint)"
-                      strokeWidth="2"
-                      strokeDasharray="4 2"
-                      opacity={0.6}
-                    />
-                    {/* Inner circle */}
-                    <circle
-                      r={isHovered ? 16 : 14}
-                      fill="var(--charcoal)"
-                      stroke="var(--mint)"
-                      strokeWidth="2"
-                    />
-                    {/* @ symbol */}
-                    <text
-                      textAnchor="middle"
-                      dominantBaseline="central"
-                      style={{
-                        fontFamily: 'system-ui, sans-serif',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        fill: 'var(--mint)',
-                      }}
-                    >
-                      @
-                    </text>
-                    {/* Event count badge */}
-                    <g transform="translate(12, -12)">
-                      <circle r="8" fill="var(--mint)" />
-                      <text
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                        style={{
-                          fontFamily: 'system-ui, sans-serif',
-                          fontSize: '9px',
-                          fontWeight: 'bold',
-                          fill: 'var(--charcoal)',
-                        }}
-                      >
-                        {districtEvents.length}
-                      </text>
-                    </g>
-                    {/* Tooltip */}
-                    {isHovered && (
-                      <g transform="translate(28, -8)">
-                        <rect
-                          x="0"
-                          y="-10"
-                          width={district.length * 7 + 60}
-                          height="20"
-                          rx="4"
-                          fill="var(--charcoal)"
-                          stroke="var(--mint)"
-                          strokeWidth="1"
-                        />
-                        <text
-                          x="8"
-                          y="0"
-                          dominantBaseline="central"
-                          style={{
-                            fontFamily: 'system-ui, sans-serif',
-                            fontSize: '10px',
-                            fill: 'var(--ivory)',
-                          }}
-                        >
-                          {district} • {districtEvents.length} event{districtEvents.length > 1 ? 's' : ''}
-                        </text>
-                      </g>
-                    )}
-                  </g>
-                </Marker>
-              );
-            })
-          )}
-        </ZoomableGroup>
-      </ComposableMap>
-
-      {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-3 text-xs">
-        <div className="font-bold text-gray-800 mb-2">DISTRICTS</div>
-        <div className="space-y-1">
-          {Object.entries(DISTRICT_COLORS)
-            .filter(([key]) => key !== 'KEPULAUAN SERIBU')
-            .map(([key, value]) => (
-              <div key={key} className="flex items-center gap-2">
-                <div
-                  className="w-4 h-4 rounded border border-gray-300 flex items-center justify-center text-[8px] font-bold"
-                  style={{ backgroundColor: value.fill }}
-                >
-                  {DISTRICT_LETTERS[key]}
-                </div>
-                <span className="text-gray-700">{value.name}</span>
-                <span className="text-gray-400">({value.indonesian})</span>
+                  {district.letter}
+                </span>
+                <span className="text-gray-300 flex-1">{district.name}</span>
+                {eventCount > 0 && (
+                  <span 
+                    className="text-[10px] px-1.5 py-0.5 rounded-full"
+                    style={{ backgroundColor: district.color + '20', color: district.color }}
+                  >
+                    {eventCount}
+                  </span>
+                )}
               </div>
-            ))}
+            );
+          })}
         </div>
       </div>
 
-      {/* Status indicator */}
-      <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-[var(--mint)] animate-pulse" />
-        <span className="text-xs text-white font-medium">
-          {events.length} active location{events.length !== 1 ? 's' : ''}
-        </span>
+      {/* Status bar */}
+      <div className="absolute bottom-4 right-4 bg-black/85 backdrop-blur-md rounded-xl px-4 py-2.5 z-[1000] border border-white/10">
+        <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[var(--mint)] animate-pulse"></span>
+            <span className="text-gray-400 uppercase tracking-wider text-[10px]">Live</span>
+          </div>
+          <span className="text-gray-600">|</span>
+          <span className="text-gray-300">{events.filter(e => e.latitude && e.longitude).length} locations</span>
+        </div>
       </div>
 
-      {/* CSS for pulse animation */}
+      {/* Auth prompt */}
+      {!isAuthenticated && events.length > 0 && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/85 backdrop-blur-md rounded-xl px-5 py-2.5 z-[1000] border border-white/10">
+          <p className="text-xs text-gray-400">
+            <span className="text-[var(--mint)] font-medium">Sign in</span> to reveal exact event locations
+          </p>
+        </div>
+      )}
+
+      {/* Custom styles */}
       <style>{`
+        .custom-at-marker {
+          background: transparent !important;
+          border: none !important;
+        }
+        .dark-popup .leaflet-popup-content-wrapper {
+          background: rgba(10, 10, 10, 0.95) !important;
+          border: 1px solid rgba(255, 255, 255, 0.1) !important;
+          border-radius: 12px !important;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+        }
+        .dark-popup .leaflet-popup-content {
+          margin: 0 !important;
+          color: white !important;
+        }
+        .dark-popup .leaflet-popup-tip {
+          background: rgba(10, 10, 10, 0.95) !important;
+          border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        .dark-popup .leaflet-popup-close-button {
+          color: rgba(255, 255, 255, 0.5) !important;
+        }
+        .leaflet-container {
+          font-family: inherit !important;
+        }
         @keyframes pulse {
           0%, 100% { transform: scale(1); opacity: 0.4; }
-          50% { transform: scale(1.2); opacity: 0.2; }
+          50% { transform: scale(1.3); opacity: 0.1; }
         }
       `}</style>
     </div>

@@ -851,3 +851,27 @@
   - [x] Clean, polished design with legend
 - [x] Replace MissionMap with new JakartaMap on homepage
 - [ ] Test all interactions
+
+
+## Jakarta Map v5 - Leaflet Dark Tiles - Jan 31, 2026
+### Implementation
+- [ ] Install leaflet and react-leaflet packages
+- [ ] Create JakartaMap component with CartoDB Dark Matter tiles
+- [ ] Add custom @ markers for event locations
+- [ ] Add district overlay polygons (subtle, semi-transparent)
+- [ ] Add hover tooltips with event info
+- [ ] Add click navigation to event detail pages
+- [ ] Professional, clean design matching Dribbble inspiration
+
+
+## Jakarta Map v5 - Leaflet Dark Map - Jan 31, 2026
+- [x] Install leaflet and react-leaflet packages
+- [x] Use CartoDB Dark Matter tiles (free, no API key)
+- [x] Create professional dark map with real Jakarta streets
+- [x] Add real Jakarta district boundaries from TopoJSON (indonesia-atlas)
+- [x] Colored district overlays (West-red, North-teal, Central-purple, East-gold, South-mint)
+- [x] Add @ markers for event locations (authenticated users)
+- [x] Click navigation to event detail pages
+- [x] Legend and status bar
+- [x] District hover effects
+- [x] Auth-based marker display (exact pins vs district centers)
