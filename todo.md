@@ -803,3 +803,10 @@
 - [x] Replace dot markers with @ logo symbol (authenticated: glowing @, non-auth: @ in ring with count badge)
 - [x] Keep district color coding on @ markers
 - [x] Maintain hover and click functionality
+
+
+## District Overlay Zones - Jan 31, 2026
+- [x] Add colored polygon overlays for each Jakarta district (West, North, South, East, Central)
+- [x] Use semi-transparent fills matching district colors (8% opacity fill, 40% stroke)
+- [x] Keep @ pins visible on top of overlays (markers rendered after polygons)
+- [x] Ensure overlays don't obstruct map interaction (clickable: false)

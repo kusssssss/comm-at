@@ -38,6 +38,42 @@ const areaToDistrict: Record<string, string> = {
   'Jakarta': 'Central',
 };
 
+// District polygon boundaries (approximate)
+const DISTRICT_POLYGONS: Record<string, { lat: number; lng: number }[]> = {
+  'West': [
+    { lat: -6.10, lng: 106.68 },
+    { lat: -6.10, lng: 106.78 },
+    { lat: -6.22, lng: 106.78 },
+    { lat: -6.30, lng: 106.78 },
+    { lat: -6.30, lng: 106.68 },
+  ],
+  'North': [
+    { lat: -6.08, lng: 106.78 },
+    { lat: -6.08, lng: 106.95 },
+    { lat: -6.15, lng: 106.95 },
+    { lat: -6.15, lng: 106.78 },
+  ],
+  'Central': [
+    { lat: -6.15, lng: 106.78 },
+    { lat: -6.15, lng: 106.88 },
+    { lat: -6.22, lng: 106.88 },
+    { lat: -6.22, lng: 106.78 },
+  ],
+  'East': [
+    { lat: -6.15, lng: 106.88 },
+    { lat: -6.15, lng: 106.98 },
+    { lat: -6.30, lng: 106.98 },
+    { lat: -6.30, lng: 106.88 },
+    { lat: -6.22, lng: 106.88 },
+  ],
+  'South': [
+    { lat: -6.22, lng: 106.78 },
+    { lat: -6.22, lng: 106.88 },
+    { lat: -6.35, lng: 106.88 },
+    { lat: -6.35, lng: 106.78 },
+  ],
+};
+
 // Area coordinates for non-authenticated markers
 const areaCoordinates: Record<string, { lat: number; lng: number }> = {
   'Blok M': { lat: -6.2436, lng: 106.7981 },
@@ -120,6 +156,21 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
       streetViewControl: false,
       fullscreenControl: false,
       clickableIcons: false,
+    });
+
+    // Add district polygon overlays
+    Object.entries(DISTRICT_POLYGONS).forEach(([district, path]) => {
+      const colors = getDistrictColor(district);
+      new google.maps.Polygon({
+        paths: path,
+        strokeColor: colors.primary,
+        strokeOpacity: 0.4,
+        strokeWeight: 1,
+        fillColor: colors.primary,
+        fillOpacity: 0.08,
+        map,
+        clickable: false,
+      });
     });
 
     // Clear existing markers
