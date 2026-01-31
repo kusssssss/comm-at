@@ -900,3 +900,9 @@
 - [x] Add live activity feed API endpoint (event.activityFeed)
 - [x] Implement auto-refresh every 30 seconds for real-time updates
 - [x] Central Jakarta now shows as "hot" with orange glow and LIVE badge
+
+
+## Bug Fix: Map Scroll Blocking Sticky Sections
+- [x] Disable scroll-zoom on map to allow page scrolling
+- [x] Ensure users can scroll past map section to other sticky sections
+- [x] Test scroll navigation between all homepage sections

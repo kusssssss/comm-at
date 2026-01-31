@@ -271,7 +271,7 @@ export function JakartaMap({
         style={{ height: '100%', width: '100%', background: '#0a0a0a' }}
         zoomControl={false}
         attributionControl={false}
-        scrollWheelZoom={true}
+        scrollWheelZoom={false}
         dragging={true}
       >
         {/* Dark tile layer - CartoDB Dark Matter */}
