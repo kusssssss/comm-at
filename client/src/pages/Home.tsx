@@ -4,7 +4,7 @@ import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Calendar, MapPin, Users, ChevronDown, Eye, EyeOff, Lock, Unlock, Shield, Layers, Navigation, Target, Radio } from 'lucide-react';
 import Nav from '@/components/Nav';
-import { MissionMap } from '@/components/MissionMap';
+import { JakartaMap } from '@/components/JakartaMap';
 // SponsorShowcase hidden from homepage - accessible via /sponsors
 // import { SponsorShowcase } from '@/components/SponsorShowcase';
 
@@ -512,10 +512,15 @@ function HeroMapSection({ events, index, isAuthenticated }: { events: any[]; ind
       className="h-screen w-full sticky top-0 bg-black"
       style={{ zIndex: index + 1 }}
     >
-      {/* Full-screen Mission Map */}
-      <MissionMap 
-        events={events} 
-        isAuthenticated={isAuthenticated} 
+      {/* Full-screen Jakarta Map */}
+      <JakartaMap 
+        events={events.map((e: any) => ({
+          id: e.id,
+          title: e.title,
+          latitude: e.latitude,
+          longitude: e.longitude,
+          district: e.area || ''
+        }))} 
         className="absolute inset-0 w-full h-full"
       />
 

@@ -834,3 +834,20 @@
 - [x] Create legend showing district names in English and Indonesian
 - [x] Use lighter map base style (not dark tactical)
 - [x] Professional cartographic look with clear boundaries
+
+
+## Jakarta Map v4 - react-simple-maps - Jan 31, 2026
+### Implementation
+- [x] Install react-simple-maps package
+- [x] Create GeoJSON file with detailed Jakarta district boundaries (5 districts, 25+ points each)
+- [x] Build JakartaMap component with:
+  - [x] Colored district polygons (pastel colors: pink, blue, purple, gold, lavender)
+  - [x] District labels (A, B, C, D, E) with circled markers
+  - [ ] Subdistrict (kecamatan) labels - deferred
+  - [x] @ markers for event locations (authenticated users)
+  - [x] Hover tooltips with event info
+  - [x] Click navigation to event detail pages
+  - [x] Smooth hover animations
+  - [x] Clean, polished design with legend
+- [x] Replace MissionMap with new JakartaMap on homepage
+- [ ] Test all interactions
