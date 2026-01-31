@@ -4,7 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useLocation } from 'wouter';
-import { Trophy, Flame, Crown, Zap, TrendingUp } from 'lucide-react';
+import { Trophy, Flame, Crown, Zap, TrendingUp, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 
 // District metadata
@@ -159,6 +159,7 @@ export function JakartaMap({
   const [hoveredDistrict, setHoveredDistrict] = useState<string | null>(null);
   const [hoveredEvent, setHoveredEvent] = useState<number | null>(null);
   const [geoData, setGeoData] = useState<any>(null);
+  const [isLeaderboardCollapsed, setIsLeaderboardCollapsed] = useState(true); // Start collapsed on mobile
 
   // Fetch real-time district activity
   const { data: activityData, isLoading: activityLoading } = trpc.event.districtActivity.useQuery(undefined, {
@@ -410,22 +411,53 @@ export function JakartaMap({
         )}
       </MapContainer>
 
-      {/* District Competition Leaderboard */}
-      <div className="absolute top-4 left-4 bg-black/90 backdrop-blur-md rounded-xl p-4 z-[1000] border border-white/10 min-w-[220px]">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
+      {/* District Competition Leaderboard - Collapsible on mobile */}
+      <div className={`absolute top-4 left-4 bg-black/90 backdrop-blur-md rounded-xl z-[1000] border border-white/10 transition-all duration-300 ${isLeaderboardCollapsed ? 'p-2 md:p-4' : 'p-3 md:p-4'} ${isLeaderboardCollapsed ? 'w-auto' : 'w-[180px] md:w-[220px]'}`}>
+        <div className="flex items-center justify-between gap-2">
+          <div 
+            className="flex items-center gap-2 cursor-pointer md:cursor-default"
+            onClick={() => setIsLeaderboardCollapsed(!isLeaderboardCollapsed)}
+          >
             <Trophy className="w-4 h-4 text-yellow-400" />
-            <span className="text-[11px] text-gray-400 uppercase tracking-wider font-medium">District Battle</span>
+            <span className={`text-[10px] md:text-[11px] text-gray-400 uppercase tracking-wider font-medium ${isLeaderboardCollapsed ? 'hidden md:inline' : ''}`}>District Battle</span>
           </div>
-          {hotDistrict && (
-            <div className="flex items-center gap-1 px-2 py-0.5 bg-orange-500/20 rounded-full animate-pulse">
-              <Flame className="w-3 h-3 text-orange-400" />
-              <span className="text-[9px] text-orange-400 font-bold uppercase">Live</span>
-            </div>
-          )}
+          <div className="flex items-center gap-1">
+            {hotDistrict && (
+              <div className="flex items-center gap-1 px-1.5 md:px-2 py-0.5 bg-orange-500/20 rounded-full animate-pulse">
+                <Flame className="w-3 h-3 text-orange-400" />
+                <span className="text-[8px] md:text-[9px] text-orange-400 font-bold uppercase hidden md:inline">Live</span>
+              </div>
+            )}
+            {/* Mobile collapse toggle */}
+            <button 
+              className="md:hidden p-1 hover:bg-white/10 rounded transition-colors"
+              onClick={() => setIsLeaderboardCollapsed(!isLeaderboardCollapsed)}
+            >
+              {isLeaderboardCollapsed ? (
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              ) : (
+                <ChevronUp className="w-4 h-4 text-gray-400" />
+              )}
+            </button>
+          </div>
         </div>
         
-        <div className="space-y-2">
+        {/* Collapsed state shows only leader */}
+        {isLeaderboardCollapsed ? (
+          <div className="hidden md:block mt-2">
+            {districtRankings[0] && districtRankings[0].count > 0 && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-yellow-400">👑</span>
+                <span style={{ color: districtRankings[0].district.color }}>
+                  {districtRankings[0].district.name.replace(' Jakarta', '')}
+                </span>
+                <span className="text-gray-500">leads</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+        <div className="space-y-1.5 md:space-y-2 mt-2 md:mt-3">
           {districtRankings.slice(0, 5).map((item, index) => {
             const isLeader = item.rank === 1 && item.count > 0;
             const isHovered = hoveredDistrict === item.name;
@@ -433,7 +465,7 @@ export function JakartaMap({
             return (
               <div 
                 key={item.name}
-                className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${
+                className={`flex items-center gap-1.5 md:gap-2 p-1.5 md:p-2 rounded-lg cursor-pointer transition-all ${
                   item.isHot ? 'bg-gradient-to-r from-orange-500/20 to-transparent border border-orange-500/30 animate-pulse' :
                   isLeader ? 'bg-gradient-to-r from-yellow-500/20 to-transparent border border-yellow-500/30' :
                   isHovered ? 'bg-white/5' : 'hover:bg-white/5'
@@ -442,8 +474,8 @@ export function JakartaMap({
                 onMouseLeave={() => setHoveredDistrict(null)}
                 onClick={() => navigate(`/gatherings?district=${encodeURIComponent(item.name)}`)}
               >
-                {/* Rank or Hot indicator */}
-                <span className={`w-5 text-center text-xs font-bold ${
+                {/* Rank indicator - show crown for #1, fire for hot */}
+                <span className={`w-5 md:w-6 text-center text-[10px] md:text-xs font-bold flex-shrink-0 ${
                   item.isHot ? 'text-orange-400' :
                   item.rank === 1 ? 'text-yellow-400' :
                   item.rank === 2 ? 'text-gray-300' :
@@ -451,9 +483,9 @@ export function JakartaMap({
                   'text-gray-500'
                 }`}>
                   {item.isHot ? (
-                    <Flame className="w-4 h-4 inline" />
+                    <Flame className="w-3.5 h-3.5 md:w-4 md:h-4 inline" />
                   ) : item.count > 0 ? (
-                    item.rank === 1 ? '👑' : `#${item.rank}`
+                    item.rank === 1 ? <Crown className="w-3.5 h-3.5 md:w-4 md:h-4 inline text-yellow-400" /> : `#${item.rank}`
                   ) : '-'}
                 </span>
                 
@@ -508,6 +540,8 @@ export function JakartaMap({
           <span className="text-[10px] text-gray-500 uppercase">Total Events</span>
           <span className="text-sm font-bold text-white">{totalEvents}</span>
         </div>
+          </>
+        )}
       </div>
 
       {/* Status bar */}

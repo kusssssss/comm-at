@@ -906,3 +906,9 @@
 - [x] Disable scroll-zoom on map to allow page scrolling
 - [x] Ensure users can scroll past map section to other sticky sections
 - [x] Test scroll navigation between all homepage sections
+
+
+## Bug Fix: District Battle Leaderboard Issues
+- [x] Fix #1 rank (Central) being cut off at the top - now shows Crown icon properly
+- [x] Make leaderboard smaller/collapsible on mobile to not cover map - starts collapsed, tap to expand
+- [x] Ensure all 5 districts are visible in the leaderboard - all 5 districts now visible when expanded
