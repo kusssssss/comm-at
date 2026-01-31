@@ -17,12 +17,27 @@ const DISTRICTS: Record<string, { name: string; nameId: string; letter: string; 
 
 type DistrictName = keyof typeof DISTRICTS;
 
-// Get district from coordinates
+// Get district from coordinates - based on actual Jakarta administrative boundaries
+// Jakarta coordinates roughly: Lat -6.08 to -6.38, Lng 106.65 to 107.05
 const getDistrictFromCoords = (lat: number, lng: number): DistrictName => {
-  if (lat > -6.15 && lng < 106.80) return 'West Jakarta';
-  if (lat > -6.15 && lng >= 106.80) return 'North Jakarta';
-  if (lat >= -6.22 && lat <= -6.15 && lng >= 106.80 && lng <= 106.88) return 'Central Jakarta';
-  if (lat > -6.22 && lng > 106.88) return 'East Jakarta';
+  // North Jakarta: northern coastal area (lat > -6.16)
+  if (lat > -6.16) {
+    // PIK and western north area is still North Jakarta
+    if (lng > 106.78) return 'North Jakarta';
+    // Far west (Cengkareng area) is West Jakarta
+    return 'West Jakarta';
+  }
+  
+  // West Jakarta: western area with lng < 106.78
+  if (lng < 106.78) return 'West Jakarta';
+  
+  // Central Jakarta: central area roughly lat -6.16 to -6.22, lng 106.78-106.87
+  if (lat >= -6.22 && lat <= -6.16 && lng >= 106.78 && lng <= 106.87) return 'Central Jakarta';
+  
+  // East Jakarta: eastern area with lng > 106.87
+  if (lng > 106.87) return 'East Jakarta';
+  
+  // South Jakarta: everything else (southern area, lat < -6.22)
   return 'South Jakarta';
 };
 

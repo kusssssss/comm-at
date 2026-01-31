@@ -1,0 +1,306 @@
+{
+  "query": "DESCRIBE events",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute DESCRIBE events",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "title",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "slug",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "chapter",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "description",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "rules",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "capacity",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "markState",
+      "Type": "enum('outside','initiate','member','inner_circle','dormant','restricted','revoked')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "initiate",
+      "Extra": ""
+    },
+    {
+      "Field": "eventVisibility",
+      "Type": "enum('public','members','inner_circle')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "public",
+      "Extra": ""
+    },
+    {
+      "Field": "city",
+      "Type": "varchar(128)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "South Jakarta",
+      "Extra": ""
+    },
+    {
+      "Field": "locationText",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "locationRevealHoursBefore",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "24",
+      "Extra": ""
+    },
+    {
+      "Field": "locationRevealAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "eventDate",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "startDatetime",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "endDatetime",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "eventStatus",
+      "Type": "enum('draft','published','completed','cancelled')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "draft",
+      "Extra": ""
+    },
+    {
+      "Field": "publishedAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "tagline",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "eventAccessType",
+      "Type": "enum('invite_only','members_only','open')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "members_only",
+      "Extra": ""
+    },
+    {
+      "Field": "eventSecretLevel",
+      "Type": "enum('low','medium','high')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "medium",
+      "Extra": ""
+    },
+    {
+      "Field": "area",
+      "Type": "varchar(128)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "venueName",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "venueAddress",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "coordinates",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "coverImageUrl",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "tags",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "featuredOrder",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "createdBy",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "timeRevealHoursBefore",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "48",
+      "Extra": ""
+    },
+    {
+      "Field": "category",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "community",
+      "Extra": ""
+    },
+    {
+      "Field": "lineup",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "registrationInfo",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "latitude",
+      "Type": "varchar(32)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "longitude",
+      "Type": "varchar(32)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\ntitle\tvarchar(255)\tNO\t\tNULL\t\nslug\tvarchar(255)\tYES\t\tNULL\t\nchapter\tvarchar(64)\tYES\t\tNULL\t\ndescription\ttext\tYES\t\tNULL\t\nrules\ttext\tYES\t\tNULL\t\ncapacity\tint(11)\tNO\t\tNULL\t\nmarkState\tenum('outside','initiate','member','inner_circle','dormant','restricted','revoked')\tYES\t\tinitiate\t\neventVisibility\tenum('public','members','inner_circle')\tYES\t\tpublic\t\ncity\tvarchar(128)\tNO\t\tSouth Jakarta\t\nlocationText\ttext\tYES\t\tNULL\t\nlocationRevealHoursBefore\tint(11)\tYES\t\t24\t\nlocationRevealAt\ttimestamp\tYES\t\tNULL\t\neventDate\ttimestamp\tYES\t\tNULL\t\nstartDatetime\ttimestamp\tYES\t\tNULL\t\nendDatetime\ttimestamp\tYES\t\tNULL\t\neventStatus\tenum('draft','published','completed','cancelled')\tNO\t\tdraft\t\npublishedAt\ttimestamp\tYES\t\tNULL\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\ntagline\tvarchar(255)\tYES\t\tNULL\t\neventAccessType\tenum('invite_only','members_only','open')\tNO\t\tmembers_only\t\neventSecretLevel\tenum('low','medium','high')\tYES\t\tmedium\t\narea\tvarchar(128)\tYES\t\tNULL\t\nvenueName\tvarchar(255)\tYES\t\tNULL\t\nvenueAddress\ttext\tYES\t\tNULL\t\ncoordinates\tvarchar(64)\tYES\t\tNULL\t\ncoverImageUrl\ttext\tYES\t\tNULL\t\ntags\ttext\tYES\t\tNULL\t\nfeaturedOrder\tint(11)\tYES\t\t0\t\ncreatedBy\tint(11)\tYES\t\tNULL\t\ntimeRevealHoursBefore\tint(11)\tNO\t\t48\t\ncategory\tvarchar(64)\tYES\t\tcommunity\t\nlineup\ttext\tYES\t\tNULL\t\nregistrationInfo\ttext\tYES\t\tNULL\t\nlatitude\tvarchar(32)\tYES\t\tNULL\t\nlongitude\tvarchar(32)\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 1520
+}

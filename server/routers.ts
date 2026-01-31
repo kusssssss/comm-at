@@ -753,7 +753,8 @@ export const appRouter = router({
       const events = await db.getPublishedEvents();
       const now = new Date();
       
-      // Return basic event info for public display (no sensitive location data)
+      // Return basic event info for public display
+      // Include lat/lng for map district grouping (exact pins shown only to authenticated users)
       return events.map(event => ({
         id: event.id,
         title: event.title,
@@ -770,6 +771,9 @@ export const appRouter = router({
         capacity: event.capacity,
         featuredOrder: event.featuredOrder,
         eventAccessType: event.eventAccessType,
+        // Include lat/lng for map district grouping (non-auth users see district center, not exact pin)
+        latitude: event.latitude ? parseFloat(event.latitude) : null,
+        longitude: event.longitude ? parseFloat(event.longitude) : null,
         // Don't reveal venue details publicly
         venueName: null,
         venueAddress: null,

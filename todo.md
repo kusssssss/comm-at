@@ -886,3 +886,9 @@
 - [x] Animated pulse on districts with upcoming events (leading district glows brighter)
 - [x] Status bar shows which district leads
 - [x] Hover interactions on leaderboard highlight districts on map
+
+## Demo Data Seeding
+- [x] Seed 15 events with real Jakarta coordinates across all 5 districts
+- [x] Fix district detection algorithm to properly categorize events by location
+- [x] Update HeroMapSection to show all events on map (not just featured 4)
+- [x] District Battle now shows: Central (5), South (4), West (3), East (2), North (1)

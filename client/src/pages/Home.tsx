@@ -689,9 +689,9 @@ export default function Home() {
         className="relative"
         style={{ height: wrapperHeight }}
       >
-        {/* Hero Map Section - First sticky section */}
+        {/* Hero Map Section - First sticky section - use ALL events for map */}
         <HeroMapSection 
-          events={events} 
+          events={eventsData || []} 
           index={0} 
           isAuthenticated={!!user}
         />

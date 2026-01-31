@@ -1,0 +1,66 @@
+{
+  "query": "SELECT id, title, area, latitude, longitude, eventDate FROM events ORDER BY eventDate",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, title, area, latitude, longitude, eventDate FROM events ORDER BY eventDate",
+  "rows": [
+    {
+      "id": "90007",
+      "title": "SOUTHBERPESTA",
+      "area": "Blok M",
+      "latitude": "-6.2614",
+      "longitude": "106.8106",
+      "eventDate": "2026-01-31 21:00:00"
+    },
+    {
+      "id": "90005",
+      "title": "FILM NOIR",
+      "area": "Blok M",
+      "latitude": "-6.2392",
+      "longitude": "106.7925",
+      "eventDate": "2026-02-04 10:18:25"
+    },
+    {
+      "id": "90004",
+      "title": "ROOFTOP SESSIONS",
+      "area": "SCBD",
+      "latitude": "-6.2088",
+      "longitude": "106.8456",
+      "eventDate": "2026-02-06 10:18:25"
+    },
+    {
+      "id": "90003",
+      "title": "GALLERY AFTER DARK",
+      "area": "Senopati",
+      "latitude": "-6.2297",
+      "longitude": "106.8295",
+      "eventDate": "2026-02-09 10:18:25"
+    },
+    {
+      "id": "90001",
+      "title": "THE VOID",
+      "area": "Kemang",
+      "latitude": "-6.2607",
+      "longitude": "106.7816",
+      "eventDate": "2026-02-13 10:18:25"
+    },
+    {
+      "id": "90002",
+      "title": "SUPPER CLUB",
+      "area": "Menteng",
+      "latitude": "-6.2550",
+      "longitude": "106.7654",
+      "eventDate": "2026-02-20 10:18:25"
+    },
+    {
+      "id": "90006",
+      "title": "DROP 003",
+      "area": "PIK",
+      "latitude": "-6.1754",
+      "longitude": "106.8272",
+      "eventDate": "2026-02-27 10:18:25"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tarea\tlatitude\tlongitude\teventDate\n90007\tSOUTHBERPESTA\tBlok M\t-6.2614\t106.8106\t2026-01-31 21:00:00\n90005\tFILM NOIR\tBlok M\t-6.2392\t106.7925\t2026-02-04 10:18:25\n90004\tROOFTOP SESSIONS\tSCBD\t-6.2088\t106.8456\t2026-02-06 10:18:25\n90003\tGALLERY AFTER DARK\tSenopati\t-6.2297\t106.8295\t2026-02-09 10:18:25\n90001\tTHE VOID\tKemang\t-6.2607\t106.7816\t2026-02-13 10:18:25\n90002\tSUPPER CLUB\tMenteng\t-6.2550\t106.7654\t2026-02-20 10:18:25\n90006\tDROP 003\tPIK\t-6.1754\t106.8272\t2026-02-27 10:18:25\n",
+  "stderr": "",
+  "execution_time_ms": 1510
+}

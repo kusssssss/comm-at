@@ -1,0 +1,59 @@
+{
+  "query": "SELECT id, title, eventStatus, latitude, longitude FROM events",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3gXnTNTdZCBcu6S.3066a4e269ee --database cVz8pxyPALhhBHJqgpAifY --execute SELECT id, title, eventStatus, latitude, longitude FROM events",
+  "rows": [
+    {
+      "id": "90001",
+      "title": "THE VOID",
+      "eventStatus": "published",
+      "latitude": "-6.2607",
+      "longitude": "106.7816"
+    },
+    {
+      "id": "90002",
+      "title": "SUPPER CLUB",
+      "eventStatus": "published",
+      "latitude": "-6.2550",
+      "longitude": "106.7654"
+    },
+    {
+      "id": "90003",
+      "title": "GALLERY AFTER DARK",
+      "eventStatus": "published",
+      "latitude": "-6.2297",
+      "longitude": "106.8295"
+    },
+    {
+      "id": "90004",
+      "title": "ROOFTOP SESSIONS",
+      "eventStatus": "published",
+      "latitude": "-6.2088",
+      "longitude": "106.8456"
+    },
+    {
+      "id": "90005",
+      "title": "FILM NOIR",
+      "eventStatus": "published",
+      "latitude": "-6.2392",
+      "longitude": "106.7925"
+    },
+    {
+      "id": "90006",
+      "title": "DROP 003",
+      "eventStatus": "published",
+      "latitude": "-6.1754",
+      "longitude": "106.8272"
+    },
+    {
+      "id": "90007",
+      "title": "SOUTHBERPESTA",
+      "eventStatus": "published",
+      "latitude": "-6.2614",
+      "longitude": "106.8106"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\teventStatus\tlatitude\tlongitude\n90001\tTHE VOID\tpublished\t-6.2607\t106.7816\n90002\tSUPPER CLUB\tpublished\t-6.2550\t106.7654\n90003\tGALLERY AFTER DARK\tpublished\t-6.2297\t106.8295\n90004\tROOFTOP SESSIONS\tpublished\t-6.2088\t106.8456\n90005\tFILM NOIR\tpublished\t-6.2392\t106.7925\n90006\tDROP 003\tpublished\t-6.1754\t106.8272\n90007\tSOUTHBERPESTA\tpublished\t-6.2614\t106.8106\n",
+  "stderr": "",
+  "execution_time_ms": 1497
+}
