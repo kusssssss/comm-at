@@ -817,3 +817,20 @@
 - [x] Use proper polygon shapes that follow actual district borders (Polygon type from GeoJSON)
 - [x] Make boundaries look authentic and professional
 - [x] Created jakartaDistricts.ts with real coordinates for all 5 districts
+
+
+## Map Redesign v3 - Reference Style - Jan 31, 2026
+### Requirements (based on reference image)
+- [x] Change to lighter/pastel color scheme for districts:
+  - West Jakarta (A): Pink/salmon (#F5B7B1)
+  - North Jakarta (B): Light blue (#AED6F1)
+  - Central Jakarta (C): Light purple/lavender (#D7BDE2)
+  - East Jakarta (D): Beige/cream (#F9E79F)
+  - South Jakarta (E): Light lavender (#E8DAEF)
+- [x] Add district letter markers (A, B, C, D, E) as circled labels
+- [x] Show subdistrict (Kecamatan) names within each district (28 subdistricts added)
+- [x] Show surrounding areas visible via map bounds (Tangerang, Bekasi, Depok)
+- [ ] Add shopping mall/landmark markers with blue dots (future enhancement)
+- [x] Create legend showing district names in English and Indonesian
+- [x] Use lighter map base style (not dark tactical)
+- [x] Professional cartographic look with clear boundaries
