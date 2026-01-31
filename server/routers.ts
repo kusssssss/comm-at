@@ -748,6 +748,18 @@ export const appRouter = router({
   // EVENT ROUTER
   // ============================================================================
   event: router({
+    // Public: Get district activity stats for real-time leaderboard
+    districtActivity: publicProcedure.query(async () => {
+      return db.getDistrictActivityStats();
+    }),
+    
+    // Public: Get recent activity feed
+    activityFeed: publicProcedure
+      .input(z.object({ limit: z.number().min(1).max(50).optional().default(10) }).optional())
+      .query(async ({ input }) => {
+        return db.getRecentActivityFeed(input?.limit || 10);
+      }),
+
     // Public: list published events for home page (no auth required)
     publicList: publicProcedure.query(async () => {
       const events = await db.getPublishedEvents();

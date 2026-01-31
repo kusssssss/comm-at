@@ -892,3 +892,11 @@
 - [x] Fix district detection algorithm to properly categorize events by location
 - [x] Update HeroMapSection to show all events on map (not just featured 4)
 - [x] District Battle now shows: Central (5), South (4), West (3), East (2), North (1)
+
+## Real-Time District Activity Feature
+- [x] Create district_activity tracking functions in db.ts (RSVPs, check-ins, activity scores)
+- [x] Add activity pulse indicator to District Battle leaderboard
+- [x] Show "HOT" badge with fire icon on most active district
+- [x] Add live activity feed API endpoint (event.activityFeed)
+- [x] Implement auto-refresh every 30 seconds for real-time updates
+- [x] Central Jakarta now shows as "hot" with orange glow and LIVE badge

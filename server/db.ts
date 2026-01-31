@@ -3556,3 +3556,223 @@ export async function isBookmarked(userId: number, postId: number) {
   
   return result.length > 0;
 }
+
+
+// ============================================================================
+// DISTRICT ACTIVITY TRACKING
+// ============================================================================
+
+// Get district from coordinates - based on actual Jakarta administrative boundaries
+function getDistrictFromCoords(lat: number, lng: number): string {
+  // North Jakarta: northern coastal area (lat > -6.16)
+  if (lat > -6.16) {
+    if (lng > 106.78) return 'North Jakarta';
+    return 'West Jakarta';
+  }
+  
+  // West Jakarta: western area with lng < 106.78
+  if (lng < 106.78) return 'West Jakarta';
+  
+  // Central Jakarta: central area roughly lat -6.16 to -6.22, lng 106.78-106.87
+  if (lat >= -6.22 && lat <= -6.16 && lng >= 106.78 && lng <= 106.87) return 'Central Jakarta';
+  
+  // East Jakarta: eastern area with lng > 106.87
+  if (lng > 106.87) return 'East Jakarta';
+  
+  // South Jakarta: everything else (southern area, lat < -6.22)
+  return 'South Jakarta';
+}
+
+export interface DistrictActivity {
+  district: string;
+  eventCount: number;
+  recentRsvps: number;
+  recentCheckIns: number;
+  activityScore: number;
+  isHot: boolean;
+  lastActivityAt: Date | null;
+}
+
+export async function getDistrictActivityStats(): Promise<DistrictActivity[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  
+  // Get all published events with coordinates
+  const eventsResult = await db.execute(sql`
+    SELECT id, latitude, longitude 
+    FROM events 
+    WHERE eventStatus = 'published' 
+      AND latitude IS NOT NULL 
+      AND longitude IS NOT NULL
+  `);
+  const eventsList = ((eventsResult as any)[0] || []) as any[];
+  
+  // Build district to event IDs mapping
+  const districtEventIds: Record<string, number[]> = {
+    'North Jakarta': [],
+    'South Jakarta': [],
+    'East Jakarta': [],
+    'West Jakarta': [],
+    'Central Jakarta': [],
+  };
+  
+  for (const event of eventsList) {
+    if (event.latitude && event.longitude) {
+      const lat = parseFloat(event.latitude);
+      const lng = parseFloat(event.longitude);
+      const district = getDistrictFromCoords(lat, lng);
+      if (districtEventIds[district]) {
+        districtEventIds[district].push(event.id);
+      }
+    }
+  }
+  
+  // Get recent RSVPs (passes claimed in last 24 hours) per district
+  const recentRsvpsResult = await db.execute(sql`
+    SELECT ep.eventId, COUNT(*) as count
+    FROM event_passes ep
+    WHERE ep.claimedAt > ${oneDayAgo}
+    GROUP BY ep.eventId
+  `);
+  const recentRsvps = ((recentRsvpsResult as any)[0] || []) as any[];
+  
+  // Get recent check-ins (in last hour) per district
+  const recentCheckInsResult = await db.execute(sql`
+    SELECT ep.eventId, COUNT(*) as count, MAX(ep.checkedInAt) as lastCheckIn
+    FROM event_passes ep
+    WHERE ep.checkedInAt > ${oneHourAgo}
+    GROUP BY ep.eventId
+  `);
+  const recentCheckIns = ((recentCheckInsResult as any)[0] || []) as any[];
+  
+  // Calculate activity for each district
+  const districtStats: DistrictActivity[] = [];
+  let maxScore = 0;
+  
+  for (const [district, eventIds] of Object.entries(districtEventIds)) {
+    let rsvpCount = 0;
+    let checkInCount = 0;
+    let lastActivity: Date | null = null;
+    
+    for (const eventId of eventIds) {
+      const rsvp = recentRsvps.find((r: any) => r.eventId === eventId);
+      if (rsvp) rsvpCount += Number(rsvp.count);
+      
+      const checkIn = recentCheckIns.find((c: any) => c.eventId === eventId);
+      if (checkIn) {
+        checkInCount += Number(checkIn.count);
+        const checkInTime = new Date(checkIn.lastCheckIn);
+        if (!lastActivity || checkInTime > lastActivity) {
+          lastActivity = checkInTime;
+        }
+      }
+    }
+    
+    // Activity score: check-ins weighted 3x, RSVPs weighted 1x, event count weighted 0.5x
+    const activityScore = (checkInCount * 3) + (rsvpCount * 1) + (eventIds.length * 0.5);
+    if (activityScore > maxScore) maxScore = activityScore;
+    
+    districtStats.push({
+      district,
+      eventCount: eventIds.length,
+      recentRsvps: rsvpCount,
+      recentCheckIns: checkInCount,
+      activityScore,
+      isHot: false, // Will be set after we know the max
+      lastActivityAt: lastActivity,
+    });
+  }
+  
+  // Mark the most active district as "hot" if it has any activity
+  for (const stat of districtStats) {
+    stat.isHot = stat.activityScore === maxScore && stat.activityScore > 0;
+  }
+  
+  // Sort by activity score descending
+  districtStats.sort((a, b) => b.activityScore - a.activityScore);
+  
+  return districtStats;
+}
+
+// Get live activity feed (recent actions across all districts)
+export interface ActivityFeedItem {
+  type: 'rsvp' | 'check_in';
+  district: string;
+  eventTitle: string;
+  timestamp: Date;
+  count: number;
+}
+
+export async function getRecentActivityFeed(limit: number = 10): Promise<ActivityFeedItem[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  
+  // Get recent RSVPs with event info
+  const rsvpsResult = await db.execute(sql`
+    SELECT 
+      e.title as eventTitle,
+      e.latitude,
+      e.longitude,
+      ep.claimedAt as timestamp,
+      1 as count
+    FROM event_passes ep
+    JOIN events e ON ep.eventId = e.id
+    WHERE ep.claimedAt > ${oneHourAgo}
+      AND e.latitude IS NOT NULL
+      AND e.longitude IS NOT NULL
+    ORDER BY ep.claimedAt DESC
+    LIMIT ${limit}
+  `);
+  const rsvps = ((rsvpsResult as any)[0] || []) as any[];
+  
+  // Get recent check-ins with event info
+  const checkInsResult = await db.execute(sql`
+    SELECT 
+      e.title as eventTitle,
+      e.latitude,
+      e.longitude,
+      ep.checkedInAt as timestamp,
+      1 as count
+    FROM event_passes ep
+    JOIN events e ON ep.eventId = e.id
+    WHERE ep.checkedInAt > ${oneHourAgo}
+      AND e.latitude IS NOT NULL
+      AND e.longitude IS NOT NULL
+    ORDER BY ep.checkedInAt DESC
+    LIMIT ${limit}
+  `);
+  const checkIns = ((checkInsResult as any)[0] || []) as any[];
+  
+  // Combine and sort
+  const feed: ActivityFeedItem[] = [];
+  
+  for (const rsvp of rsvps) {
+    feed.push({
+      type: 'rsvp',
+      district: getDistrictFromCoords(parseFloat(rsvp.latitude), parseFloat(rsvp.longitude)),
+      eventTitle: rsvp.eventTitle,
+      timestamp: new Date(rsvp.timestamp),
+      count: 1,
+    });
+  }
+  
+  for (const checkIn of checkIns) {
+    feed.push({
+      type: 'check_in',
+      district: getDistrictFromCoords(parseFloat(checkIn.latitude), parseFloat(checkIn.longitude)),
+      eventTitle: checkIn.eventTitle,
+      timestamp: new Date(checkIn.timestamp),
+      count: 1,
+    });
+  }
+  
+  // Sort by timestamp descending
+  feed.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  
+  return feed.slice(0, limit);
+}

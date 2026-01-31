@@ -1,10 +1,11 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useLocation } from 'wouter';
-import { Trophy, TrendingUp, Flame, Crown } from 'lucide-react';
+import { Trophy, Flame, Crown, Zap, TrendingUp } from 'lucide-react';
+import { trpc } from '@/lib/trpc';
 
 // District metadata
 const DISTRICTS: Record<string, { name: string; nameId: string; letter: string; color: string; center: [number, number] }> = {
@@ -18,36 +19,24 @@ const DISTRICTS: Record<string, { name: string; nameId: string; letter: string; 
 type DistrictName = keyof typeof DISTRICTS;
 
 // Get district from coordinates - based on actual Jakarta administrative boundaries
-// Jakarta coordinates roughly: Lat -6.08 to -6.38, Lng 106.65 to 107.05
 const getDistrictFromCoords = (lat: number, lng: number): DistrictName => {
-  // North Jakarta: northern coastal area (lat > -6.16)
   if (lat > -6.16) {
-    // PIK and western north area is still North Jakarta
     if (lng > 106.78) return 'North Jakarta';
-    // Far west (Cengkareng area) is West Jakarta
     return 'West Jakarta';
   }
-  
-  // West Jakarta: western area with lng < 106.78
   if (lng < 106.78) return 'West Jakarta';
-  
-  // Central Jakarta: central area roughly lat -6.16 to -6.22, lng 106.78-106.87
   if (lat >= -6.22 && lat <= -6.16 && lng >= 106.78 && lng <= 106.87) return 'Central Jakarta';
-  
-  // East Jakarta: eastern area with lng > 106.87
   if (lng > 106.87) return 'East Jakarta';
-  
-  // South Jakarta: everything else (southern area, lat < -6.22)
   return 'South Jakarta';
 };
 
 // Custom @ marker icon with improved styling
-const createAtMarker = (color: string, isAuth: boolean, isHovered: boolean = false, rank?: number) => {
+const createAtMarker = (color: string, isAuth: boolean, isHovered: boolean = false, rank?: number, isHot?: boolean) => {
   const size = isAuth ? (isHovered ? 48 : 42) : (isHovered ? 40 : 34);
   const fontSize = isAuth ? (isHovered ? 22 : 20) : (isHovered ? 18 : 16);
   
-  // Crown for #1 district
-  const crownHtml = rank === 1 ? `
+  // Crown for #1 district, fire for hot district
+  const badgeHtml = rank === 1 ? `
     <div style="
       position: absolute;
       top: -14px;
@@ -55,6 +44,14 @@ const createAtMarker = (color: string, isAuth: boolean, isHovered: boolean = fal
       transform: translateX(-50%);
       font-size: 12px;
     ">👑</div>
+  ` : isHot ? `
+    <div style="
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+    ">🔥</div>
   ` : '';
   
   return L.divIcon({
@@ -68,7 +65,7 @@ const createAtMarker = (color: string, isAuth: boolean, isHovered: boolean = fal
         position: relative;
         cursor: pointer;
       ">
-        ${crownHtml}
+        ${badgeHtml}
         ${isAuth ? `
           <div style="
             position: absolute;
@@ -89,6 +86,17 @@ const createAtMarker = (color: string, isAuth: boolean, isHovered: boolean = fal
             animation: pulse 2s ease-in-out infinite 0.5s;
           "></div>
         ` : ''}
+        ${isHot ? `
+          <div style="
+            position: absolute;
+            width: ${size + 15}px;
+            height: ${size + 15}px;
+            border-radius: 50%;
+            border: 2px solid #FF6B35;
+            opacity: 0.6;
+            animation: hotPulse 1s ease-in-out infinite;
+          "></div>
+        ` : ''}
         <div style="
           width: ${size - 6}px;
           height: ${size - 6}px;
@@ -98,35 +106,29 @@ const createAtMarker = (color: string, isAuth: boolean, isHovered: boolean = fal
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 0 ${isHovered ? 25 : 15}px ${color}50, inset 0 0 10px ${color}20;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          transform: ${isHovered ? 'scale(1.1)' : 'scale(1)'};
-        ">
-          <span style="
-            color: ${color};
-            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-            font-size: ${fontSize}px;
-            font-weight: 800;
-            text-shadow: 0 0 10px ${color}80;
-          ">@</span>
-        </div>
+          font-size: ${fontSize}px;
+          font-weight: 700;
+          color: ${color};
+          font-family: system-ui, -apple-system, sans-serif;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+          text-shadow: 0 0 8px ${color}40;
+          transition: all 0.2s ease;
+        ">@</div>
       </div>
     `,
     className: 'custom-at-marker',
     iconSize: [size, size],
-    iconAnchor: [size/2, size/2],
-    popupAnchor: [0, -size/2]
+    iconAnchor: [size / 2, size / 2],
   });
 };
 
 interface EventLocation {
   id: number;
   title: string;
-  tagline?: string;
-  latitude: number | null;
-  longitude: number | null;
+  tagline?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   location?: string;
-  district?: string;
 }
 
 interface JakartaMapProps {
@@ -158,6 +160,12 @@ export function JakartaMap({
   const [hoveredEvent, setHoveredEvent] = useState<number | null>(null);
   const [geoData, setGeoData] = useState<any>(null);
 
+  // Fetch real-time district activity
+  const { data: activityData, isLoading: activityLoading } = trpc.event.districtActivity.useQuery(undefined, {
+    refetchInterval: 30000, // Refresh every 30 seconds
+    staleTime: 15000,
+  });
+
   // Load GeoJSON
   useEffect(() => {
     fetch('/jakarta-real-boundaries.json')
@@ -179,14 +187,22 @@ export function JakartaMap({
     return grouped;
   }, [events]);
 
-  // District rankings by event count
+  // District rankings by event count, enhanced with activity data
   const districtRankings = useMemo(() => {
     const rankings = Object.entries(eventsByDistrict)
-      .map(([name, events]) => ({
-        name,
-        count: events.length,
-        district: DISTRICTS[name],
-      }))
+      .map(([name, events]) => {
+        const activity = activityData?.find(a => a.district === name);
+        return {
+          name,
+          count: events.length,
+          district: DISTRICTS[name],
+          recentRsvps: activity?.recentRsvps || 0,
+          recentCheckIns: activity?.recentCheckIns || 0,
+          activityScore: activity?.activityScore || 0,
+          isHot: activity?.isHot || false,
+          lastActivityAt: activity?.lastActivityAt ? new Date(activity.lastActivityAt) : null,
+        };
+      })
       .sort((a, b) => b.count - a.count);
     
     // Assign ranks (handle ties)
@@ -197,11 +213,21 @@ export function JakartaMap({
       }
       return { ...item, rank: item.count > 0 ? currentRank : 0 };
     });
-  }, [eventsByDistrict]);
+  }, [eventsByDistrict, activityData]);
+
+  // Find the hot district
+  const hotDistrict = useMemo(() => {
+    return districtRankings.find(d => d.isHot);
+  }, [districtRankings]);
 
   // Get rank for a district
   const getDistrictRank = (name: string): number => {
     return districtRankings.find(r => r.name === name)?.rank || 0;
+  };
+
+  // Check if district is hot
+  const isDistrictHot = (name: string): boolean => {
+    return districtRankings.find(r => r.name === name)?.isHot || false;
   };
 
   // Style function for GeoJSON
@@ -211,14 +237,15 @@ export function JakartaMap({
     const isHovered = hoveredDistrict === name;
     const rank = getDistrictRank(name);
     const isLeader = rank === 1 && eventsByDistrict[name]?.length > 0;
+    const isHot = isDistrictHot(name);
     
     return {
       fillColor: color,
-      fillOpacity: isLeader ? 0.4 : (isHovered ? 0.3 : 0.12),
-      color: color,
-      weight: isLeader ? 3 : (isHovered ? 2.5 : 1.5),
-      opacity: isLeader ? 1 : (isHovered ? 1 : 0.6),
-      dashArray: isLeader ? '' : '',
+      fillOpacity: isHot ? 0.45 : (isLeader ? 0.4 : (isHovered ? 0.3 : 0.12)),
+      color: isHot ? '#FF6B35' : color,
+      weight: isHot ? 3.5 : (isLeader ? 3 : (isHovered ? 2.5 : 1.5)),
+      opacity: isHot ? 1 : (isLeader ? 1 : (isHovered ? 1 : 0.6)),
+      dashArray: '',
     };
   };
 
@@ -255,7 +282,7 @@ export function JakartaMap({
         {/* Real Jakarta district boundaries from GeoJSON */}
         {showDistricts && geoData && (
           <GeoJSON 
-            key={`${hoveredDistrict}-${leadingDistrict?.name}`} 
+            key={`${hoveredDistrict}-${leadingDistrict?.name}-${hotDistrict?.name}`} 
             data={geoData} 
             style={getStyle}
             onEachFeature={onEachFeature}
@@ -270,12 +297,13 @@ export function JakartaMap({
             const color = DISTRICTS[district]?.color || '#6FCF97';
             const isHovered = hoveredEvent === event.id;
             const rank = getDistrictRank(district);
+            const isHot = isDistrictHot(district);
             
             return (
               <Marker
                 key={event.id}
                 position={[event.latitude!, event.longitude!]}
-                icon={createAtMarker(color, true, isHovered, rank)}
+                icon={createAtMarker(color, true, isHovered, rank, isHot)}
                 eventHandlers={{
                   click: () => navigate(`/gatherings/${event.id}`),
                   mouseover: () => setHoveredEvent(event.id),
@@ -286,11 +314,18 @@ export function JakartaMap({
                   <div className="p-3 min-w-[240px]">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-bold text-sm text-white">{event.title}</h3>
-                      {rank === 1 && (
-                        <span className="text-yellow-400 text-xs flex items-center gap-1">
-                          <Crown className="w-3 h-3" /> #1
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {isHot && (
+                          <span className="text-orange-400 text-xs flex items-center gap-1">
+                            <Flame className="w-3 h-3" /> HOT
+                          </span>
+                        )}
+                        {rank === 1 && (
+                          <span className="text-yellow-400 text-xs flex items-center gap-1">
+                            <Crown className="w-3 h-3" /> #1
+                          </span>
+                        )}
+                      </div>
                     </div>
                     {event.tagline && <p className="text-xs text-gray-400 mb-2">{event.tagline}</p>}
                     {event.location && (
@@ -320,12 +355,13 @@ export function JakartaMap({
               if (!district) return null;
               const isHovered = hoveredDistrict === districtName;
               const rank = getDistrictRank(districtName);
+              const isHot = isDistrictHot(districtName);
               
               return (
                 <Marker
                   key={districtName}
                   position={district.center}
-                  icon={createAtMarker(district.color, false, isHovered, rank)}
+                  icon={createAtMarker(district.color, false, isHovered, rank, isHot)}
                   eventHandlers={{
                     click: () => navigate(`/gatherings?district=${encodeURIComponent(districtName)}`),
                     mouseover: () => setHoveredDistrict(districtName),
@@ -347,25 +383,25 @@ export function JakartaMap({
                             <span className="text-[10px] text-gray-500">{district.nameId}</span>
                           </div>
                         </div>
-                        {rank === 1 && (
-                          <span className="text-yellow-400">👑</span>
-                        )}
+                        <div className="flex items-center gap-1">
+                          {isHot && (
+                            <span className="text-orange-400 text-xs">🔥</span>
+                          )}
+                          {rank === 1 && (
+                            <span className="text-yellow-400 text-xs">👑</span>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs text-gray-400">
-                          {districtEvents.length} gathering{districtEvents.length !== 1 ? 's' : ''}
-                        </p>
-                        {rank > 0 && rank <= 3 && (
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                            rank === 1 ? 'bg-yellow-500/20 text-yellow-400' :
-                            rank === 2 ? 'bg-gray-400/20 text-gray-300' :
-                            'bg-orange-500/20 text-orange-400'
-                          }`}>
-                            #{rank}
-                          </span>
-                        )}
+                      <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
+                        <span>{districtEvents.length} gatherings</span>
+                        {isHot && <span className="text-orange-400 font-medium">Most Active</span>}
                       </div>
-                      <p className="text-xs text-[var(--mint)]">Sign in to reveal exact locations</p>
+                      <button 
+                        onClick={() => navigate(`/gatherings?district=${encodeURIComponent(districtName)}`)}
+                        className="w-full py-2 px-3 text-xs font-medium border border-[var(--mint)] text-[var(--mint)] rounded hover:bg-[var(--mint)] hover:text-black transition-all"
+                      >
+                        EXPLORE DISTRICT
+                      </button>
                     </div>
                   </Popup>
                 </Marker>
@@ -375,10 +411,18 @@ export function JakartaMap({
       </MapContainer>
 
       {/* District Competition Leaderboard */}
-      <div className="absolute top-4 left-4 bg-black/90 backdrop-blur-md rounded-xl p-4 z-[1000] border border-white/10 min-w-[200px]">
-        <div className="flex items-center gap-2 mb-3">
-          <Trophy className="w-4 h-4 text-yellow-400" />
-          <span className="text-[11px] text-gray-400 uppercase tracking-wider font-medium">District Battle</span>
+      <div className="absolute top-4 left-4 bg-black/90 backdrop-blur-md rounded-xl p-4 z-[1000] border border-white/10 min-w-[220px]">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-4 h-4 text-yellow-400" />
+            <span className="text-[11px] text-gray-400 uppercase tracking-wider font-medium">District Battle</span>
+          </div>
+          {hotDistrict && (
+            <div className="flex items-center gap-1 px-2 py-0.5 bg-orange-500/20 rounded-full animate-pulse">
+              <Flame className="w-3 h-3 text-orange-400" />
+              <span className="text-[9px] text-orange-400 font-bold uppercase">Live</span>
+            </div>
+          )}
         </div>
         
         <div className="space-y-2">
@@ -390,6 +434,7 @@ export function JakartaMap({
               <div 
                 key={item.name}
                 className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${
+                  item.isHot ? 'bg-gradient-to-r from-orange-500/20 to-transparent border border-orange-500/30 animate-pulse' :
                   isLeader ? 'bg-gradient-to-r from-yellow-500/20 to-transparent border border-yellow-500/30' :
                   isHovered ? 'bg-white/5' : 'hover:bg-white/5'
                 }`}
@@ -397,45 +442,58 @@ export function JakartaMap({
                 onMouseLeave={() => setHoveredDistrict(null)}
                 onClick={() => navigate(`/gatherings?district=${encodeURIComponent(item.name)}`)}
               >
-                {/* Rank */}
+                {/* Rank or Hot indicator */}
                 <span className={`w-5 text-center text-xs font-bold ${
+                  item.isHot ? 'text-orange-400' :
                   item.rank === 1 ? 'text-yellow-400' :
                   item.rank === 2 ? 'text-gray-300' :
                   item.rank === 3 ? 'text-orange-400' :
                   'text-gray-500'
                 }`}>
-                  {item.count > 0 ? (
+                  {item.isHot ? (
+                    <Flame className="w-4 h-4 inline" />
+                  ) : item.count > 0 ? (
                     item.rank === 1 ? '👑' : `#${item.rank}`
                   ) : '-'}
                 </span>
                 
                 {/* District letter badge */}
                 <span 
-                  className="w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold"
+                  className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold ${item.isHot ? 'ring-2 ring-orange-400/50' : ''}`}
                   style={{ backgroundColor: item.district.color + '25', color: item.district.color }}
                 >
                   {item.district.letter}
                 </span>
                 
-                {/* Name */}
-                <span className={`flex-1 text-xs ${isLeader ? 'text-white font-medium' : 'text-gray-400'}`}>
-                  {item.district.name.replace(' Jakarta', '')}
-                </span>
+                {/* Name and activity */}
+                <div className="flex-1 min-w-0">
+                  <span className={`text-xs block truncate ${item.isHot ? 'text-orange-300 font-medium' : isLeader ? 'text-white font-medium' : 'text-gray-400'}`}>
+                    {item.district.name.replace(' Jakarta', '')}
+                  </span>
+                  {item.isHot && (item.recentRsvps > 0 || item.recentCheckIns > 0) && (
+                    <span className="text-[9px] text-orange-400/80 flex items-center gap-1">
+                      <Zap className="w-2.5 h-2.5" />
+                      {item.recentCheckIns > 0 && `${item.recentCheckIns} check-ins`}
+                      {item.recentCheckIns > 0 && item.recentRsvps > 0 && ' · '}
+                      {item.recentRsvps > 0 && `${item.recentRsvps} RSVPs`}
+                    </span>
+                  )}
+                </div>
                 
                 {/* Event count with bar */}
                 <div className="flex items-center gap-2">
-                  <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div className="w-12 h-1.5 bg-white/10 rounded-full overflow-hidden">
                     <div 
-                      className="h-full rounded-full transition-all duration-500"
+                      className={`h-full rounded-full transition-all duration-500 ${item.isHot ? 'animate-pulse' : ''}`}
                       style={{ 
                         width: `${(item.count / Math.max(...districtRankings.map(r => r.count), 1)) * 100}%`,
-                        backgroundColor: item.district.color 
+                        backgroundColor: item.isHot ? '#FF6B35' : item.district.color 
                       }}
                     />
                   </div>
                   <span 
-                    className="text-xs font-mono font-bold min-w-[20px] text-right"
-                    style={{ color: item.count > 0 ? item.district.color : '#666' }}
+                    className="text-xs font-mono font-bold min-w-[16px] text-right"
+                    style={{ color: item.count > 0 ? (item.isHot ? '#FF6B35' : item.district.color) : '#666' }}
                   >
                     {item.count}
                   </span>
@@ -461,11 +519,22 @@ export function JakartaMap({
           </div>
           <span className="text-gray-600">|</span>
           <span className="text-gray-300">{totalEvents} locations</span>
-          {leadingDistrict && (
+          {hotDistrict && (
             <>
               <span className="text-gray-600">|</span>
               <span className="flex items-center gap-1">
-                <Flame className="w-3 h-3 text-orange-400" />
+                <Flame className="w-3 h-3 text-orange-400 animate-pulse" />
+                <span className="text-orange-400 font-medium">
+                  {hotDistrict.district.name.replace(' Jakarta', '')} is hot
+                </span>
+              </span>
+            </>
+          )}
+          {!hotDistrict && leadingDistrict && (
+            <>
+              <span className="text-gray-600">|</span>
+              <span className="flex items-center gap-1">
+                <TrendingUp className="w-3 h-3 text-yellow-400" />
                 <span style={{ color: leadingDistrict.district.color }}>
                   {leadingDistrict.district.name.replace(' Jakarta', '')} leads
                 </span>
@@ -510,6 +579,10 @@ export function JakartaMap({
         @keyframes pulse {
           0%, 100% { transform: scale(1); opacity: 0.3; }
           50% { transform: scale(1.15); opacity: 0.1; }
+        }
+        @keyframes hotPulse {
+          0%, 100% { transform: scale(1); opacity: 0.6; }
+          50% { transform: scale(1.2); opacity: 0.3; }
         }
       `}</style>
     </div>
