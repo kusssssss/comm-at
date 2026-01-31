@@ -875,3 +875,14 @@
 - [x] Legend and status bar
 - [x] District hover effects
 - [x] Auth-based marker display (exact pins vs district centers)
+
+
+## Map Event Markers & District Competition - Jan 31, 2026
+- [x] Add @ custom markers for each event location on the map (with glow effects and pulse animation)
+- [x] Show event count per district (in leaderboard and legend)
+- [x] Implement district competition ranking (most events = #1, with crown emoji)
+- [x] Visual indicator showing which district is "winning" (highlighted fill, crown on markers)
+- [x] Leaderboard panel showing district rankings by event volume (top-left with progress bars)
+- [x] Animated pulse on districts with upcoming events (leading district glows brighter)
+- [x] Status bar shows which district leads
+- [x] Hover interactions on leaderboard highlight districts on map
