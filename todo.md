@@ -797,3 +797,9 @@
 - [x] Update authenticated markers to use district colors
 - [x] Added district legend in top-right corner
 - [x] Tooltips show district name
+
+
+## Map Marker Branding - Jan 31, 2026
+- [x] Replace dot markers with @ logo symbol (authenticated: glowing @, non-auth: @ in ring with count badge)
+- [x] Keep district color coding on @ markers
+- [x] Maintain hover and click functionality

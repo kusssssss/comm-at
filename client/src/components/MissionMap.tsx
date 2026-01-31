@@ -139,23 +139,28 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
           const markerEl = document.createElement('div');
           markerEl.style.cssText = 'position: relative; cursor: pointer;';
           markerEl.innerHTML = `
-            <div class="marker-dot" style="
-              width: 14px;
-              height: 14px;
-              background: ${colors.primary};
-              border-radius: 50%;
-              box-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.glow};
+            <div class="marker-at" style="
+              width: 32px;
+              height: 32px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 24px;
+              font-weight: bold;
+              color: ${colors.primary};
+              text-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.glow};
               position: relative;
               z-index: 2;
-              transition: transform 0.2s;
-            "></div>
+              transition: transform 0.2s, text-shadow 0.2s;
+              font-family: system-ui, -apple-system, sans-serif;
+            ">@</div>
             <div style="
               position: absolute;
               top: 50%;
               left: 50%;
               transform: translate(-50%, -50%);
-              width: 30px;
-              height: 30px;
+              width: 44px;
+              height: 44px;
               border: 2px solid ${colors.rgba};
               border-radius: 50%;
               animation: pulse-${district} 2s infinite;
@@ -190,15 +195,21 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
           // Hover effect
           markerEl.addEventListener('mouseenter', () => {
             const tip = markerEl.querySelector('.marker-tip') as HTMLElement;
-            const dot = markerEl.querySelector('.marker-dot') as HTMLElement;
+            const at = markerEl.querySelector('.marker-at') as HTMLElement;
             if (tip) tip.style.opacity = '1';
-            if (dot) dot.style.transform = 'scale(1.3)';
+            if (at) {
+              at.style.transform = 'scale(1.2)';
+              at.style.textShadow = `0 0 30px ${colors.primary}, 0 0 60px ${colors.glow}`;
+            }
           });
           markerEl.addEventListener('mouseleave', () => {
             const tip = markerEl.querySelector('.marker-tip') as HTMLElement;
-            const dot = markerEl.querySelector('.marker-dot') as HTMLElement;
+            const at = markerEl.querySelector('.marker-at') as HTMLElement;
             if (tip) tip.style.opacity = '0';
-            if (dot) dot.style.transform = 'scale(1)';
+            if (at) {
+              at.style.transform = 'scale(1)';
+              at.style.textShadow = `0 0 20px ${colors.primary}, 0 0 40px ${colors.glow}`;
+            }
           });
 
           const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -236,11 +247,29 @@ export function MissionMap({ events, isAuthenticated, className = '' }: MissionM
             justify-content: center;
             animation: areaPulse-${district} 3s infinite;
             transition: all 0.3s;
+            position: relative;
           " class="area-ring">
             <span style="
               color: ${colors.primary};
-              font-size: 16px;
+              font-size: 28px;
               font-weight: bold;
+              font-family: system-ui, -apple-system, sans-serif;
+              text-shadow: 0 0 15px ${colors.glow};
+            ">@</span>
+            <span style="
+              position: absolute;
+              top: -6px;
+              right: -6px;
+              background: ${colors.primary};
+              color: #000;
+              font-size: 11px;
+              font-weight: bold;
+              width: 18px;
+              height: 18px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
               font-family: monospace;
             ">${count}</span>
           </div>
