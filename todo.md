@@ -912,3 +912,11 @@
 - [x] Fix #1 rank (Central) being cut off at the top - now shows Crown icon properly
 - [x] Make leaderboard smaller/collapsible on mobile to not cover map - starts collapsed, tap to expand
 - [x] Ensure all 5 districts are visible in the leaderboard - all 5 districts now visible when expanded
+
+
+## Project Migration to Manus Team Account
+- [x] Export database schema and create SQL migration files (21 migration files)
+- [x] Document all environment variables with descriptions (ENV_VARIABLES.md)
+- [x] Create setup guide with step-by-step instructions (MIGRATION_README.md)
+- [x] Package all source code files (comm-at-source.zip - 93MB)
+- [x] Create comprehensive migration README with database schema docs
